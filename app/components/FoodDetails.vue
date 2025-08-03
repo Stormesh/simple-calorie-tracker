@@ -1,9 +1,14 @@
 <script setup lang="ts">
 const foodData = foodDetails;
+const rootElement = ref<Element | null>(null);
+
+defineExpose({
+  rootElement,
+});
 </script>
 
 <template>
-  <div class="flex justify-center items-center">
+  <div ref="rootElement" class="flex justify-center items-center">
     <div class="m-4 w-lg">
       <div v-if="isFoodLoading" class="flex justify-center items-center">
         <icon
@@ -25,32 +30,32 @@ const foodData = foodDetails;
           }}
         </h1>
         <div class="bg-slate-300 rounded-b-xl p-4">
-          <div class="grid grid-cols-2 gap-2 text-xl">
-            <div class="font-bold">Calories:</div>
-            <div>{{ foodData.nf_calories }}</div>
+          <div class="grid grid-cols-2 gap-1 text-lg">
+            <div class="font-bold text-center">Calories:</div>
+            <div>{{ foodData.nf_calories }}kcal</div>
   
-            <div class="font-bold">Total Fat:</div>
+            <div class="font-bold text-center">Total Fat:</div>
             <div>{{ foodData.nf_total_fat }}g</div>
   
-            <div class="font-bold">Saturated Fat:</div>
+            <div class="font-bold text-center">Saturated Fat:</div>
             <div>{{ foodData.nf_saturated_fat }}g</div>
   
-            <div class="font-bold">Cholesterol:</div>
+            <div class="font-bold text-center">Cholesterol:</div>
             <div>{{ foodData.nf_cholesterol }}mg</div>
   
-            <div class="font-bold">Sodium:</div>
+            <div class="font-bold text-center">Sodium:</div>
             <div>{{ foodData.nf_sodium }}mg</div>
   
-            <div class="font-bold">Total Carbohydrate:</div>
+            <div class="font-bold text-center">Total Carbohydrate:</div>
             <div>{{ foodData.nf_total_carbohydrate }}g</div>
   
-            <div class="font-bold">Dietary Fiber:</div>
+            <div class="font-bold text-center">Dietary Fiber:</div>
             <div>{{ foodData.nf_dietary_fiber }}g</div>
   
-            <div class="font-bold">Sugars:</div>
+            <div class="font-bold text-center">Sugars:</div>
             <div>{{ foodData.nf_sugars }}g</div>
   
-            <div class="font-bold">Protein:</div>
+            <div class="font-bold text-center">Protein:</div>
             <div>{{ foodData.nf_protein }}g</div>
           </div>
         </div>
