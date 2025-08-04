@@ -78,8 +78,8 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
     >
       {{ title }}
     </h1>
-    <ul class="bg-slate-300 rounded-b-xl">
-      <li v-for="(food, index) in foods" :key="index">
+    <div class="bg-slate-300 rounded-b-xl">
+      <div v-for="(food, index) in foods" :key="index">
         <div class="py-1.5 mx-2">
           <div class="h-10 flex relative rounded-lg overflow-hidden shadow">
             <form
@@ -91,11 +91,15 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
                 v-model="food.foodName"
                 class="focus:outline-none focus:placeholder-shown:scale-110 focus:placeholder-shown:translate-x-3 transition-transform container"
                 type="text"
+                name="foodName"
+                aria-label="Enter food"
                 placeholder="Enter food"
               >
             </form>
             <button
               class="min-h-fit inline-block bg-slate-600 hover:bg-slate-500 group cursor-pointer"
+              name="showFoodDetails"
+              aria-label="Show food details"
               @click="changeFoodDetails(index, true)"
             >
               <icon
@@ -106,6 +110,8 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
             </button>
             <button
               class="min-h-fit inline-block bg-slate-600 hover:bg-slate-500 group cursor-pointer"
+              name="deleteFood"
+              aria-label="Delete food"
               @click="deleteItem(index)"
             >
               <icon
@@ -126,10 +132,12 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
             <div>{{ food.calories }}kcal</div>
           </div>
         </div>
-      </li>
+      </div>
       <div class="flex justify-center overflow-hidden">
         <button
           class="px-4 py-1 bg-slate-600 hover:bg-slate-500 font-bold translate-y-2 hover:translate-y-0 transition-transform text-white rounded-t-xl cursor-pointer"
+          name="addFood"
+          aria-label="Add food"
           @click="addItem"
         >
           Add food
@@ -140,7 +148,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
           />
         </button>
       </div>
-    </ul>
+    </div>
     <div>
       <div class="grid grid-cols-1 text-xl text-center">
         <div class="font-bold">Calories:</div>

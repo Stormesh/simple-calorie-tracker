@@ -7,19 +7,26 @@ const foodListRef = ref<InstanceType<typeof FoodList>[]>([]);
 
 const foodDetailsRef = ref<InstanceType<typeof FoodDetails> | null>(null);
 
-const foodDetailsElement = computed(() => foodDetailsRef.value?.rootElement || null);
+const foodDetailsElement = computed(
+  () => foodDetailsRef.value?.rootElement || null
+);
 
-  const totalCalories = computed(() => {
+const totalCalories = computed(() => {
   return foodListRef.value.reduce((total, foodList) => {
     return total + foodList.totalCalories;
   }, 0);
-})
+});
 </script>
 
 <template>
   <Head>
     <Title>MaxHP - Level up your health</Title>
-    <Meta name="description" content="MaxHP - Level up your health" />
+    <Meta
+      name="description"
+      content="MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed."
+    />
+    <Meta name="og:image" content="/maxhp_side.png" />
+    <Meta name="twitter:image" content="/maxhp_side.png" />
   </Head>
   <div class="bg-slate-100 min-h-screen">
     <NuxtRouteAnnouncer />
@@ -33,7 +40,10 @@ const foodDetailsElement = computed(() => foodDetailsRef.value?.rootElement || n
         :food-details-ref="foodDetailsElement"
       />
     </div>
-    <h2 class="text-center text-2xl"><span class="font-bold">Total Calories: </span>{{ Math.round(totalCalories) }}kcal</h2>
+    <h2 class="text-center text-2xl">
+      <span class="font-bold">Total Calories: </span
+      >{{ Math.round(totalCalories) }}kcal
+    </h2>
     <FoodDetails ref="foodDetailsRef" />
   </div>
 </template>
