@@ -12,6 +12,13 @@ export default defineNuxtConfig({
       NUXT_NUTRITIONIX_APP_ID: process.env.NUXT_NUTRITIONIX_APP_ID
     }
   },
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: "en",
+      }
+    }
+  },
   vite: {
     plugins: [tailwindcss()],
   },
