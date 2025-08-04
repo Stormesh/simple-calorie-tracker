@@ -6,6 +6,9 @@ interface NutritionixResponse {
 // API configuration
 const API_BASE_URL = "https://trackapi.nutritionix.com/v2";
 
+// Cache configuration
+const cache = new Map<string, IFoodDetails>();
+
 // Function to search for food nutrition data
 export const searchFood = async (
   query: string
@@ -21,6 +24,11 @@ export const searchFood = async (
 
   if (query.trim() === "") {
     return null;
+  }
+
+  // Check cache first
+  if (cache.has(query)) {
+    return cache.get(query) ?? null;
   }
 
   isFoodLoading.value = true;
@@ -53,6 +61,13 @@ export const searchFood = async (
     return null;
   }
 
+  const foodData = foodName.foods[0];
+
+  // Store in cache
+  if (foodData) {
+    cache.set(query, foodData);
+  }
+
   // Return the first food item if available
-  return foodName.foods[0] ?? null;
+  return foodData ?? null;
 };
