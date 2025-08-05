@@ -11,10 +11,7 @@ defineExpose({
   <div ref="rootElement" class="flex justify-center items-center">
     <div class="m-4 w-lg">
       <div v-if="isFoodLoading" class="flex justify-center items-center">
-        <icon
-          name="line-md:loading-loop"
-          size="5rem"
-        />
+        <icon name="line-md:loading-loop" size="5rem" />
       </div>
       <div v-else-if="foodData && !isFoodLoading">
         <h1
@@ -33,28 +30,28 @@ defineExpose({
           <div class="grid grid-cols-2 gap-1 text-lg">
             <div class="font-bold text-center">Calories:</div>
             <div>{{ foodData.nf_calories }}kcal</div>
-  
+
             <div class="font-bold text-center">Total Fat:</div>
             <div>{{ foodData.nf_total_fat }}g</div>
-  
+
             <div class="font-bold text-center">Saturated Fat:</div>
             <div>{{ foodData.nf_saturated_fat }}g</div>
-  
+
             <div class="font-bold text-center">Cholesterol:</div>
             <div>{{ foodData.nf_cholesterol }}mg</div>
-  
+
             <div class="font-bold text-center">Sodium:</div>
             <div>{{ foodData.nf_sodium }}mg</div>
-  
+
             <div class="font-bold text-center">Total Carbohydrate:</div>
             <div>{{ foodData.nf_total_carbohydrate }}g</div>
-  
+
             <div class="font-bold text-center">Dietary Fiber:</div>
             <div>{{ foodData.nf_dietary_fiber }}g</div>
-  
+
             <div class="font-bold text-center">Sugars:</div>
             <div>{{ foodData.nf_sugars }}g</div>
-  
+
             <div class="font-bold text-center">Protein:</div>
             <div>{{ foodData.nf_protein }}g</div>
           </div>

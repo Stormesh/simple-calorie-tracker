@@ -13,7 +13,7 @@ const cache = new Map<string, IFoodDetails>();
 export const searchFood = async (
   query: string
 ): Promise<IFoodDetails | null> => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const API_KEY = String(config.public.NUXT_NUTRITIONIX_API_KEY || "");
   const APP_ID = String(config.public.NUXT_NUTRITIONIX_APP_ID || "");
 

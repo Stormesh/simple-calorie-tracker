@@ -9,18 +9,16 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       NUXT_NUTRITIONIX_API_KEY: process.env.NUXT_NUTRITIONIX_API_KEY,
-      NUXT_NUTRITIONIX_APP_ID: process.env.NUXT_NUTRITIONIX_APP_ID
-    }
+      NUXT_NUTRITIONIX_APP_ID: process.env.NUXT_NUTRITIONIX_APP_ID,
+    },
   },
   app: {
     head: {
-      link: [
-        { rel: "icon", type: "image/x-icon", href: "/favicon.png" }
-      ],
+      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.png" }],
       htmlAttrs: {
         lang: "en",
-      }
-    }
+      },
+    },
   },
   vite: {
     plugins: [tailwindcss()],

@@ -20,7 +20,9 @@ const foodLength = 6;
 
 const { title, foodDetailsRef } = defineProps<FoodProps>();
 
-const foods = ref<IFoodTemplate[]>(Array.from({ length: foodLength }, foodTemplate));
+const foods = ref<IFoodTemplate[]>(
+  Array.from({ length: foodLength }, foodTemplate)
+);
 
 const totalCalories = computed(() => {
   return foods.value.reduce((total, food) => {
@@ -121,11 +123,11 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
               />
             </button>
           </div>
-          <div v-if="food.isFoodLoading" class="flex justify-center items-center">
-            <icon
-              name="line-md:loading-loop"
-              size="2rem"
-            />
+          <div
+            v-if="food.isFoodLoading"
+            class="flex justify-center items-center"
+          >
+            <icon name="line-md:loading-loop" size="2rem" />
           </div>
           <div v-else-if="food.calories > 0" class="grid grid-cols-2">
             <div class="font-bold text-center">Calories:</div>
