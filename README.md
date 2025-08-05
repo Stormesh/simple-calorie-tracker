@@ -1,75 +1,64 @@
-# Nuxt Minimal Starter
+# Calorie Tracker
+![Logo](./maxhp_git.png)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A simple calorie tracking application built with Nuxt and powered by the Nutritionix API.
 
-## Setup
+## Features
 
-Make sure to install dependencies:
+*   Search for food items.
+*   View detailed nutritional information for each food item.
+*   Track your daily calorie intake.
+
+## Technologies Used
+
+*   [Nuxt](https://nuxt.com/)
+*   [Vue.js](https://vuejs.org/)
+*   [Tailwind CSS](https://tailwindcss.com/)
+*   [Nutritionix API](https://www.nutritionix.com/business/api)
+*   [TypeScript](https://www.typescriptlang.org/)
+
+## Getting Started
+
+### Prerequisites
+
+*   Node.js (v18 or newer)
+*   npm or yarn
+
+### Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/Stormesh/simple-calorie-tracker.git
+    cd simple-calorie-tracker
+    ```
+
+2.  Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+3.  You will need API credentials from Nutritionix. Create a `.env` file in the root of the project and add your credentials:
+    ```
+    NUXT_PUBLIC_NUTRITIONIX_APP_ID=your_app_id
+    NUXT_PUBLIC_NUTRITIONIX_APP_KEY=your_app_key
+    ```
+
+### Running the Application
+
+Start the development server:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+The application will be available at `http://localhost:3000`.
 
-Build the application for production:
+## Project Structure
 
-```bash
-# npm
-npm run build
+*   `app/`: Contains the core application files, including pages, components, and composables.
+*   `public/`: Static assets that are publicly accessible.
+*   `nuxt.config.ts`: Nuxt configuration file.
 
-# pnpm
-pnpm build
+---
 
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Powered by [Nutritionix API](https://www.nutritionix.com/business/api)
