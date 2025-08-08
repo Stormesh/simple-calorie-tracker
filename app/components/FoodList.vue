@@ -7,21 +7,33 @@ interface FoodProps {
 interface IFoodTemplate {
   foodName: string;
   calories: number;
-  isFoodLoading: boolean;
 }
 
 const foodTemplate = () => ({
   foodName: "",
   calories: 0,
-  isFoodLoading: false,
 });
 
 const foodLength = 6;
 
 const { title, foodDetailsRef } = defineProps<FoodProps>();
 
-const foods = ref<IFoodTemplate[]>(
-  Array.from({ length: foodLength }, foodTemplate)
+const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
+  default: () => {
+    return Array.from({ length: foodLength }, foodTemplate);
+  }
+});
+
+const foodLoadingStates = reactive<boolean[]>(
+  Array(foods.value.length).fill(false)
+);
+
+watch(
+  () => foods.value.length,
+  (newLength) => {
+    foodLoadingStates.length = newLength;
+    foodLoadingStates.fill(false, newLength - (newLength - foods.value.length));
+  }
 );
 
 const totalCalories = computed(() => {
@@ -34,6 +46,7 @@ const totalCalories = computed(() => {
 defineExpose({
   totalCalories,
 });
+
 
 const deleteItem = (index: number) => {
   // Allow deletion but ensure there's always at least one item
@@ -58,7 +71,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
   const foodItem = foods.value[index];
   if (!foodItem) return;
 
-  foodItem.isFoodLoading = true;
+  foodLoadingStates[index] = true;
 
   if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
 
@@ -69,7 +82,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
     foodItem.calories = details.nf_calories;
   }
 
-  foodItem.isFoodLoading = false;
+  foodLoadingStates[index] = false;
 };
 </script>
 
@@ -124,7 +137,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
             </button>
           </div>
           <div
-            v-if="food.isFoodLoading"
+            v-if="foodLoadingStates[index]"
             class="flex justify-center items-center"
           >
             <icon name="line-md:loading-loop" size="2rem" />
