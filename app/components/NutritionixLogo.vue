@@ -1,7 +1,12 @@
 <template>
   <NuxtImg
-    src="Updated_NutritionixAPI_hires_flat.png"
+    src="nutritionix.png"
     alt="Nutritionix"
-    class="h-12 md:h-16"
+    class="dark:hidden h-12 md:h-16"
+  />
+  <NuxtImg
+    src="nutritionix_dark.png"
+    alt="Nutritionix"
+    class="hidden dark:block h-12 md:h-16"
   />
 </template>

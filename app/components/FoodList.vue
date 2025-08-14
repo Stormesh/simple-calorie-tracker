@@ -14,25 +14,41 @@ const foodTemplate = () => ({
   calories: 0,
 });
 
-const foodLength = 6;
+const foodLength = 6,
+  maxFoods = 10;
 
 const { title, foodDetailsRef } = defineProps<FoodProps>();
 
 const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   default: () => {
     return Array.from({ length: foodLength }, foodTemplate);
-  }
+  },
 });
 
-const foodLoadingStates = reactive<boolean[]>(
-  Array(foods.value.length).fill(false)
-);
+const foodLoadingStates = ref<boolean[]>(Array(foods.value.length).fill(false));
+
+const maxFoodsReached = computed(() => {
+  return foods.value.length >= maxFoods;
+});
+
+const toast = useToast();
+
+const showToast = (title: string, description: string, icon: string) => {
+  toast.add({
+    title,
+    description,
+    icon,
+  });
+};
 
 watch(
   () => foods.value.length,
   (newLength) => {
-    foodLoadingStates.length = newLength;
-    foodLoadingStates.fill(false, newLength - (newLength - foods.value.length));
+    foodLoadingStates.value.length = newLength;
+    foodLoadingStates.value.fill(
+      false,
+      newLength - (newLength - foods.value.length)
+    );
   }
 );
 
@@ -46,7 +62,6 @@ const totalCalories = computed(() => {
 defineExpose({
   totalCalories,
 });
-
 
 const deleteItem = (index: number) => {
   // Allow deletion but ensure there's always at least one item
@@ -64,41 +79,56 @@ const deleteItem = (index: number) => {
 };
 
 const addItem = () => {
+  if (maxFoodsReached.value) {
+    return showToast(
+      "Max Foods Reached",
+      `You can only add up to ${maxFoods} foods for ${title}`,
+      "ic:outline-error"
+    );
+  }
   foods.value.push(foodTemplate());
+};
+
+const resetFood = () => {
+  foods.value.forEach((food) => {
+    food.foodName = "";
+    food.calories = 0;
+  });
 };
 
 const changeFoodDetails = async (index: number, scroll: boolean = false) => {
   const foodItem = foods.value[index];
   if (!foodItem) return;
 
-  foodLoadingStates[index] = true;
-
-  if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+  foodLoadingStates.value[index] = true;
 
   const foodName = foodItem.foodName || "";
   const details = await searchFood(foodName);
   if (details) {
     foodDetails.value = details;
     foodItem.calories = details.nf_calories;
+    if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
   }
 
-  foodLoadingStates[index] = false;
+  foodLoadingStates.value[index] = false;
 };
 </script>
 
 <template>
   <div class="m-4 flex-col flex justify-center">
     <h1
-      class="text-2xl bg-slate-500 rounded-t-xl text-white text-center font-black"
+      class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
     >
       {{ title }}
     </h1>
-    <div class="bg-slate-300 rounded-b-xl">
+    <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl shadow-md">
       <div v-for="(food, index) in foods" :key="index">
         <div class="py-1.5 mx-2">
-          <div class="h-10 flex relative rounded-lg overflow-hidden shadow">
+          <div
+            class="h-10 flex relative bg-stone-50 dark:bg-slate-900 rounded-lg overflow-hidden shadow"
+          >
             <form
-              class="container inline-block bg-stone-50 p-2"
+              class="container inline-block p-2"
               @submit.prevent
               @submit="changeFoodDetails(index)"
             >
@@ -112,27 +142,27 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
               >
             </form>
             <button
-              class="min-h-fit inline-block bg-slate-600 hover:bg-slate-500 group cursor-pointer"
+              class="min-h-fit inline-block hover:bg-teal-600 active:bg-teal-500 transition-colors group cursor-pointer"
               name="showFoodDetails"
               aria-label="Show food details"
               @click="changeFoodDetails(index, true)"
             >
-              <icon
-                name="ic:outline-keyboard-double-arrow-down"
+              <Icon
+                name="ic:outline-keyboard-arrow-down"
                 size="2.5rem"
-                class="text-white group-hover:translate-y-1 transition-transform duration-150"
+                class="text-black group-hover:text-white dark:text-white group-hover:translate-y-1 transition-transform duration-150"
               />
             </button>
             <button
-              class="min-h-fit inline-block bg-slate-600 hover:bg-slate-500 group cursor-pointer"
+              class="min-h-fit inline-block hover:bg-rose-800 active:bg-rose-700 transition-colors group cursor-pointer"
               name="deleteFood"
               aria-label="Delete food"
               @click="deleteItem(index)"
             >
-              <icon
+              <Icon
                 name="ic:outline-delete"
                 size="2.5rem"
-                class="text-white group-hover:scale-110 group-hover:text-red-600 transition-all duration-150"
+                class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
               />
             </button>
           </div>
@@ -140,7 +170,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
             v-if="foodLoadingStates[index]"
             class="flex justify-center items-center"
           >
-            <icon name="line-md:loading-loop" size="2rem" />
+            <Icon name="line-md:loading-loop" size="2rem" />
           </div>
           <div v-else-if="food.calories > 0" class="grid grid-cols-2">
             <div class="font-bold text-center">Calories:</div>
@@ -149,19 +179,18 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
         </div>
       </div>
       <div class="flex justify-center overflow-hidden">
-        <button
-          class="px-4 py-1 bg-slate-600 hover:bg-slate-500 font-bold translate-y-2 hover:translate-y-0 transition-transform text-white rounded-t-xl cursor-pointer"
+        <FoodListButton
+          label="Add food"
           name="addFood"
-          aria-label="Add food"
-          @click="addItem"
-        >
-          Add food
-          <icon
-            name="ic:outline-add"
-            size="2rem"
-            class="inline-block align-middle"
-          />
-        </button>
+          icon="ic:outline-plus"
+          @button-click="addItem"
+        />
+        <FoodListButton
+          label="Reset"
+          name="resetFood"
+          icon="heroicons:arrow-path"
+          @button-click="resetFood"
+        />
       </div>
     </div>
     <div>
