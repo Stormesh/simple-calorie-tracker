@@ -1,3 +1,13 @@
+export const foodsList = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+
+export const resetCookies = (cookieNames: string[]) => {
+  cookieNames.forEach((cookieName) => {
+    const cookie = useCookie(cookieName);
+    cookie.value = null;
+  });
+  window.location.reload();
+};
+
 export interface IFoodDetails {
   food_name: string;
   serving_qty: number;

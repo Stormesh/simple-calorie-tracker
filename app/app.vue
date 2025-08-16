@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import FoodDetails from "./components/FoodDetails.vue";
 import FoodList from "./components/FoodList.vue";
-import ResetButton from "./components/ResetCookies.vue";
-
-const foodLists = ["Breakfast", "Lunch", "Dinner", "Snacks"];
-
-const cookieNames = foodLists.map((foodList) => `foods-${foodList}`);
 
 type foodListType = InstanceType<typeof FoodList>;
 
@@ -37,9 +32,10 @@ const totalCalories = computed(() => {
     <div class="bg-slate-100 dark:bg-slate-900 min-h-screen dark:text-white">
       <NuxtRouteAnnouncer />
       <MyHeader />
+      <SettingsMenu />
       <div class="flex justify-center items-baseline flex-wrap">
         <FoodList
-          v-for="(foodList, index) in foodLists"
+          v-for="(foodList, index) in foodsList"
           :key="foodList"
           :ref="(el) => {if (el) foodListRef[index] = el as InstanceType<typeof FoodList>}"
           :title="foodList"
@@ -53,9 +49,6 @@ const totalCalories = computed(() => {
         </h2>
       </div>
       <FoodDetails ref="foodDetailsRef" />
-      <div class="flex justify-center">
-        <ResetButton :cookie-names="cookieNames" />
-      </div>
     </div>
   </UApp>
 </template>
