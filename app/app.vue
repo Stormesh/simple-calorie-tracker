@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FoodDetails from "./components/FoodDetails.vue";
 import FoodList from "./components/FoodList.vue";
+import TotalNutritions from "./components/TotalNutritions.vue";
 
 type foodListType = InstanceType<typeof FoodList>;
 
@@ -10,12 +11,6 @@ const foodDetailsRef = useTemplateRef("foodDetailsRef");
 const foodDetailsElement = computed(
   () => foodDetailsRef.value?.rootElement || null
 );
-
-const totalCalories = computed(() => {
-  return foodListRef.value.reduce((total, foodList) => {
-    return total + foodList.totalCalories;
-  }, 0);
-});
 </script>
 
 <template>
@@ -42,13 +37,8 @@ const totalCalories = computed(() => {
           :food-details-ref="foodDetailsElement"
         />
       </div>
-      <div class="flex justify-center items-center">
-        <h2 class="text-center text-2xl mt-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md">
-          <span class="font-bold">Total Calories: </span
-          >{{ Math.round(totalCalories) }}kcal
-        </h2>
-      </div>
       <FoodDetails ref="foodDetailsRef" />
+      <TotalNutritions :food-list-ref="foodListRef" />
     </div>
   </UApp>
 </template>

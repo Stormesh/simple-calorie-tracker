@@ -4,28 +4,58 @@ interface FoodProps {
   foodDetailsRef: Element | null;
 }
 
-interface IFoodTemplate {
+interface FoodTemplate {
   foodName: string;
   calories: number;
+  totalFat: number;
+  saturatedFat: number;
+  cholesterol: number;
+  sodium: number;
+  totalCarbohydrate: number;
+  dietaryFiber: number;
+  sugars: number;
+  protein: number;
+  potassium: number;
 }
 
-const foodTemplate = () => ({
+interface FoodState {
+  loading: boolean;
+  focused: boolean;
+}
+
+const foodTemplateDefault = () => ({
   foodName: "",
   calories: 0,
+  totalFat: 0,
+  saturatedFat: 0,
+  cholesterol: 0,
+  sodium: 0,
+  totalCarbohydrate: 0,
+  dietaryFiber: 0,
+  sugars: 0,
+  protein: 0,
+  potassium: 0,
 });
 
-const foodLength = 6,
+const foodLength = 4,
   maxFoods = 10;
 
 const { title, foodDetailsRef } = defineProps<FoodProps>();
 
-const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
+const foods = useCookie<FoodTemplate[]>(`foods-${title}`, {
   default: () => {
-    return Array.from({ length: foodLength }, foodTemplate);
+    return Array.from({ length: foodLength }, foodTemplateDefault);
   },
 });
 
-const foodLoadingStates = ref<boolean[]>(Array(foods.value.length).fill(false));
+const foodStateDefault = () => ({
+  loading: false,
+  focused: false,
+});
+
+const foodStates = ref<FoodState[]>(
+  Array.from({ length: foods.value.length }, foodStateDefault)
+);
 
 const maxFoodsReached = computed(() => {
   return foods.value.length >= maxFoods;
@@ -44,23 +74,40 @@ const showToast = (title: string, description: string, icon: string) => {
 watch(
   () => foods.value.length,
   (newLength) => {
-    foodLoadingStates.value.length = newLength;
-    foodLoadingStates.value.fill(
-      false,
-      newLength - (newLength - foods.value.length)
-    );
+    foodStates.value = Array.from({ length: newLength }, foodStateDefault);
   }
 );
 
-const totalCalories = computed(() => {
-  return foods.value.reduce((total, food) => {
-    if (food.foodName.trim() === "") food.calories = 0;
-    return total + food.calories;
-  }, 0);
+const totalNutrients = computed(() => {
+  return foods.value.reduce((totals, food) => {
+    return {
+      totalCalories: totals.totalCalories + food.calories,
+      totalFat: totals.totalFat + food.totalFat,
+      saturatedFat: totals.saturatedFat + food.saturatedFat,
+      cholesterol: totals.cholesterol + food.cholesterol,
+      sodium: totals.sodium + food.sodium,
+      totalCarbohydrate: totals.totalCarbohydrate + food.totalCarbohydrate,
+      dietaryFiber: totals.dietaryFiber + food.dietaryFiber,
+      sugars: totals.sugars + food.sugars,
+      protein: totals.protein + food.protein,
+      potassium: totals.potassium + food.potassium,
+    };
+  }, {
+    totalCalories: 0,
+    totalFat: 0,
+    saturatedFat: 0,
+    cholesterol: 0,
+    sodium: 0,
+    totalCarbohydrate: 0,
+    dietaryFiber: 0,
+    sugars: 0,
+    protein: 0,
+    potassium: 0,
+  });
 });
 
 defineExpose({
-  totalCalories,
+  totalNutrients,
 });
 
 const deleteItem = (index: number) => {
@@ -86,7 +133,7 @@ const addItem = () => {
       "ic:outline-error"
     );
   }
-  foods.value.push(foodTemplate());
+  foods.value.push(foodTemplateDefault());
 };
 
 const resetFood = () => {
@@ -97,20 +144,33 @@ const resetFood = () => {
 };
 
 const changeFoodDetails = async (index: number, scroll: boolean = false) => {
-  const foodItem = foods.value[index];
-  if (!foodItem) return;
+  const foodItem = foods.value[index],
+    foodState = foodStates.value[index];
+  if (!foodItem || !foodState) return;
 
-  foodLoadingStates.value[index] = true;
+  foodState.loading = true;
 
   const foodName = foodItem.foodName || "";
   const details = await searchFood(foodName);
   if (details) {
     foodDetails.value = details;
     foodItem.calories = details.nf_calories;
+    foodItem.totalFat = details.nf_total_fat;
+    foodItem.sodium = details.nf_sodium;
+    foodItem.totalCarbohydrate = details.nf_total_carbohydrate;
+    foodItem.cholesterol = details.nf_cholesterol;
+    foodItem.sugars = details.nf_sugars;
+    foodItem.protein = details.nf_protein;
     if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
   }
 
-  foodLoadingStates.value[index] = false;
+  foodState.loading = false;
+};
+
+const onFocus = (index: number, focus: boolean) => {
+  const foodState = foodStates.value[index];
+  if (!foodState) return;
+  foodState.focused = focus;
 };
 </script>
 
@@ -139,8 +199,23 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
                 name="foodName"
                 aria-label="Enter food"
                 placeholder="Enter food"
+                @focus="onFocus(index, true)"
+                @blur="onFocus(index, false)"
               >
             </form>
+            <div
+              v-if="foodStates[index]?.loading"
+              class="absolute right-24 top-2"
+            >
+              <Icon name="line-md:loading-loop" size="2rem" />
+            </div>
+            <div
+              v-else-if="food.calories > 0"
+              class="absolute right-20 top-2 select-none pointer-events-none transition-opacity"
+              :class="foodStates[index]?.focused ? 'opacity-0' : 'opacity-65'"
+            >
+              <div>{{ food.calories }}kcal</div>
+            </div>
             <button
               class="min-h-fit inline-block hover:bg-teal-600 active:bg-teal-500 transition-colors group cursor-pointer"
               name="showFoodDetails"
@@ -166,16 +241,6 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
               />
             </button>
           </div>
-          <div
-            v-if="foodLoadingStates[index]"
-            class="flex justify-center items-center"
-          >
-            <Icon name="line-md:loading-loop" size="2rem" />
-          </div>
-          <div v-else-if="food.calories > 0" class="grid grid-cols-2">
-            <div class="font-bold text-center">Calories:</div>
-            <div>{{ food.calories }}kcal</div>
-          </div>
         </div>
       </div>
       <div class="flex justify-center overflow-hidden">
@@ -183,20 +248,20 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
           label="Add food"
           name="addFood"
           icon="ic:outline-plus"
-          @button-click="addItem"
+          @click="addItem"
         />
         <FoodListButton
           label="Reset"
           name="resetFood"
           icon="heroicons:arrow-path"
-          @button-click="resetFood"
+          @click="resetFood"
         />
       </div>
     </div>
     <div>
       <div class="grid grid-cols-1 text-xl text-center">
         <div class="font-bold">Calories:</div>
-        <div>{{ Math.round(totalCalories) }}kcal</div>
+        <div>{{ Math.round(totalNutrients.totalCalories) }}kcal</div>
       </div>
     </div>
   </div>

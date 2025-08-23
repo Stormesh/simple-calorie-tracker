@@ -2,6 +2,36 @@
 const foodData = foodDetails;
 const rootElement = ref<Element | null>(null);
 
+interface NutritionFacts {
+  label: string;
+  value?: number;
+  unit: string;
+}
+
+const nutritionFacts = computed<NutritionFacts[]>(() => [
+  { label: "Calories", value: foodData.value?.nf_calories, unit: "kcal" },
+  { label: "Total Fat", value: foodData.value?.nf_total_fat, unit: "g" },
+  {
+    label: "Saturated Fat",
+    value: foodData.value?.nf_saturated_fat,
+    unit: "g",
+  },
+  { label: "Cholesterol", value: foodData.value?.nf_cholesterol, unit: "mg" },
+  { label: "Sodium", value: foodData.value?.nf_sodium, unit: "mg" },
+  {
+    label: "Total Carbohydrate",
+    value: foodData.value?.nf_total_carbohydrate,
+    unit: "g",
+  },
+  {
+    label: "Dietary Fiber",
+    value: foodData.value?.nf_dietary_fiber,
+    unit: "g",
+  },
+  { label: "Sugars", value: foodData.value?.nf_sugars, unit: "g" },
+  { label: "Protein", value: foodData.value?.nf_protein, unit: "g" },
+]);
+
 defineExpose({
   rootElement,
 });
@@ -26,34 +56,12 @@ defineExpose({
             "g"
           }}
         </h1>
-        <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl p-4">
+        <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl p-2">
           <div class="grid grid-cols-2 gap-x-4 gap-y-1 md:text-lg">
-            <div class="font-bold text-right">Calories:</div>
-            <div>{{ foodData.nf_calories }}kcal</div>
-
-            <div class="font-bold text-right">Total Fat:</div>
-            <div>{{ foodData.nf_total_fat }}g</div>
-
-            <div class="font-bold text-right">Saturated Fat:</div>
-            <div>{{ foodData.nf_saturated_fat }}g</div>
-
-            <div class="font-bold text-right">Cholesterol:</div>
-            <div>{{ foodData.nf_cholesterol }}mg</div>
-
-            <div class="font-bold text-right">Sodium:</div>
-            <div>{{ foodData.nf_sodium }}mg</div>
-
-            <div class="font-bold text-right">Total Carbohydrate:</div>
-            <div>{{ foodData.nf_total_carbohydrate }}g</div>
-
-            <div class="font-bold text-right">Dietary Fiber:</div>
-            <div>{{ foodData.nf_dietary_fiber }}g</div>
-
-            <div class="font-bold text-right">Sugars:</div>
-            <div>{{ foodData.nf_sugars }}g</div>
-
-            <div class="font-bold text-right">Protein:</div>
-            <div>{{ foodData.nf_protein }}g</div>
+            <template v-for="(fact, index) in nutritionFacts" :key="index">
+              <div class="font-bold text-right">{{ fact.label }}:</div>
+              <div>{{ fact.value }}{{ fact.unit }}</div>
+            </template>
           </div>
         </div>
       </div>

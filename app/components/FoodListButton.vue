@@ -3,10 +3,9 @@ interface ButtonProps {
   label: string;
   name: string;
   icon: string;
-  onButtonClick: () => void;
 }
 
-const { label, name, icon, onButtonClick } = defineProps<ButtonProps>();
+const { label, name, icon } = defineProps<ButtonProps>();
 </script>
 
 <template>
@@ -16,6 +15,5 @@ const { label, name, icon, onButtonClick } = defineProps<ButtonProps>();
     :name
     :icon
     :aria-label="label"
-    @click="onButtonClick"
   />
 </template>
