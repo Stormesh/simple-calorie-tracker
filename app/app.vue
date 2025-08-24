@@ -15,15 +15,6 @@ const foodDetailsElement = computed(
 
 <template>
   <UApp>
-    <Head>
-      <Title>MaxHP - Level up your health</Title>
-      <Meta
-        name="description"
-        content="MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed."
-      />
-      <Meta name="og:image" content="/maxhp_side.png" />
-      <Meta name="twitter:image" content="/maxhp_side.png" />
-    </Head>
     <div class="bg-slate-100 dark:bg-slate-900 min-h-screen dark:text-white">
       <NuxtRouteAnnouncer />
       <MyHeader />

@@ -11,6 +11,9 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxtjs/seo",
   ],
+  site: {
+    name: "MaxHP - Level Up Your Health",
+  },
   css: ["~/assets/css/app.css"],
   runtimeConfig: {
     public: {
@@ -20,11 +23,25 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "MaxHP",
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.png" }],
       htmlAttrs: {
         lang: "en",
       },
+      meta: [
+        {
+          name: "description",
+          content:
+            "MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed.",
+        },
+        {
+          name: "og:image",
+          content: "/maxhp_side.png",
+        },
+        {
+          name: "twitter:image",
+          content: "/maxhp_side.png",
+        },
+      ],
     },
   },
   vite: {
