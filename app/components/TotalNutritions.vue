@@ -36,29 +36,62 @@ const totalNutrients = computed(() => {
   );
 });
 
-interface nutritionList {
+interface NutritionList {
   label: string;
   value: number;
   unit: string;
   max?: number | null;
 }
 
-const nutritionFacts = computed<nutritionList[]>(() => [
+const PROTEIN_PER_KCAL = 4;
+const FAT_PER_KCAL = 9;
+const CARBS_PER_KCAL = 4;
+const SUGARS_PER_KCAL = 4;
+const MAX_SODIUM = 2300;
+const MAX_FAT = 0.3;
+const MAX_CARBS = 0.45;
+const MAX_PROTEIN = 0.25;
+const MAX_SUGARS = 0.1;
+
+const nutritionFacts = computed<NutritionList[]>(() => [
   {
     label: "Calories",
     value: totalNutrients.value.totalCalories,
     unit: "kcal",
     max: bmrState.value.bmr,
   },
-  { label: "Fats", value: totalNutrients.value.totalFat, unit: "g" },
-  { label: "Sodium", value: totalNutrients.value.sodium, unit: "mg" },
+  {
+    label: "Fats",
+    value: totalNutrients.value.totalFat,
+    unit: "g",
+    max: Math.round(((bmrState.value.bmr || 0) * MAX_FAT) / FAT_PER_KCAL),
+  },
+  {
+    label: "Protein",
+    value: totalNutrients.value.protein,
+    unit: "g",
+    max: Math.round(
+      ((bmrState.value.bmr || 0) * MAX_PROTEIN) / PROTEIN_PER_KCAL
+    ),
+  },
   {
     label: "Carbohydrates",
     value: totalNutrients.value.totalCarbohydrate,
     unit: "g",
+    max: Math.round(((bmrState.value.bmr || 0) * MAX_CARBS) / CARBS_PER_KCAL),
   },
-  { label: "Sugars", value: totalNutrients.value.sugars, unit: "g" },
-  { label: "Protein", value: totalNutrients.value.protein, unit: "g" },
+  {
+    label: "Sodium",
+    value: totalNutrients.value.sodium,
+    unit: "mg",
+    max: MAX_SODIUM,
+  },
+  {
+    label: "Sugars",
+    value: totalNutrients.value.sugars,
+    unit: "g",
+    max: Math.round(((bmrState.value.bmr || 0) * MAX_SUGARS) / SUGARS_PER_KCAL),
+  },
 ]);
 </script>
 
@@ -70,20 +103,20 @@ const nutritionFacts = computed<nutritionList[]>(() => [
       <h2 v-for="nutrition in nutritionFacts" :key="nutrition.label">
         <span
           :class="
-            nutrition.label === 'Calories' &&
             nutrition.value > (nutrition.max ?? 0)
               ? 'dark:text-red-500 text-red-700'
-              : nutrition.label === 'Calories' &&
-                nutrition.value <= (nutrition.max ?? 0)
-              ? 'dark:text-green-500 text-green-700'
-              : ''
+              : 'dark:text-green-500 text-green-700'
           "
           >{{ Math.round(nutrition.value) }}{{ nutrition.unit }}</span
         >
-        <template v-if="nutrition.label === 'Calories' && nutrition.max">
+        <template v-if="nutrition.max">
           / {{ nutrition.max }}{{ nutrition.unit }}
         </template>
-        <span class="font-light block" :class="nutrition.label === 'Calories' ? 'text-xl' : 'text-base'">{{ nutrition.label }}</span>
+        <span
+          class="font-light block"
+          :class="nutrition.label === 'Calories' ? 'text-xl' : 'text-base'"
+          >{{ nutrition.label }}</span
+        >
       </h2>
     </div>
   </div>

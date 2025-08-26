@@ -12,6 +12,56 @@ const UNIT_SYSTEM_OPTIONS = [
   { label: "Imperial (lbs, inches)", value: "imperial" },
 ];
 
+const ACTIVITY = [
+  { label: "Sedentary", value: 1.2 },
+  { label: "Light", value: 1.375 },
+  { label: "Moderate", value: 1.55 },
+  { label: "Active", value: 1.725 },
+  { label: "Very Active", value: 1.9 },
+];
+
+const TARGET: Array<{
+  metricLabel: string;
+  imperialLabel: string;
+  value: number;
+}> = [
+  {
+    metricLabel: "Lose 1kg a week",
+    imperialLabel: "Lose 2lbs a week",
+    value: -1100,
+  },
+  {
+    metricLabel: "Lose 0.75kg a week",
+    imperialLabel: "Lose 1.5lbs a week",
+    value: -825,
+  },
+  {
+    metricLabel: "Lose 0.5kg a week",
+    imperialLabel: "Lose 1lb a week",
+    value: -550,
+  },
+  {
+    metricLabel: "Lose 0.25kg a week",
+    imperialLabel: "Lose 0.5lb a week",
+    value: -275,
+  },
+  {
+    metricLabel: "Maintain current weight",
+    imperialLabel: "Maintain current weight",
+    value: 0,
+  },
+  {
+    metricLabel: "Gain 0.25kg a week",
+    imperialLabel: "Gain 0.5lb a week",
+    value: 275,
+  },
+  {
+    metricLabel: "Gain 0.5kg a week",
+    imperialLabel: "Gain 1lb a week",
+    value: 550,
+  },
+];
+
 // Mifflin-St Jeor Equation Constants
 const LBS_TO_KG_CONVERSION = 0.453592;
 const INCHES_TO_CM_CONVERSION = 2.54;
@@ -22,6 +72,16 @@ const BMR_HEIGHT_MULTIPLIER = 6.25;
 const BMR_AGE_MULTIPLIER = 5;
 
 const bmrForm = useBmr();
+
+const targetOptions = computed(() => {
+  return TARGET.map((target) => ({
+    label:
+      bmrForm.value.unitSystem === "metric"
+        ? target.metricLabel
+        : target.imperialLabel,
+    value: target.value,
+  }));
+});
 
 const calculateBMR = () => {
   if (
@@ -49,7 +109,9 @@ const calculateBMR = () => {
     BMR_HEIGHT_MULTIPLIER * h -
     BMR_AGE_MULTIPLIER * a +
     (bmrForm.value.gender === "male" ? MALE_BMR_CONSTANT : FEMALE_BMR_CONSTANT);
-  bmrForm.value.bmr = Math.round(calculatedBMR);
+  bmrForm.value.bmr = Math.round(
+    calculatedBMR * bmrForm.value.activity + bmrForm.value.target
+  );
 };
 
 const closeModal = () => {
@@ -62,13 +124,13 @@ const closeModal = () => {
     <UForm
       ref="form"
       :state="bmrForm"
-      class="p-4 space-y-4"
+      class="p-4"
       @submit.prevent="calculateBMR"
     >
-      <div class="flex justify-center items-center flex-col gap-2">
+      <div class="flex flex-col gap-0.5 flex-wrap">
+        <h3 class="text-lg font-semibold">Unit System</h3>
         <URadioGroup
           v-model="bmrForm.unitSystem"
-          legend="Unit System"
           size="xl"
           :items="UNIT_SYSTEM_OPTIONS"
           class="mb-4"
@@ -100,16 +162,29 @@ const closeModal = () => {
           size="xl"
           class="w-full"
         />
+        <h3 class="mt-4 text-lg font-semibold">Activity Level</h3>
+        <USelect
+          v-model="bmrForm.activity"
+          legend="Activity Level"
+          size="xl"
+          :items="ACTIVITY"
+        />
+        <h3 class="mt-4 text-lg font-semibold">Target</h3>
+        <USelect
+          v-model="bmrForm.target"
+          size="xl"
+          :items="targetOptions"
+          class="w-60"
+        />
+        <h3 class="mt-4 text-lg font-semibold">Gender</h3>
         <URadioGroup
           v-model="bmrForm.gender"
-          legend="Gender"
           size="xl"
           :items="GENDER_OPTIONS"
-          class="mt-4"
         />
       </div>
 
-      <div class="flex justify-center gap-4 mt-6">
+      <div class="flex justify-center gap-4 mt-4">
         <UButton
           icon="heroicons:calculator"
           label="Calculate"

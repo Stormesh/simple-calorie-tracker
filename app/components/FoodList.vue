@@ -78,32 +78,42 @@ watch(
   }
 );
 
+const resetFoodIfEmpty = (index: number) => {
+  const food = foods.value[index];
+  if (food?.foodName.trim() === "") {
+    Object.assign(food, foodTemplateDefault());
+  }
+};
+
 const totalNutrients = computed(() => {
-  return foods.value.reduce((totals, food) => {
-    return {
-      totalCalories: totals.totalCalories + food.calories,
-      totalFat: totals.totalFat + food.totalFat,
-      saturatedFat: totals.saturatedFat + food.saturatedFat,
-      cholesterol: totals.cholesterol + food.cholesterol,
-      sodium: totals.sodium + food.sodium,
-      totalCarbohydrate: totals.totalCarbohydrate + food.totalCarbohydrate,
-      dietaryFiber: totals.dietaryFiber + food.dietaryFiber,
-      sugars: totals.sugars + food.sugars,
-      protein: totals.protein + food.protein,
-      potassium: totals.potassium + food.potassium,
-    };
-  }, {
-    totalCalories: 0,
-    totalFat: 0,
-    saturatedFat: 0,
-    cholesterol: 0,
-    sodium: 0,
-    totalCarbohydrate: 0,
-    dietaryFiber: 0,
-    sugars: 0,
-    protein: 0,
-    potassium: 0,
-  });
+  return foods.value.reduce(
+    (totals, food) => {
+      return {
+        totalCalories: totals.totalCalories + food.calories,
+        totalFat: totals.totalFat + food.totalFat,
+        saturatedFat: totals.saturatedFat + food.saturatedFat,
+        cholesterol: totals.cholesterol + food.cholesterol,
+        sodium: totals.sodium + food.sodium,
+        totalCarbohydrate: totals.totalCarbohydrate + food.totalCarbohydrate,
+        dietaryFiber: totals.dietaryFiber + food.dietaryFiber,
+        sugars: totals.sugars + food.sugars,
+        protein: totals.protein + food.protein,
+        potassium: totals.potassium + food.potassium,
+      };
+    },
+    {
+      totalCalories: 0,
+      totalFat: 0,
+      saturatedFat: 0,
+      cholesterol: 0,
+      sodium: 0,
+      totalCarbohydrate: 0,
+      dietaryFiber: 0,
+      sugars: 0,
+      protein: 0,
+      potassium: 0,
+    }
+  );
 });
 
 defineExpose({
@@ -201,6 +211,7 @@ const onFocus = (index: number, focus: boolean) => {
                 placeholder="Enter food"
                 @focus="onFocus(index, true)"
                 @blur="onFocus(index, false)"
+                @input="resetFoodIfEmpty(index)"
               >
             </form>
             <div
