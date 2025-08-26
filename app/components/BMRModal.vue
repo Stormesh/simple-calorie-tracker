@@ -120,7 +120,7 @@ const closeModal = () => {
 </script>
 
 <template>
-  <ModalTemplate title="Calculate Your BMR">
+  <ModalTemplate title="Diet Profile">
     <UForm
       ref="form"
       :state="bmrForm"
@@ -204,7 +204,7 @@ const closeModal = () => {
         v-if="bmrForm.bmr !== null"
         class="mt-4 text-center text-xl font-semibold"
       >
-        Your BMR: {{ bmrForm.bmr }} calories/day
+        Your TDEE: {{ bmrForm.bmr }} calories/day
       </div>
     </UForm>
   </ModalTemplate>

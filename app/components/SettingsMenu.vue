@@ -27,7 +27,7 @@ const items = ref<DropdownMenuItem[]>([
     },
   },
   {
-    label: "Calculate BMR",
+    label: "Diet Profile",
     name: "bmr",
     icon: "heroicons:scale",
     class: "cursor-pointer",
