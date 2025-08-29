@@ -78,10 +78,15 @@ watch(
   }
 );
 
+const resetFood = (index: number) => {
+  const food = foods.value[index] as FoodTemplate;
+  Object.assign(food, foodTemplateDefault());
+}
+
 const resetFoodIfEmpty = (index: number) => {
   const food = foods.value[index];
   if (food?.foodName.trim() === "") {
-    Object.assign(food, foodTemplateDefault());
+    resetFood(index);
   }
 };
 
@@ -124,11 +129,8 @@ const deleteItem = (index: number) => {
   // Allow deletion but ensure there's always at least one item
 
   if (foods.value.length <= 1) {
-    const firstFood = foods.value[0];
     // If trying to delete the last item, just clear it instead
-    if (!firstFood) return;
-    firstFood.foodName = "";
-    firstFood.calories = 0;
+    resetFood(0);
     return;
   }
 
@@ -146,10 +148,9 @@ const addItem = () => {
   foods.value.push(foodTemplateDefault());
 };
 
-const resetFood = () => {
+const resetFoods = () => {
   foods.value.forEach((food) => {
-    food.foodName = "";
-    food.calories = 0;
+    resetFood(foods.value.indexOf(food));
   });
 };
 
@@ -265,7 +266,7 @@ const onFocus = (index: number, focus: boolean) => {
           label="Reset"
           name="resetFood"
           icon="heroicons:arrow-path"
-          @click="resetFood"
+          @click="resetFoods"
         />
       </div>
     </div>
