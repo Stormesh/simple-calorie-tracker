@@ -1,11 +1,11 @@
 <script setup lang="ts">
-interface ButtonProps {
+interface IButtonProps {
   label: string;
   name: string;
   icon: string;
 }
 
-const { label, name, icon } = defineProps<ButtonProps>();
+const { label, name, icon } = defineProps<IButtonProps>();
 </script>
 
 <template>

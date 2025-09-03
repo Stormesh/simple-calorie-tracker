@@ -1,4 +1,4 @@
-interface BmrForm {
+interface IBmrForm {
   bmr: number | null;
   weight: number | null;
   height: number | null;
@@ -10,7 +10,7 @@ interface BmrForm {
 }
 
 export const useBmr = () =>
-  useCookie<BmrForm>("bmr", {
+  useCookie<IBmrForm>("bmr", {
     default: () => {
       return {
         bmr: null,

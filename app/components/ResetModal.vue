@@ -1,11 +1,11 @@
 <script setup lang="ts">
-interface ResetProps {
+interface IResetProps {
   cookieNames: string[];
 }
 
 const emit = defineEmits<{ close: [boolean] }>();
 
-const { cookieNames } = defineProps<ResetProps>();
+const { cookieNames } = defineProps<IResetProps>();
 
 const resetCookies = () => {
   cookieNames.forEach((cookieName) => {

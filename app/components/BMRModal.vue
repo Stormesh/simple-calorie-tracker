@@ -63,13 +63,13 @@ const TARGET: Array<{
 ];
 
 // Mifflin-St Jeor Equation Constants
-const LBS_TO_KG_CONVERSION = 0.453592;
-const INCHES_TO_CM_CONVERSION = 2.54;
-const MALE_BMR_CONSTANT = 5;
-const FEMALE_BMR_CONSTANT = -161;
-const BMR_WEIGHT_MULTIPLIER = 10;
-const BMR_HEIGHT_MULTIPLIER = 6.25;
-const BMR_AGE_MULTIPLIER = 5;
+const LBS_TO_KG_CONVERSION = 0.453592,
+  INCHES_TO_CM_CONVERSION = 2.54,
+  MALE_BMR_CONSTANT = 5,
+  FEMALE_BMR_CONSTANT = -161,
+  BMR_WEIGHT_MULTIPLIER = 10,
+  BMR_HEIGHT_MULTIPLIER = 6.25,
+  BMR_AGE_MULTIPLIER = 5;
 
 const bmrForm = useBmr();
 
@@ -84,11 +84,7 @@ const targetOptions = computed(() => {
 });
 
 const calculateBMR = () => {
-  if (
-    bmrForm.value.weight === null ||
-    bmrForm.value.height === null ||
-    bmrForm.value.age === null
-  ) {
+  if (!bmrForm.value.weight || !bmrForm.value.height || !bmrForm.value.age) {
     bmrForm.value.bmr = null;
     return;
   }
@@ -141,6 +137,7 @@ const closeModal = () => {
             bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
           "
           type="number"
+          required
           size="xl"
           step="0.1"
           class="w-full"
@@ -151,6 +148,7 @@ const closeModal = () => {
             bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
           "
           type="number"
+          required
           size="xl"
           step="0.1"
           class="w-full"
@@ -159,6 +157,7 @@ const closeModal = () => {
           v-model.number="bmrForm.age"
           placeholder="Age"
           type="number"
+          required
           size="xl"
           class="w-full"
         />

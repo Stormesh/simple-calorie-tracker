@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import FoodDetails from "./components/FoodDetails.vue";
-import FoodList from "./components/FoodList.vue";
-import TotalNutritions from "./components/TotalNutritions.vue";
 
-type foodListType = InstanceType<typeof FoodList>;
-
-const foodListRef = ref<foodListType[]>([]);
 const foodDetailsRef = useTemplateRef("foodDetailsRef");
 
 const foodDetailsElement = computed(
   () => foodDetailsRef.value?.rootElement || null
 );
+
+const { aggregatedNutrients } = useAggregatedNutrients();
 </script>
 
 <template>
@@ -21,15 +18,14 @@ const foodDetailsElement = computed(
       <SettingsMenu />
       <div class="flex justify-center items-baseline flex-wrap">
         <FoodList
-          v-for="(foodList, index) in foodsList"
+          v-for="foodList in foodsList"
           :key="foodList"
-          :ref="(el) => {if (el) foodListRef[index] = el as InstanceType<typeof FoodList>}"
           :title="foodList"
           :food-details-ref="foodDetailsElement"
         />
       </div>
       <FoodDetails ref="foodDetailsRef" />
-      <TotalNutritions :food-list-ref="foodListRef" />
+      <TotalNutritions :total-nutrients="aggregatedNutrients" />
     </div>
   </UApp>
 </template>

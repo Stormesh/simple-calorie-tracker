@@ -2,13 +2,13 @@
 const foodData = foodDetails;
 const rootElement = ref<Element | null>(null);
 
-interface NutritionFacts {
+interface INutritionFacts {
   label: string;
   value?: number;
   unit: string;
 }
 
-const nutritionFacts = computed<NutritionFacts[]>(() => [
+const nutritionFacts = computed<INutritionFacts[]>(() => [
   { label: "Calories", value: foodData.value?.nf_calories, unit: "kcal" },
   { label: "Total Fat", value: foodData.value?.nf_total_fat, unit: "g" },
   {

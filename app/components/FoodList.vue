@@ -1,10 +1,10 @@
 <script setup lang="ts">
-interface FoodProps {
+interface IFoodProps {
   title: string;
   foodDetailsRef: Element | null;
 }
 
-interface FoodTemplate {
+export interface IFoodTemplate {
   foodName: string;
   calories: number;
   totalFat: number;
@@ -15,10 +15,9 @@ interface FoodTemplate {
   dietaryFiber: number;
   sugars: number;
   protein: number;
-  potassium: number;
 }
 
-interface FoodState {
+interface IFoodState {
   loading: boolean;
   focused: boolean;
 }
@@ -34,17 +33,16 @@ const foodTemplateDefault = () => ({
   dietaryFiber: 0,
   sugars: 0,
   protein: 0,
-  potassium: 0,
 });
 
-const foodLength = 4,
-  maxFoods = 10;
+const FOOD_LENGTH = 4,
+  MAX_FOODS = 10;
 
-const { title, foodDetailsRef } = defineProps<FoodProps>();
+const { title, foodDetailsRef } = defineProps<IFoodProps>();
 
-const foods = useCookie<FoodTemplate[]>(`foods-${title}`, {
+const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   default: () => {
-    return Array.from({ length: foodLength }, foodTemplateDefault);
+    return Array.from({ length: FOOD_LENGTH }, foodTemplateDefault);
   },
 });
 
@@ -53,12 +51,12 @@ const foodStateDefault = () => ({
   focused: false,
 });
 
-const foodStates = ref<FoodState[]>(
+const foodStates = ref<IFoodState[]>(
   Array.from({ length: foods.value.length }, foodStateDefault)
 );
 
 const maxFoodsReached = computed(() => {
-  return foods.value.length >= maxFoods;
+  return foods.value.length >= MAX_FOODS;
 });
 
 const toast = useToast();
@@ -79,7 +77,7 @@ watch(
 );
 
 const resetFood = (index: number) => {
-  const food = foods.value[index] as FoodTemplate;
+  const food = foods.value[index] as IFoodTemplate;
   Object.assign(food, foodTemplateDefault());
 }
 
@@ -103,7 +101,6 @@ const totalNutrients = computed(() => {
         dietaryFiber: totals.dietaryFiber + food.dietaryFiber,
         sugars: totals.sugars + food.sugars,
         protein: totals.protein + food.protein,
-        potassium: totals.potassium + food.potassium,
       };
     },
     {
@@ -116,7 +113,6 @@ const totalNutrients = computed(() => {
       dietaryFiber: 0,
       sugars: 0,
       protein: 0,
-      potassium: 0,
     }
   );
 });
@@ -141,7 +137,7 @@ const addItem = () => {
   if (maxFoodsReached.value) {
     return showToast(
       "Max Foods Reached",
-      `You can only add up to ${maxFoods} foods for ${title}`,
+      `You can only add up to ${MAX_FOODS} foods for ${title}`,
       "ic:outline-error"
     );
   }

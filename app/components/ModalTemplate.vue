@@ -1,11 +1,11 @@
 <script setup lang="ts">
-interface ModalProps {
+interface IModalProps {
   title: string;
 }
 
 const emit = defineEmits<{ close: [boolean] }>();
 
-const { title } = defineProps<ModalProps>();
+const { title } = defineProps<IModalProps>();
 </script>
 
 <template>
