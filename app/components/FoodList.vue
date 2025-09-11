@@ -79,7 +79,7 @@ watch(
 const resetFood = (index: number) => {
   const food = foods.value[index] as IFoodTemplate;
   Object.assign(food, foodTemplateDefault());
-}
+};
 
 const resetFoodIfEmpty = (index: number) => {
   const food = foods.value[index];
@@ -196,8 +196,7 @@ const onFocus = (index: number, focus: boolean) => {
           >
             <form
               class="container inline-block p-2"
-              @submit.prevent
-              @submit="changeFoodDetails(index)"
+              @submit.prevent="changeFoodDetails(index)"
             >
               <input
                 v-model="food.foodName"

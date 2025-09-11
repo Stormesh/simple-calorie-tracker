@@ -89,10 +89,10 @@ const nutritionFacts = computed<INutritionList[]>(() => [
               ? 'dark:text-red-500 text-red-700'
               : 'dark:text-green-500 text-green-700'
           "
-          >{{ Math.round(nutrition.value) }}{{ nutrition.unit }}</span
+          >{{ Math.round(nutrition.value) + nutrition.unit }}</span
         >
         <span v-if="nutrition.max">
-          / {{ nutrition.max }}{{ nutrition.unit }}
+          / {{ nutrition.max + nutrition.unit }}
         </span>
         <span
           class="font-light block"

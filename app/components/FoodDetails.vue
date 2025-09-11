@@ -52,15 +52,14 @@ defineExpose({
             (foodData.food_name.charAt(0).toUpperCase() +
               foodData.food_name.slice(1)) +
             " " +
-            foodData.serving_weight_grams +
-            "g"
-          }}
+            foodData.serving_weight_grams
+          }}g
         </h1>
         <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl p-2">
           <div class="grid grid-cols-2 gap-x-4 gap-y-1 md:text-lg">
             <template v-for="(fact, index) in nutritionFacts" :key="index">
               <div class="font-bold text-right">{{ fact.label }}:</div>
-              <div>{{ fact.value }}{{ fact.unit }}</div>
+              <div>{{ fact.value + fact.unit }}</div>
             </template>
           </div>
         </div>

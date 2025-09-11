@@ -20,11 +20,7 @@ const ACTIVITY = [
   { label: "Very Active", value: 1.9 },
 ];
 
-const TARGET: Array<{
-  metricLabel: string;
-  imperialLabel: string;
-  value: number;
-}> = [
+const TARGET = [
   {
     metricLabel: "Lose 1kg a week",
     imperialLabel: "Lose 2lbs a week",
