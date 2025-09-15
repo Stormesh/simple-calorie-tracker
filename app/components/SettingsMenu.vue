@@ -19,7 +19,6 @@ const bmrOpen = () => {
 const items = ref<DropdownMenuItem[]>([
   {
     label: "Reset",
-    name: "reset",
     icon: "heroicons:arrow-path",
     class: "cursor-pointer",
     onSelect: () => {
@@ -28,7 +27,6 @@ const items = ref<DropdownMenuItem[]>([
   },
   {
     label: "Diet Profile",
-    name: "bmr",
     icon: "heroicons:scale",
     class: "cursor-pointer",
     onSelect: () => {
