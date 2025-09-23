@@ -199,7 +199,7 @@ const onFocus = (index: number, focus: boolean) => {
               @submit.prevent="changeFoodDetails(index)"
             >
               <input
-                v-model="food.foodName"
+                v-model.lazy="food.foodName"
                 class="focus:outline-none focus:placeholder-shown:scale-110 focus:placeholder-shown:translate-x-3 transition-transform container"
                 type="text"
                 name="foodName"
@@ -207,7 +207,7 @@ const onFocus = (index: number, focus: boolean) => {
                 placeholder="Enter food"
                 @focus="onFocus(index, true)"
                 @blur="onFocus(index, false)"
-                @input="resetFoodIfEmpty(index)"
+                @change="resetFoodIfEmpty(index)"
               >
             </form>
             <div
