@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NutritionCard from "./NutritionCard.vue";
 interface ITotalNutrients {
   totalCalories: number;
   totalFat: number;
@@ -80,26 +81,30 @@ const nutritionFacts = computed<INutritionList[]>(() => [
 <template>
   <div class="flex justify-center items-center">
     <div
-      class="text-center text-2xl mb-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md flex items-center justify-center flex-col md:flex-row flex-wrap gap-5"
+      class="text-center text-2xl mb-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md items-center justify-center flex-col md:flex-row flex-wrap gap-5 hidden md:flex"
     >
-      <h2 v-for="nutrition in nutritionFacts" :key="nutrition.label">
-        <span
-          :class="
-            nutrition.max && Math.round(nutrition.value) > nutrition.max
-              ? 'dark:text-red-500 text-red-700'
-              : 'dark:text-green-500 text-green-700'
-          "
-          >{{ Math.round(nutrition.value) + nutrition.unit }}</span
+      <NutritionCard
+        v-for="nutrition in nutritionFacts"
+        :key="nutrition.label"
+        :nutrition="nutrition"
+      />
+    </div>
+    <div class="md:hidden flex justify-center w-full">
+      <UCarousel
+        v-slot="{ item }"
+        :items="nutritionFacts"
+        :ui="{
+          item: 'basis-full',
+        }"
+        class="w-full"
+        arrows
+      >
+        <div
+          class="text-center text-2xl m-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md flex items-center justify-center flex-col md:flex-row flex-wrap gap-5"
         >
-        <span v-if="nutrition.max">
-          / {{ nutrition.max + nutrition.unit }}
-        </span>
-        <span
-          class="font-light block"
-          :class="nutrition.label === 'Calories' ? 'text-xl' : 'text-base'"
-          >{{ nutrition.label }}</span
-        >
-      </h2>
+          <NutritionCard :nutrition="item" />
+        </div>
+      </UCarousel>
     </div>
   </div>
 </template>

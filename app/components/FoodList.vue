@@ -182,7 +182,7 @@ const onFocus = (index: number, focus: boolean) => {
 </script>
 
 <template>
-  <div class="m-4 flex-col flex justify-center">
+  <div class="flex-col flex justify-center m-4">
     <h1
       class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
     >

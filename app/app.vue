@@ -16,13 +16,28 @@ const { aggregatedNutrients } = useAggregatedNutrients();
       <NuxtRouteAnnouncer />
       <MyHeader />
       <SettingsMenu />
-      <div class="flex justify-center items-baseline flex-wrap">
+      <div class="hidden justify-center items-baseline flex-wrap md:flex">
         <FoodList
           v-for="foodList in foodsList"
           :key="foodList"
           :title="foodList"
           :food-details-ref="foodDetailsElement"
         />
+      </div>
+      <div class="md:hidden">
+        <UCarousel
+          v-slot="{ item }"
+          :items="foodsList"
+          :ui="{
+            item: 'basis-full',
+          }"
+        >
+          <FoodList
+            :key="item"
+            :title="item"
+            :food-details-ref="foodDetailsElement"
+          />
+        </UCarousel>
       </div>
       <FoodDetails ref="foodDetailsRef" />
       <TotalNutritions :total-nutrients="aggregatedNutrients" />
