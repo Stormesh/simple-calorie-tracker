@@ -24,21 +24,20 @@ const { aggregatedNutrients } = useAggregatedNutrients();
           :food-details-ref="foodDetailsElement"
         />
       </div>
-      <div class="md:hidden">
-        <UCarousel
-          v-slot="{ item }"
-          :items="foodsList"
-          :ui="{
-            item: 'basis-full',
-          }"
-        >
-          <FoodList
-            :key="item"
-            :title="item"
-            :food-details-ref="foodDetailsElement"
-          />
-        </UCarousel>
-      </div>
+      <UCarousel
+        v-slot="{ item }"
+        class="md:hidden"
+        :items="foodsList"
+        :ui="{
+          item: 'basis-full',
+        }"
+      >
+        <FoodList
+          :key="item"
+          :title="item"
+          :food-details-ref="foodDetailsElement"
+        />
+      </UCarousel>
       <FoodDetails ref="foodDetailsRef" />
       <TotalNutritions :total-nutrients="aggregatedNutrients" />
     </div>
