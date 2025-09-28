@@ -9,11 +9,7 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxt/image",
     "@nuxt/icon",
-    "@nuxtjs/seo",
   ],
-  site: {
-    name: "MaxHP - Level Up Your Health",
-  },
   css: ["~/assets/css/app.css"],
   runtimeConfig: {
     public: {
@@ -23,6 +19,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      title: "MaxHP - Level Up Your Health",
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.png" }],
       htmlAttrs: {
         lang: "en",

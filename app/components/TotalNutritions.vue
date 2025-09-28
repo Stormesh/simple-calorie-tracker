@@ -97,7 +97,6 @@ const nutritionFacts = computed<INutritionList[]>(() => [
           item: 'basis-full',
         }"
         class="w-full"
-        arrows
       >
         <div
           class="text-center text-2xl m-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md flex items-center justify-center flex-col md:flex-row flex-wrap gap-5"
