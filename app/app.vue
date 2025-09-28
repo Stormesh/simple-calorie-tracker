@@ -24,6 +24,7 @@ const { aggregatedNutrients } = useAggregatedNutrients();
           :food-details-ref="foodDetailsElement"
         />
       </div>
+      <CaloriesHPBar />
       <FoodDetails ref="foodDetailsRef" />
       <TotalNutritions :total-nutrients="aggregatedNutrients" />
     </div>
