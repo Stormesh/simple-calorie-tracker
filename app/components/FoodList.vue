@@ -222,7 +222,7 @@ const onFocus = (index: number, focus: boolean) => {
               class="absolute right-20 top-2 select-none pointer-events-none transition-opacity"
               :class="foodStates[index]?.focused ? 'opacity-0' : 'opacity-65'"
             >
-              <div>{{ food.calories }}kcal</div>
+              <div>{{ Math.round(food.calories) }}kcal</div>
             </div>
             <button
               class="min-h-fit inline-block hover:bg-teal-600 active:bg-teal-500 transition-colors group cursor-pointer"
