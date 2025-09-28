@@ -8,7 +8,7 @@ const maxBmr = computed(() => (bmr ? bmr : defaultMaxBmr));
 
 const caloriesLeft = computed(() => {
   return bmr
-    ? Math.round(bmr - aggregatedNutrients.value.totalCalories)
+    ? Math.round(maxBmr.value - aggregatedNutrients.value.totalCalories)
     : 0;
 });
 
