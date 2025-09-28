@@ -10,22 +10,12 @@ interface INutritionFacts {
 
 const nutritionFacts = computed<INutritionFacts[]>(() => [
   { label: "Calories", value: foodData.value?.nf_calories, unit: "kcal" },
-  { label: "Total Fat", value: foodData.value?.nf_total_fat, unit: "g" },
-  {
-    label: "Saturated Fat",
-    value: foodData.value?.nf_saturated_fat,
-    unit: "g",
-  },
+  { label: "Fat", value: foodData.value?.nf_total_fat, unit: "g" },
   { label: "Cholesterol", value: foodData.value?.nf_cholesterol, unit: "mg" },
   { label: "Sodium", value: foodData.value?.nf_sodium, unit: "mg" },
   {
-    label: "Total Carbohydrate",
+    label: "Carbohydrates",
     value: foodData.value?.nf_total_carbohydrate,
-    unit: "g",
-  },
-  {
-    label: "Dietary Fiber",
-    value: foodData.value?.nf_dietary_fiber,
     unit: "g",
   },
   { label: "Sugars", value: foodData.value?.nf_sugars, unit: "g" },
@@ -39,7 +29,7 @@ defineExpose({
 
 <template>
   <div ref="rootElement" class="flex justify-center items-center">
-    <div class="m-4 w-md">
+    <div class="m-4 w-sm max-w-md">
       <div v-if="isFoodLoading" class="flex justify-center items-center">
         <icon name="line-md:loading-loop" size="5rem" />
       </div>
@@ -59,7 +49,7 @@ defineExpose({
           <div class="grid grid-cols-2 gap-x-4 gap-y-1 md:text-lg">
             <template v-for="(fact, index) in nutritionFacts" :key="index">
               <div class="font-bold text-right">{{ fact.label }}:</div>
-              <div>{{ fact.value + fact.unit }}</div>
+              <div>{{ Math.round(fact.value || 0) + fact.unit }}</div>
             </template>
           </div>
         </div>

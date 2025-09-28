@@ -44,7 +44,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
     max: bmrState.value.bmr || 0,
   },
   {
-    label: "Fats",
+    label: "Fat",
     value: totalNutrients.totalFat,
     unit: "g",
     max: Math.round(((bmrState.value.bmr || 0) * MAX_FAT) / FAT_PER_KCAL),
@@ -81,7 +81,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
 <template>
   <div class="flex justify-center items-center">
     <div
-      class="text-center text-2xl mb-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md items-center justify-center flex-col md:flex-row flex-wrap gap-5 hidden md:flex"
+      class="text-center text-2xl md:mx-16 lg:mx-0 mb-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md items-center justify-center flex-col md:flex-row flex-wrap gap-5 hidden md:flex"
     >
       <NutritionCard
         v-for="nutrition in nutritionFacts"
