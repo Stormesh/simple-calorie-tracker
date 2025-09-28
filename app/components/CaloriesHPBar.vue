@@ -8,7 +8,7 @@ const maxBmr = computed(() => (bmr ? bmr : defaultMaxBmr));
 
 const caloriesLeft = computed(() => {
   return bmr
-    ? Math.round(Math.max(bmr - aggregatedNutrients.value.totalCalories, 0))
+    ? Math.round(bmr - aggregatedNutrients.value.totalCalories)
     : 0;
 });
 
@@ -37,7 +37,7 @@ const getCaloriePercentage = () => {
     <NuxtImg
       src="/heart.png"
       alt="Heart"
-      class="-left-4 absolute z-10 mx-auto h-12 w-12"
+      class="-left-7 absolute z-10 mx-auto h-12 w-12"
     />
     <UProgress
       v-model="caloriesLeft"
