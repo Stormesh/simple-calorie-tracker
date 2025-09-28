@@ -5,12 +5,17 @@ interface IResetProps {
 
 const emit = defineEmits<{ close: [boolean] }>();
 
+const cookiesReset = ref(false);
+
 const { cookieNames } = defineProps<IResetProps>();
 
 const resetCookies = () => {
+  if (cookiesReset.value) return;
+
   cookieNames.forEach((cookieName) => {
     useCookie(cookieName).value = null;
   });
+  cookiesReset.value = true;
   window.location.reload();
 };
 </script>
