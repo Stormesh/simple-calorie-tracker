@@ -155,6 +155,7 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
     foodState = foodStates.value[index];
   if (!foodItem || !foodState) return;
 
+  foodState.focused = false;
   foodState.loading = true;
 
   const foodName = foodItem.foodName || "";
@@ -199,7 +200,7 @@ const onFocus = (index: number, focus: boolean) => {
               @submit.prevent="changeFoodDetails(index)"
             >
               <input
-                v-model.lazy="food.foodName"
+                v-model="food.foodName"
                 class="focus:outline-none focus:placeholder-shown:scale-110 focus:placeholder-shown:translate-x-3 transition-transform container"
                 type="text"
                 name="foodName"
