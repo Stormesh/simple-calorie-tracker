@@ -33,7 +33,7 @@ const getCaloriePercentage = () => {
     >
     / {{ maxBmr }} HP
   </div>
-  <div class="flex relative flex-wrap items-center w-2xl mx-auto">
+  <div class="flex relative flex-wrap items-center w-80 md:w-2xl mx-auto">
     <NuxtImg
       src="/heart.png"
       alt="Heart"
