@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { bmr } = useBmr().value;
+const bmrState = useBmr();
 const { aggregatedNutrients } = useAggregatedNutrients();
 
 const defaultMaxBmr = 2000;
 
-const maxBmr = computed(() => (bmr ? bmr : defaultMaxBmr));
+const maxBmr = computed(() => (bmrState.value.bmr ? bmrState.value.bmr : defaultMaxBmr));
 
 const caloriesLeft = computed(() => {
   return Math.round(maxBmr.value - aggregatedNutrients.value.totalCalories);
