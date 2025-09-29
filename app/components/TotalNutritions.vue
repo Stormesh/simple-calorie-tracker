@@ -99,7 +99,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
         class="w-full"
       >
         <div
-          class="text-center text-2xl m-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md flex items-center justify-center flex-col md:flex-row flex-wrap gap-5"
+          class="text-center text-2xl m-4 mb-12 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md flex items-center justify-center flex-col md:flex-row flex-wrap gap-5"
         >
           <NutritionCard :nutrition="item" />
         </div>

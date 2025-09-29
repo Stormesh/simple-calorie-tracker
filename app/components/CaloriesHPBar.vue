@@ -17,7 +17,7 @@ const getCaloriePercentage = () => {
 
 <template>
   <div
-    class="fixed flex items-center justify-center bottom-0 flex-col w-full z-20 select-none"
+    class="fixed flex items-center justify-center bottom-2 flex-col w-full z-20 select-none"
   >
     <div
       class="absolute bottom-3 text-center text-lg font-bold z-20 text-shadow-[0_0_3px_#000] select-none"
