@@ -4,7 +4,9 @@ const { aggregatedNutrients } = useAggregatedNutrients();
 
 const defaultMaxBmr = 2000;
 
-const maxBmr = computed(() => (bmrState.value.bmr ? bmrState.value.bmr : defaultMaxBmr));
+const maxBmr = computed(() =>
+  bmrState.value.bmr ? bmrState.value.bmr : defaultMaxBmr
+);
 
 const caloriesLeft = computed(() => {
   return Math.round(maxBmr.value - aggregatedNutrients.value.totalCalories);
@@ -20,7 +22,7 @@ const getCaloriePercentage = () => {
     class="fixed flex items-center justify-center bottom-2 flex-col w-full z-20 select-none"
   >
     <div
-      class="absolute bottom-3 text-center text-lg font-bold z-20 text-shadow-[0_0_3px_#000] select-none"
+      class="absolute bottom-3 text-center text-lg font-bold z-20 dark:text-shadow-[0_0_3px_#000] select-none"
     >
       <span
         :class="getCaloriePercentage() <= 0 && 'dark:text-red-500 text-red-700'"
