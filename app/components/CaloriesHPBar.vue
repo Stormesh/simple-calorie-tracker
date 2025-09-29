@@ -19,10 +19,10 @@ const getCaloriePercentage = () => {
 
 <template>
   <div
-    class="fixed flex items-center justify-center bottom-2 flex-col w-full z-20 select-none"
+    class="sticky md:fixed flex items-center justify-center top-2 flex-col w-full z-10 select-none"
   >
     <div
-      class="absolute bottom-3 text-center text-lg font-bold z-20 dark:text-shadow-[0_0_3px_#000] select-none"
+      class="absolute text-center text-lg font-bold z-20 dark:text-shadow-[0_0_3px_#000] select-none"
     >
       <span
         :class="getCaloriePercentage() <= 0 && 'dark:text-red-500 text-red-700'"
@@ -30,7 +30,7 @@ const getCaloriePercentage = () => {
       >
       / {{ maxBmr }} HP
     </div>
-    <div class="flex relative flex-wrap items-center w-80 md:w-2xl mx-auto">
+    <div class="flex relative flex-wrap items-center w-80 md:w-sm lg:w-2xl mx-auto">
       <NuxtImg
         src="/heart.png"
         alt="Heart"

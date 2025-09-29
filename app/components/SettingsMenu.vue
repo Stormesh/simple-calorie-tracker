@@ -37,7 +37,7 @@ const items = ref<DropdownMenuItem[]>([
 </script>
 
 <template>
-  <div class="sticky z-10 top-0">
+  <div class="sticky z-20 top-0">
     <UDropdownMenu
       arrow
       :ui="{

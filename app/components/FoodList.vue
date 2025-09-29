@@ -4,43 +4,18 @@ interface IFoodProps {
   foodDetailsRef: Element | null;
 }
 
-export interface IFoodTemplate {
-  foodName: string;
-  calories: number;
-  totalFat: number;
-  cholesterol: number;
-  sodium: number;
-  totalCarbohydrate: number;
-  sugars: number;
-  protein: number;
-}
-
 interface IFoodState {
   loading: boolean;
   focused: boolean;
 }
 
-const foodTemplateDefault = () => ({
-  foodName: "",
-  calories: 0,
-  totalFat: 0,
-  saturatedFat: 0,
-  cholesterol: 0,
-  sodium: 0,
-  totalCarbohydrate: 0,
-  dietaryFiber: 0,
-  sugars: 0,
-  protein: 0,
-});
-
-const FOOD_LENGTH = 4,
-  MAX_FOODS = 10;
+const MAX_FOODS = 10;
 
 const { title, foodDetailsRef } = defineProps<IFoodProps>();
 
 const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   default: () => {
-    return Array.from({ length: FOOD_LENGTH }, foodTemplateDefault);
+    return foodArrayDefault();
   },
 });
 
