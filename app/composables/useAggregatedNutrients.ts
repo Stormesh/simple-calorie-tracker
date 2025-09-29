@@ -1,5 +1,3 @@
-import type { IFoodTemplate } from "../components/FoodList.vue";
-
 export const useAggregatedNutrients = () => {
   const aggregatedNutrients = computed(() => {
     const totals = {
@@ -20,11 +18,9 @@ export const useAggregatedNutrients = () => {
         foodsCookie.value.forEach((food) => {
           totals.totalCalories += food.calories;
           totals.totalFat += food.totalFat;
-          totals.saturatedFat += food.saturatedFat;
           totals.cholesterol += food.cholesterol;
           totals.sodium += food.sodium;
           totals.totalCarbohydrate += food.totalCarbohydrate;
-          totals.dietaryFiber += food.dietaryFiber;
           totals.sugars += food.sugars;
           totals.protein += food.protein;
         });
