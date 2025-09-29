@@ -81,7 +81,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
 <template>
   <div class="flex justify-center items-center">
     <div
-      class="text-center text-2xl md:mx-16 lg:mx-0 mb-4 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md items-center justify-center flex-col md:flex-row flex-wrap gap-5 hidden md:flex"
+      class="text-center text-2xl md:mx-16 lg:mx-0 mb-12 p-4 bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md items-center justify-center flex-col md:flex-row flex-wrap gap-5 hidden md:flex"
     >
       <NutritionCard
         v-for="nutrition in nutritionFacts"
