@@ -12,7 +12,6 @@ const { aggregatedNutrients } = useAggregatedNutrients();
 
 <template>
   <div>
-    <CaloriesHPBar />
     <div class="justify-center items-baseline flex-wrap flex">
       <FoodList
         v-for="foodList in foodsList"
