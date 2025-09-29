@@ -8,11 +8,9 @@ export interface IFoodTemplate {
   foodName: string;
   calories: number;
   totalFat: number;
-  saturatedFat: number;
   cholesterol: number;
   sodium: number;
   totalCarbohydrate: number;
-  dietaryFiber: number;
   sugars: number;
   protein: number;
 }
@@ -94,11 +92,9 @@ const totalNutrients = computed(() => {
       return {
         totalCalories: totals.totalCalories + food.calories,
         totalFat: totals.totalFat + food.totalFat,
-        saturatedFat: totals.saturatedFat + food.saturatedFat,
         cholesterol: totals.cholesterol + food.cholesterol,
         sodium: totals.sodium + food.sodium,
         totalCarbohydrate: totals.totalCarbohydrate + food.totalCarbohydrate,
-        dietaryFiber: totals.dietaryFiber + food.dietaryFiber,
         sugars: totals.sugars + food.sugars,
         protein: totals.protein + food.protein,
       };
@@ -106,11 +102,9 @@ const totalNutrients = computed(() => {
     {
       totalCalories: 0,
       totalFat: 0,
-      saturatedFat: 0,
       cholesterol: 0,
       sodium: 0,
       totalCarbohydrate: 0,
-      dietaryFiber: 0,
       sugars: 0,
       protein: 0,
     }
