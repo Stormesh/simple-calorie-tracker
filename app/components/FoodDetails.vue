@@ -25,6 +25,16 @@ const nutritionFacts = computed<INutritionFacts[]>(() => [
 defineExpose({
   rootElement,
 });
+
+const isValidQuantity = computed(() => {
+  if (!foodData.value) return false;
+  const qty = foodData.value.serving_qty;
+  const weight = foodData.value.serving_weight_grams;
+  if (qty <= 1) return false;
+  if (weight === null) return true;
+  // Check if qty is not "near" the weight. "Near" is defined as a difference of less than 10.
+  return Math.abs(qty - weight) >= 10;
+});
 </script>
 
 <template>
@@ -38,7 +48,7 @@ defineExpose({
           class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
         >
           {{
-            (foodData.serving_qty > 1 ? foodData.serving_qty + " " : "") +
+            (isValidQuantity ? foodData.serving_qty + " " : "") +
             (foodData.food_name.charAt(0).toUpperCase() +
               foodData.food_name.slice(1)) +
             " " +

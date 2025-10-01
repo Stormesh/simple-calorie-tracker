@@ -114,9 +114,7 @@ const addItem = () => {
 };
 
 const resetFoods = () => {
-  foods.value.forEach((food) => {
-    resetFood(foods.value.indexOf(food));
-  });
+  foods.value = foodArrayDefault();
 };
 
 const changeFoodDetails = async (index: number, scroll: boolean = false) => {
@@ -160,65 +158,7 @@ const onFocus = (index: number, focus: boolean) => {
     </h1>
     <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl shadow-md">
       <div v-for="(food, index) in foods" :key="index">
-        <div class="py-1.5 mx-2">
-          <div
-            class="h-10 flex relative bg-stone-50 dark:bg-slate-900 rounded-lg overflow-hidden shadow"
-          >
-            <form
-              class="container inline-block p-2"
-              @submit.prevent="changeFoodDetails(index)"
-            >
-              <input
-                v-model="food.foodName"
-                class="focus:outline-none focus:placeholder-shown:scale-110 focus:placeholder-shown:translate-x-3 transition-transform container"
-                type="text"
-                name="foodName"
-                aria-label="Enter food"
-                placeholder="Enter food"
-                @focus="onFocus(index, true)"
-                @blur="onFocus(index, false)"
-                @change="resetFoodIfEmpty(index)"
-              >
-            </form>
-            <div
-              v-if="foodStates[index]?.loading"
-              class="absolute right-24 top-2"
-            >
-              <Icon name="line-md:loading-loop" size="2rem" />
-            </div>
-            <div
-              v-else-if="food.calories > 0"
-              class="absolute right-20 top-2 select-none pointer-events-none transition-opacity"
-              :class="foodStates[index]?.focused ? 'opacity-0' : 'opacity-65'"
-            >
-              <div>{{ Math.round(food.calories) }}kcal</div>
-            </div>
-            <button
-              class="min-h-fit inline-block hover:bg-teal-600 active:bg-teal-500 transition-colors group cursor-pointer"
-              name="showFoodDetails"
-              aria-label="Show food details"
-              @click="changeFoodDetails(index, true)"
-            >
-              <Icon
-                name="ic:outline-keyboard-arrow-down"
-                size="2.5rem"
-                class="text-black group-hover:text-white dark:text-white group-hover:translate-y-1 transition-transform duration-150"
-              />
-            </button>
-            <button
-              class="min-h-fit inline-block hover:bg-rose-800 active:bg-rose-700 transition-colors group cursor-pointer"
-              name="deleteFood"
-              aria-label="Delete food"
-              @click="deleteItem(index)"
-            >
-              <Icon
-                name="ic:outline-delete"
-                size="2.5rem"
-                class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
-              />
-            </button>
-          </div>
-        </div>
+        <FoodInput v-model:food-name="food.foodName" :index="index" :calories="food.calories" :food-state="foodStates[index]" :change-food-details="changeFoodDetails" :on-focus="onFocus" :reset-food-if-empty="resetFoodIfEmpty" :delete-item="deleteItem" />
       </div>
       <div class="flex justify-center overflow-hidden">
         <FoodListButton

@@ -22,6 +22,11 @@ export interface IFoodDetails {
   nf_total_carbohydrate: number;
   nf_sugars: number;
   nf_protein: number;
+  photo: {
+    thumb: string;
+    highres: string | null;
+    is_user_uploaded: boolean;
+  }
 }
 
 export const foodTemplateDefault = () => ({
