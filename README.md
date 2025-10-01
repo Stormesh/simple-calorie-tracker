@@ -1,5 +1,5 @@
 # Calorie Tracker
-![Logo](./maxhp_git.png)
+![Logo](./public/maxhp_banner.png)
 
 A simple calorie tracking application built with Nuxt and powered by the Nutritionix API.
 

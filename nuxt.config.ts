@@ -32,11 +32,11 @@ export default defineNuxtConfig({
         },
         {
           name: "og:image",
-          content: "/maxhp_side.png",
+          content: "/maxhp_banner.png",
         },
         {
           name: "twitter:image",
-          content: "/maxhp_side.png",
+          content: "/maxhp_banner.png",
         },
       ],
     },
