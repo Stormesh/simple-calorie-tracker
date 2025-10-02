@@ -31,6 +31,15 @@ export default defineNuxtConfig({
             "MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed.",
         },
         {
+          name: "og:title",
+          content: "MaxHP - Level Up Your Health",
+        },
+        {
+          name: "og:description",
+          content:
+            "MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed.",
+        },
+        {
           name: "og:image",
           content: "/maxhp_banner.png",
         },
@@ -39,9 +48,22 @@ export default defineNuxtConfig({
           content: "summary_large_image",
         },
         {
+          name: "twitter:title",
+          content: "MaxHP - Level Up Your Health",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "MaxHP is a simple but effective calorie tracker to level up your health. Track your food and see how many calories you have consumed.",
+        },
+        {
           name: "twitter:image",
           content: "/maxhp_banner.png",
         },
+        {
+          name: "twitter:image:alt",
+          content: "MaxHP Banner",
+        }
       ],
     },
   },
