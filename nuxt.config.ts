@@ -35,6 +35,10 @@ export default defineNuxtConfig({
           content: "/maxhp_banner.png",
         },
         {
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
           name: "twitter:image",
           content: "/maxhp_banner.png",
         },
