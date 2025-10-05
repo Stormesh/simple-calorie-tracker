@@ -34,7 +34,8 @@ const getCaloriePercentage = () => {
       <NuxtImg
         src="/heart.png"
         alt="Heart"
-        class="-left-5 absolute z-10 mx-auto h-12 w-12"
+        height="48"
+        class="-left-5 absolute z-10 mx-auto"
       />
       <UProgress
         v-model="caloriesLeft"
