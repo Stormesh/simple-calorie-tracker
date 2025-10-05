@@ -35,7 +35,8 @@ const getCaloriePercentage = () => {
         src="/heart.png"
         alt="Heart"
         height="48"
-        class="-left-5 absolute z-10 mx-auto"
+        width="48"
+        class="-left-5 absolute z-10 mx-auto w-12 h-12"
       />
       <UProgress
         v-model="caloriesLeft"
