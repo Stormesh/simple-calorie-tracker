@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import FoodCardInput from "./FoodCardInput.vue";
 interface IFoodCardProps {
   calories: number;
   foodName: string;
