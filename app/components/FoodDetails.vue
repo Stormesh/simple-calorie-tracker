@@ -43,7 +43,7 @@ const isValidQuantity = computed(() => {
       <div v-if="isFoodLoading" class="flex justify-center items-center">
         <icon name="line-md:loading-loop" size="5rem" />
       </div>
-      <div v-else-if="foodData && !isFoodLoading">
+      <div v-else-if="foodData">
         <h1
           class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
         >

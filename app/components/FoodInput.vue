@@ -1,13 +1,15 @@
 <script setup lang="ts">
-defineProps<{
+interface IFoodInputProps {
   index: number;
-  foodState?: { loading: boolean; focused: boolean };
+  foodState?: IFoodState;
   calories: number;
   changeFoodDetails: (index: number, scroll?: boolean) => Promise<void>;
   onFocus: (index: number, focus: boolean) => void;
   resetFoodIfEmpty: (index: number) => void;
   deleteItem: (index: number) => void;
-}>();
+}
+
+defineProps<IFoodInputProps>();
 
 const foodName = defineModel<string>("foodName");
 </script>

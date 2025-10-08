@@ -9,6 +9,7 @@ export interface IFoodTemplate {
   totalCarbohydrate: number;
   sugars: number;
   protein: number;
+  photo: string;
 }
 
 export interface IFoodDetails {
@@ -26,10 +27,20 @@ export interface IFoodDetails {
     thumb: string;
     highres: string | null;
     is_user_uploaded: boolean;
-  }
+  };
 }
 
-export const foodTemplateDefault = () => ({
+export interface IFoodState {
+  loading: boolean;
+  focused: boolean;
+}
+
+export const foodStateDefault = (): IFoodState => ({
+  loading: false,
+  focused: false,
+});
+
+export const foodTemplateDefault = (): IFoodTemplate => ({
   foodName: "",
   calories: 0,
   totalFat: 0,
@@ -38,6 +49,7 @@ export const foodTemplateDefault = () => ({
   totalCarbohydrate: 0,
   sugars: 0,
   protein: 0,
+  photo: "",
 });
 
 const FOOD_LENGTH = 4;
@@ -56,3 +68,8 @@ export const resetCookies = (cookieNames: string[]) => {
 export const foodDetails = ref<IFoodDetails | null>(null);
 
 export const isFoodLoading = ref(false);
+
+export const useCardMode = () =>
+  useCookie<boolean>("cardMode", {
+    default: () => false,
+  });

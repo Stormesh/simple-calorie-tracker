@@ -13,7 +13,7 @@ const { aggregatedNutrients } = useAggregatedNutrients();
 <template>
   <div>
     <CaloriesHPBar />
-    <div class="justify-center items-baseline flex-wrap flex">
+    <div class="justify-center items-baseline flex-wrap flex mx-30">
       <FoodList
         v-for="foodList in foodsList"
         :key="foodList"

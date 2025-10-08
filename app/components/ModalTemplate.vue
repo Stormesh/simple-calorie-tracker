@@ -10,6 +10,9 @@ const { title } = defineProps<IModalProps>();
 
 <template>
   <UModal
+    :ui="{
+      content: 'bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md ring-0',
+    }"
     @close="
       {
         emit('close', false);

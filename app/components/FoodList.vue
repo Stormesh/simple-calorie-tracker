@@ -4,11 +4,6 @@ interface IFoodProps {
   foodDetailsRef: Element | null;
 }
 
-interface IFoodState {
-  loading: boolean;
-  focused: boolean;
-}
-
 const MAX_FOODS = 10;
 
 const { title, foodDetailsRef } = defineProps<IFoodProps>();
@@ -19,10 +14,9 @@ const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   },
 });
 
-const foodStateDefault = () => ({
-  loading: false,
-  focused: false,
-});
+const isPopoverOpen = ref(false);
+
+const foodText = ref("");
 
 const foodStates = ref<IFoodState[]>(
   Array.from({ length: foods.value.length }, foodStateDefault)
@@ -33,33 +27,6 @@ const maxFoodsReached = computed(() => {
 });
 
 const toast = useToast();
-
-const showToast = (title: string, description: string, icon: string) => {
-  toast.add({
-    title,
-    description,
-    icon,
-  });
-};
-
-watch(
-  () => foods.value.length,
-  (newLength) => {
-    foodStates.value = Array.from({ length: newLength }, foodStateDefault);
-  }
-);
-
-const resetFood = (index: number) => {
-  const food = foods.value[index] as IFoodTemplate;
-  Object.assign(food, foodTemplateDefault());
-};
-
-const resetFoodIfEmpty = (index: number) => {
-  const food = foods.value[index];
-  if (food?.foodName.trim() === "") {
-    resetFood(index);
-  }
-};
 
 const totalNutrients = computed(() => {
   return foods.value.reduce(
@@ -86,23 +53,24 @@ const totalNutrients = computed(() => {
   );
 });
 
-defineExpose({
-  totalNutrients,
-});
+const cardMode = useCardMode();
 
-const deleteItem = (index: number) => {
-  // Allow deletion but ensure there's always at least one item
-
-  if (foods.value.length <= 1) {
-    // If trying to delete the last item, just clear it instead
-    resetFood(0);
-    return;
+watch(
+  () => foods.value.length,
+  (newLength) => {
+    foodStates.value = Array.from({ length: newLength }, foodStateDefault);
   }
+);
 
-  foods.value.splice(index, 1);
+const showToast = (title: string, description: string, icon: string) => {
+  toast.add({
+    title,
+    description,
+    icon,
+  });
 };
 
-const addItem = () => {
+const addFood = async (foodName?: string) => {
   if (maxFoodsReached.value) {
     return showToast(
       "Max Foods Reached",
@@ -111,13 +79,46 @@ const addItem = () => {
     );
   }
   foods.value.push(foodTemplateDefault());
+  foodStates.value.push(foodStateDefault());
+
+  if (foodName?.trim()) {
+    isPopoverOpen.value = false;
+    await nextTick();
+    await changeFoodDetails(foods.value.length - 1, false, foodName);
+    foodText.value = "";
+  }
+};
+
+const resetFood = (index: number) => {
+  const food = foods.value[index] as IFoodTemplate;
+  Object.assign(food, foodTemplateDefault());
+};
+
+const resetFoodIfEmpty = (index: number) => {
+  const food = foods.value[index];
+  if (food?.foodName.trim() === "") {
+    resetFood(index);
+  }
 };
 
 const resetFoods = () => {
   foods.value = foodArrayDefault();
 };
 
-const changeFoodDetails = async (index: number, scroll: boolean = false) => {
+const deleteItem = (index: number) => {
+  if (foods.value.length <= 1) {
+    resetFood(0);
+    return;
+  }
+
+  foods.value.splice(index, 1);
+};
+
+const changeFoodDetails = async (
+  index: number,
+  scroll: boolean = false,
+  name?: string
+) => {
   const foodItem = foods.value[index],
     foodState = foodStates.value[index];
   if (!foodItem || !foodState) return;
@@ -125,17 +126,22 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
   foodState.focused = false;
   foodState.loading = true;
 
-  const foodName = foodItem.foodName || "";
+  const foodName = name || foodItem?.foodName || "";
   const details = await searchFood(foodName);
   if (details) {
     foodDetails.value = details;
-    foodItem.calories = details.nf_calories;
-    foodItem.totalFat = details.nf_total_fat;
-    foodItem.sodium = details.nf_sodium;
-    foodItem.totalCarbohydrate = details.nf_total_carbohydrate;
-    foodItem.cholesterol = details.nf_cholesterol;
-    foodItem.sugars = details.nf_sugars;
-    foodItem.protein = details.nf_protein;
+    foods.value[index] = {
+      ...foodItem,
+      foodName: name || foodName,
+      calories: details.nf_calories,
+      totalFat: details.nf_total_fat,
+      sodium: details.nf_sodium,
+      totalCarbohydrate: details.nf_total_carbohydrate,
+      cholesterol: details.nf_cholesterol,
+      sugars: details.nf_sugars,
+      protein: details.nf_protein,
+      photo: details.photo.thumb,
+    };
     if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -150,29 +156,75 @@ const onFocus = (index: number, focus: boolean) => {
 </script>
 
 <template>
-  <div class="flex-col flex justify-center m-4">
+  <div class="flex flex-col justify-center m-4">
     <h1
       class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
     >
       {{ title }}
     </h1>
     <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl shadow-md">
-      <div v-for="(food, index) in foods" :key="index">
-        <FoodInput v-model:food-name="food.foodName" :index="index" :calories="food.calories" :food-state="foodStates[index]" :change-food-details="changeFoodDetails" :on-focus="onFocus" :reset-food-if-empty="resetFoodIfEmpty" :delete-item="deleteItem" />
-      </div>
-      <div class="flex justify-center overflow-hidden">
-        <FoodListButton
-          label="Add food"
-          name="addFood"
-          icon="ic:outline-plus"
-          @click="addItem"
-        />
-        <FoodListButton
-          label="Reset"
-          name="resetFood"
-          icon="heroicons:arrow-path"
-          @click="resetFoods"
-        />
+      <div
+        :class="
+          cardMode && 'flex justify-center items-center flex-wrap w-xs md:w-lg'
+        "
+      >
+        <div v-for="(food, index) in foods" :key="index">
+          <FoodInput
+            v-if="!cardMode"
+            v-model:food-name="food.foodName"
+            :index="index"
+            :calories="food.calories"
+            :food-state="foodStates[index]"
+            :change-food-details="changeFoodDetails"
+            :on-focus="onFocus"
+            :reset-food-if-empty="resetFoodIfEmpty"
+            :delete-item="deleteItem"
+          />
+          <FoodCard
+            v-else
+            :food-name="food.foodName"
+            :index="index"
+            :calories="food.calories"
+            :food-state="foodStates[index]"
+            :src="food.photo"
+            :change-food-details="changeFoodDetails"
+            :delete-item="deleteItem"
+          />
+        </div>
+        <div class="flex justify-center overflow-hidden">
+          <PopoverTemplate
+            v-if="cardMode"
+            v-model:open="isPopoverOpen"
+            title="Add food"
+          >
+            <template #trigger>
+              <FoodListButton
+                label="Add food"
+                name="addFood"
+                icon="ic:outline-plus"
+              />
+            </template>
+            <template #content>
+              <FoodCardInput
+                v-model:food-text="foodText"
+                :food-callback="() => addFood(foodText)"
+              />
+            </template>
+          </PopoverTemplate>
+          <FoodListButton
+            v-else
+            label="Add food"
+            name="addFood"
+            icon="ic:outline-plus"
+            @click="addFood"
+          />
+          <FoodListButton
+            label="Reset"
+            name="resetFood"
+            icon="heroicons:arrow-path"
+            @click="resetFoods"
+          />
+        </div>
       </div>
     </div>
     <div>
