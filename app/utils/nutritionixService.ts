@@ -9,6 +9,8 @@ const API_BASE_URL = "https://trackapi.nutritionix.com/v2";
 // Cache configuration
 const cache = new Map<string, IFoodDetails>();
 
+const { isFoodLoading } = useFoodDetails();
+
 // Function to search for food nutrition data
 export const searchFood = async (
   query: string

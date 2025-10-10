@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { FoodModal } from "#components";
+
 interface IFoodCardProps {
   calories: number;
   foodName: string;
@@ -20,8 +22,15 @@ const {
   src = "",
 } = defineProps<IFoodCardProps>();
 
+const overlay = useOverlay();
+
+const foodModal = overlay.create(FoodModal);
+const { foodDetails } = useFoodDetails();
 const foodText = ref("");
+
 const isPopoverOpen = ref(false);
+
+const { showFoodError } = useCustomToast();
 
 watch(isPopoverOpen, (newVal) => {
   if (newVal) {
@@ -30,8 +39,21 @@ watch(isPopoverOpen, (newVal) => {
 });
 
 const editFood = async (index: number) => {
+  if (!foodText.value.trim()) {
+    return showFoodError();
+  }
+
   isPopoverOpen.value = false;
+
   await changeFoodDetails(index, false, foodText.value);
+};
+
+const viewFood = async (index: number) => {
+  if (!foodDetails.value || foodDetails.value.food_name !== foodName) {
+    await changeFoodDetails(index, true);
+  }
+
+  foodModal.open();
 };
 </script>
 
@@ -39,7 +61,10 @@ const editFood = async (index: number) => {
   <div
     class="bg-slate-200 shadow-sm dark:bg-slate-900 dark:border-2 border-slate-500 dark:border-slate-700 flex justify-center items-center w-56 h-56 rounded-lg m-2"
   >
-    <div v-if="foodState?.loading" class="flex justify-center items-center w-full h-full">
+    <div
+      v-if="foodState?.loading"
+      class="flex justify-center items-center w-full h-full"
+    >
       <icon name="line-md:loading-loop" size="5rem" />
     </div>
     <div v-else class="flex flex-col flex-wrap justify-center items-center">
@@ -65,9 +90,9 @@ const editFood = async (index: number) => {
           :title="foodName ? 'Edit food' : 'Add food'"
         >
           <template #trigger>
-            <button
+            <SmallButton
               v-if="foodName"
-              class="w-10 h-10 inline-block hover:bg-teal-600 rounded-lg active:bg-teal-500 transition-colors group cursor-pointer"
+              class="hover:bg-teal-600 active:bg-teal-500"
               name="editFood"
               aria-label="Edit food"
             >
@@ -76,7 +101,7 @@ const editFood = async (index: number) => {
                 size="2.5rem"
                 class="text-black group-hover:text-white dark:text-white group-hover:-rotate-90 transition-transform duration-150"
               />
-            </button>
+            </SmallButton>
             <button
               v-else
               class="group cursor-pointer text-4xl font-extrabold opacity-50 flex flex-col items-center justify-center select-none"
@@ -97,19 +122,32 @@ const editFood = async (index: number) => {
             />
           </template>
         </PopoverTemplate>
-        <button
-          v-if="foodName"
-          class="w-10 h-10 inline-block hover:bg-rose-800 active:bg-rose-700 rounded-lg transition-colors group cursor-pointer"
-          name="deleteFood"
-          aria-label="Delete food"
-          @click="deleteItem(index)"
-        >
-          <Icon
-            name="ic:outline-delete"
-            size="2.5rem"
-            class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
-          />
-        </button>
+        <div v-if="foodName" class="inline-block">
+          <SmallButton
+            class="hover:bg-sky-600 active:bg-sky-500"
+            name="viewFood"
+            aria-label="View food"
+            @click="viewFood(index)"
+          >
+            <Icon
+              name="ic:round-info"
+              size="2.5rem"
+              class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
+            />
+          </SmallButton>
+          <SmallButton
+            class="hover:bg-rose-800 active:bg-rose-700"
+            name="deleteFood"
+            aria-label="Delete food"
+            @click="deleteItem(index)"
+          >
+            <Icon
+              name="ic:outline-delete"
+              size="2.5rem"
+              class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
+            />
+          </SmallButton>
+        </div>
       </div>
     </div>
   </div>

@@ -4,7 +4,6 @@ export interface IFoodTemplate {
   foodName: string;
   calories: number;
   totalFat: number;
-  cholesterol: number;
   sodium: number;
   totalCarbohydrate: number;
   sugars: number;
@@ -18,7 +17,6 @@ export interface IFoodDetails {
   serving_weight_grams: number;
   nf_calories: number;
   nf_total_fat: number;
-  nf_cholesterol: number;
   nf_sodium: number;
   nf_total_carbohydrate: number;
   nf_sugars: number;
@@ -44,7 +42,6 @@ export const foodTemplateDefault = (): IFoodTemplate => ({
   foodName: "",
   calories: 0,
   totalFat: 0,
-  cholesterol: 0,
   sodium: 0,
   totalCarbohydrate: 0,
   sugars: 0,
@@ -64,10 +61,6 @@ export const resetCookies = (cookieNames: string[]) => {
   });
   window.location.reload();
 };
-
-export const foodDetails = ref<IFoodDetails | null>(null);
-
-export const isFoodLoading = ref(false);
 
 export const useCardMode = () =>
   useCookie<boolean>("cardMode", {

@@ -8,6 +8,8 @@ const MAX_FOODS = 10;
 
 const { title, foodDetailsRef } = defineProps<IFoodProps>();
 
+const { foodDetails } = useFoodDetails();
+
 const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   default: () => {
     return foodArrayDefault();
@@ -26,7 +28,7 @@ const maxFoodsReached = computed(() => {
   return foods.value.length >= MAX_FOODS;
 });
 
-const toast = useToast();
+const { showToast, showFoodError } = useCustomToast();
 
 const totalNutrients = computed(() => {
   return foods.value.reduce(
@@ -34,7 +36,6 @@ const totalNutrients = computed(() => {
       return {
         totalCalories: totals.totalCalories + food.calories,
         totalFat: totals.totalFat + food.totalFat,
-        cholesterol: totals.cholesterol + food.cholesterol,
         sodium: totals.sodium + food.sodium,
         totalCarbohydrate: totals.totalCarbohydrate + food.totalCarbohydrate,
         sugars: totals.sugars + food.sugars,
@@ -44,7 +45,6 @@ const totalNutrients = computed(() => {
     {
       totalCalories: 0,
       totalFat: 0,
-      cholesterol: 0,
       sodium: 0,
       totalCarbohydrate: 0,
       sugars: 0,
@@ -62,14 +62,6 @@ watch(
   }
 );
 
-const showToast = (title: string, description: string, icon: string) => {
-  toast.add({
-    title,
-    description,
-    icon,
-  });
-};
-
 const addFood = async (foodName?: string) => {
   if (maxFoodsReached.value) {
     return showToast(
@@ -78,13 +70,24 @@ const addFood = async (foodName?: string) => {
       "ic:outline-error"
     );
   }
+
+  if (cardMode.value && !foodName?.trim()) {
+    return showFoodError();
+  }
+
   foods.value.push(foodTemplateDefault());
-  foodStates.value.push(foodStateDefault());
 
   if (foodName?.trim()) {
     isPopoverOpen.value = false;
+
     await nextTick();
     await changeFoodDetails(foods.value.length - 1, false, foodName);
+
+    if (foods.value[foods.value.length - 1]!.foodName !== foodName) {
+      deleteItem(foods.value.length - 1);
+      return showFoodError();
+    }
+
     foodText.value = "";
   }
 };
@@ -137,12 +140,13 @@ const changeFoodDetails = async (
       totalFat: details.nf_total_fat,
       sodium: details.nf_sodium,
       totalCarbohydrate: details.nf_total_carbohydrate,
-      cholesterol: details.nf_cholesterol,
       sugars: details.nf_sugars,
       protein: details.nf_protein,
       photo: details.photo.thumb,
     };
     if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+  } else {
+    showFoodError();
   }
 
   foodState.loading = false;

@@ -8,6 +8,8 @@ const foodDetailsElement = computed(
 );
 
 const { aggregatedNutrients } = useAggregatedNutrients();
+
+const cardMode = useCardMode();
 </script>
 
 <template>
@@ -21,7 +23,7 @@ const { aggregatedNutrients } = useAggregatedNutrients();
         :food-details-ref="foodDetailsElement"
       />
     </div>
-    <FoodDetails ref="foodDetailsRef" />
+    <FoodDetails v-if="!cardMode" ref="foodDetailsRef" class="m-4" />
     <TotalNutritions :total-nutrients="aggregatedNutrients" />
   </div>
 </template>

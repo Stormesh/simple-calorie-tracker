@@ -26,16 +26,16 @@ const resetCookies = () => {
       Are you sure you want to reset all foods?
     </p>
     <div>
-      <UButton
+      <ModalButton
         icon="heroicons:check"
         label="Yes"
-        class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-rose-700 active:bg-rose-600 text-white font-bold py-2 px-4 mx-2 rounded-lg"
+        class="hover:bg-rose-700 active:bg-rose-600"
         @click="resetCookies"
       />
-      <UButton
+      <ModalButton
         icon="heroicons:x-mark"
         label="No"
-        class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-teal-600 active:bg-teal-500 text-white font-bold py-2 px-4 mx-2 rounded-lg"
+        class="hover:bg-teal-600 active:bg-teal-500"
         @click="emit('close', false)"
       />
     </div>
