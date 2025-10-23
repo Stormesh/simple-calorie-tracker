@@ -10,7 +10,7 @@ const { title, foodDetailsRef } = defineProps<IFoodProps>();
 
 const { foodDetails } = useFoodDetails();
 
-const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
+const foods = useCookie<IFoodTemplate[]>(`foods-${title.toLowerCase()}`, {
   default: () => {
     return foodArrayDefault();
   },
@@ -195,7 +195,7 @@ const onFocus = (index: number, focus: boolean) => {
             :delete-item="deleteItem"
           />
         </div>
-        <div class="flex justify-center overflow-hidden">
+        <div class="flex flex-row flex-wrap items-center justify-center overflow-hidden">
           <PopoverTemplate
             v-if="cardMode"
             v-model:open="isPopoverOpen"
@@ -212,6 +212,7 @@ const onFocus = (index: number, focus: boolean) => {
               <FoodCardInput
                 v-model:food-text="foodText"
                 :food-callback="() => addFood(foodText)"
+                :close-modal="() => (isPopoverOpen = false)"
               />
             </template>
           </PopoverTemplate>

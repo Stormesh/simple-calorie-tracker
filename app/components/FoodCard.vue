@@ -22,8 +22,6 @@ const {
   src = "",
 } = defineProps<IFoodCardProps>();
 
-const overlay = useOverlay();
-
 const foodModal = overlay.create(FoodModal);
 const { foodDetails } = useFoodDetails();
 const foodText = ref("");
@@ -85,7 +83,7 @@ const viewFood = async (index: number) => {
         </div>
       </div>
       <div>
-        <PopoverTemplate
+        <ModalTemplate
           v-model:open="isPopoverOpen"
           :title="foodName ? 'Edit food' : 'Add food'"
         >
@@ -119,9 +117,10 @@ const viewFood = async (index: number) => {
             <FoodCardInput
               v-model:food-text="foodText"
               :food-callback="() => editFood(index)"
+              :close-modal="() => isPopoverOpen = false"
             />
           </template>
-        </PopoverTemplate>
+        </ModalTemplate>
         <div v-if="foodName" class="inline-block">
           <SmallButton
             class="hover:bg-sky-600 active:bg-sky-500"

@@ -11,7 +11,8 @@ const { title = "" } = defineProps<IModalProps>();
 <template>
   <UModal
     :ui="{
-      content: 'bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md ring-0',
+      content:
+        'w-fit bg-slate-300 dark:bg-slate-800 rounded-lg shadow-md ring-0',
     }"
     @close.prevent="
       {
@@ -19,6 +20,7 @@ const { title = "" } = defineProps<IModalProps>();
       }
     "
   >
+    <slot name="trigger" />
     <template #content>
       <div>
         <h1
@@ -30,7 +32,7 @@ const { title = "" } = defineProps<IModalProps>();
         <div
           class="pb-2 px-4 bg-slate-300 dark:bg-slate-800 flex justify-center items-center flex-col flex-wrap"
         >
-          <slot />
+          <slot name="content" />
         </div>
       </div>
     </template>

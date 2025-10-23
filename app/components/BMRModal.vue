@@ -113,94 +113,96 @@ const closeModal = () => {
 
 <template>
   <ModalTemplate title="Diet Profile">
-    <UForm
-      ref="form"
-      :state="bmrForm"
-      class="p-4"
-      @submit.prevent="calculateBMR"
-    >
-      <div class="flex flex-col gap-0.5 flex-wrap">
-        <h3 class="text-lg font-semibold">Unit System</h3>
-        <URadioGroup
-          v-model="bmrForm.unitSystem"
-          size="xl"
-          :items="UNIT_SYSTEM_OPTIONS"
-          class="mb-4"
-        />
-        <UInput
-          v-model.number="bmrForm.weight"
-          :placeholder="
-            bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
-          "
-          type="number"
-          required
-          size="xl"
-          step="0.1"
-          class="w-full"
-        />
-        <UInput
-          v-model.number="bmrForm.height"
-          :placeholder="
-            bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
-          "
-          type="number"
-          required
-          size="xl"
-          step="0.1"
-          class="w-full"
-        />
-        <UInput
-          v-model.number="bmrForm.age"
-          placeholder="Age"
-          type="number"
-          required
-          size="xl"
-          class="w-full"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Activity Level</h3>
-        <USelect
-          v-model="bmrForm.activity"
-          legend="Activity Level"
-          size="xl"
-          :items="ACTIVITY"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Target</h3>
-        <USelect
-          v-model="bmrForm.target"
-          size="xl"
-          :items="targetOptions"
-          class="w-60"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Gender</h3>
-        <URadioGroup
-          v-model="bmrForm.gender"
-          size="xl"
-          :items="GENDER_OPTIONS"
-        />
-      </div>
-
-      <div class="flex justify-center gap-4 mt-4">
-        <UButton
-          icon="heroicons:calculator"
-          label="Calculate"
-          class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-teal-600 active:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg"
-          type="submit"
-          @submit.prevent="calculateBMR"
-        />
-        <UButton
-          icon="heroicons:x-mark"
-          label="Cancel"
-          class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-rose-700 active:bg-rose-600 text-white font-bold py-2 px-4 rounded-lg"
-          @click="closeModal"
-        />
-      </div>
-
-      <div
-        v-if="bmrForm.bmr !== null"
-        class="mt-4 text-center text-xl font-semibold"
+    <template #content>
+      <UForm
+        ref="form"
+        :state="bmrForm"
+        class="p-4"
+        @submit.prevent="calculateBMR"
       >
-        Your TDEE: {{ bmrForm.bmr }} calories/day
-      </div>
-    </UForm>
+        <div class="flex flex-col gap-0.5 flex-wrap">
+          <h3 class="text-lg font-semibold">Unit System</h3>
+          <URadioGroup
+            v-model="bmrForm.unitSystem"
+            size="xl"
+            :items="UNIT_SYSTEM_OPTIONS"
+            class="mb-4"
+          />
+          <UInput
+            v-model.number="bmrForm.weight"
+            :placeholder="
+              bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
+            "
+            type="number"
+            required
+            size="xl"
+            step="0.1"
+            class="w-full"
+          />
+          <UInput
+            v-model.number="bmrForm.height"
+            :placeholder="
+              bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
+            "
+            type="number"
+            required
+            size="xl"
+            step="0.1"
+            class="w-full"
+          />
+          <UInput
+            v-model.number="bmrForm.age"
+            placeholder="Age"
+            type="number"
+            required
+            size="xl"
+            class="w-full"
+          />
+          <h3 class="mt-4 text-lg font-semibold">Activity Level</h3>
+          <USelect
+            v-model="bmrForm.activity"
+            legend="Activity Level"
+            size="xl"
+            :items="ACTIVITY"
+          />
+          <h3 class="mt-4 text-lg font-semibold">Target</h3>
+          <USelect
+            v-model="bmrForm.target"
+            size="xl"
+            :items="targetOptions"
+            class="w-60"
+          />
+          <h3 class="mt-4 text-lg font-semibold">Gender</h3>
+          <URadioGroup
+            v-model="bmrForm.gender"
+            size="xl"
+            :items="GENDER_OPTIONS"
+          />
+        </div>
+  
+        <div class="flex justify-center gap-4 mt-4">
+          <UButton
+            icon="heroicons:calculator"
+            label="Calculate"
+            class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-teal-600 active:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg"
+            type="submit"
+            @submit.prevent="calculateBMR"
+          />
+          <UButton
+            icon="heroicons:x-mark"
+            label="Cancel"
+            class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-rose-700 active:bg-rose-600 text-white font-bold py-2 px-4 rounded-lg"
+            @click="closeModal"
+          />
+        </div>
+  
+        <div
+          v-if="bmrForm.bmr !== null"
+          class="mt-4 text-center text-xl font-semibold"
+        >
+          Your TDEE: {{ bmrForm.bmr }} calories/day
+        </div>
+      </UForm>
+    </template>
   </ModalTemplate>
 </template>

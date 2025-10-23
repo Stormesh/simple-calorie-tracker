@@ -23,7 +23,9 @@ const open = defineModel<boolean>("open", {
       >
         {{ title }}
       </h1>
-      <slot name="content" />
+      <div class="pb-2 px-4 bg-slate-300 dark:bg-slate-800 flex justify-center items-center flex-col flex-wrap">
+        <slot name="content" />
+      </div>
     </template>
   </UPopover>
 </template>

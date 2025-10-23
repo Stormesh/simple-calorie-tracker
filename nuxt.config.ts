@@ -4,12 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/ui",
-    "@nuxt/image",
-    "@nuxt/icon",
-  ],
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/image", "@nuxt/icon", "@vueuse/nuxt"],
   css: ["~/assets/css/app.css"],
   runtimeConfig: {
     public: {
@@ -63,7 +58,7 @@ export default defineNuxtConfig({
         {
           name: "twitter:image:alt",
           content: "MaxHP Banner",
-        }
+        },
       ],
     },
   },

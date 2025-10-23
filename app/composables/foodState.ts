@@ -63,6 +63,6 @@ export const resetCookies = (cookieNames: string[]) => {
 };
 
 export const useCardMode = () =>
-  useCookie<boolean>("cardMode", {
+  useCookie<boolean>("card-mode", {
     default: () => false,
   });
