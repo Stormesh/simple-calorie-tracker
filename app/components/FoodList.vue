@@ -158,7 +158,16 @@ const onFocus = (index: number, focus: boolean) => {
     </h1>
     <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl shadow-md">
       <div v-for="(food, index) in foods" :key="index">
-        <FoodInput v-model:food-name="food.foodName" :index="index" :calories="food.calories" :food-state="foodStates[index]" :change-food-details="changeFoodDetails" :on-focus="onFocus" :reset-food-if-empty="resetFoodIfEmpty" :delete-item="deleteItem" />
+        <FoodInput
+          v-model:food-name="food.foodName"
+          :index="index"
+          :calories="food.calories"
+          :food-state="foodStates[index]"
+          :change-food-details="changeFoodDetails"
+          :on-focus="onFocus"
+          :reset-food-if-empty="resetFoodIfEmpty"
+          :delete-item="deleteItem"
+        />
       </div>
       <div class="flex justify-center overflow-hidden">
         <FoodListButton

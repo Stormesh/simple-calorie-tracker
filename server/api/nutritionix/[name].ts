@@ -1,4 +1,3 @@
-// Define the API response interface
 interface NutritionixResponse {
   foods: IFoodDetails[];
 }
@@ -9,29 +8,27 @@ const API_BASE_URL = "https://trackapi.nutritionix.com/v2";
 // Cache configuration
 const cache = new Map<string, IFoodDetails>();
 
-// Function to search for food nutrition data
-export const searchFood = async (
-  query: string
-): Promise<IFoodDetails | null> => {
+export default defineEventHandler(async (event) => {
+  // Get query parameters correctly
+  const query = getRouterParam(event, "name");
+  
   const config = useRuntimeConfig();
-  const API_KEY = String(config.public.NUXT_NUTRITIONIX_API_KEY || "");
-  const APP_ID = String(config.public.NUXT_NUTRITIONIX_APP_ID || "");
+  const apiKey = config.apiKey || "";
+  const appId = config.appId || "";
 
-  if (!API_KEY || !APP_ID) {
+  if (!apiKey || !appId) {
     console.error("API_KEY or APP_ID not found in environment variables");
-    return null;
+    return { error: "API configuration missing" };
   }
 
-  if (query.trim() === "") {
-    return null;
+  if (!query || query.trim() === "") {
+    return { error: "No query provided" };
   }
 
   // Check cache first
   if (cache.has(query)) {
     return cache.get(query) ?? null;
   }
-
-  isFoodLoading.value = true;
 
   let foodName: NutritionixResponse | null = null;
   try {
@@ -41,8 +38,8 @@ export const searchFood = async (
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-app-id": APP_ID,
-          "x-app-key": API_KEY,
+          "x-app-id": appId,
+          "x-app-key": apiKey,
         },
         body: {
           query: query,
@@ -51,14 +48,12 @@ export const searchFood = async (
     );
   } catch (error) {
     console.error("Error fetching nutrition data:", error);
-    return null; // Crucial: return null on error
-  } finally {
-    isFoodLoading.value = false;
+    return { error: "Failed to fetch nutrition data" }; // Crucial: return error on failure
   }
 
   if (!foodName || !foodName.foods || foodName.foods.length === 0) {
     console.error("No food data found or error in response:", foodName);
-    return null;
+    return { error: "No food data found" };
   }
 
   const foodData = foodName.foods[0];
@@ -69,5 +64,5 @@ export const searchFood = async (
   }
 
   // Return the first food item if available
-  return foodData ?? null;
-};
+  return foodData;
+});

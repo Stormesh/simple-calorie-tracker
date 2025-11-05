@@ -12,10 +12,8 @@ export default defineNuxtConfig({
   ],
   css: ["~/assets/css/app.css"],
   runtimeConfig: {
-    public: {
-      NUXT_NUTRITIONIX_API_KEY: process.env.NUXT_NUTRITIONIX_API_KEY,
-      NUXT_NUTRITIONIX_APP_ID: process.env.NUXT_NUTRITIONIX_APP_ID,
-    },
+    apiKey: process.env.FATSECRET_API_KEY,
+    apiSecret: process.env.FATSECRET_API_SECRET,
   },
   app: {
     head: {

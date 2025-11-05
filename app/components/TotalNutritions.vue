@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import NutritionCard from "./NutritionCard.vue";
 interface ITotalNutrients {
   totalCalories: number;
   totalFat: number;
