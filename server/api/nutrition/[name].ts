@@ -1,50 +1,17 @@
-// server/api/fatsecret/search.ts
 import { getAccessToken } from "~~/server/utils/fatsecret-oauth2";
 
 const FATSECRET_API_URL = "https://platform.fatsecret.com/rest/server.api";
 
-// Define interfaces for FatSecret API responses
-interface FatSecretFood {
-  food_id: string;
-  food_name: string;
-  brand_name?: string;
-  food_type: string;
-  servings: {
-    serving: FatSecretServing | FatSecretServing[];
-  };
-}
-
-interface FatSecretServing {
-  serving_id: string;
-  measurement_description: string;
-  metric_serving_amount: string;
-  metric_serving_unit: string;
-  number_of_units: string;
-  calories: string;
-  carbohydrate: string;
-  protein: string;
-  fat: string;
-  saturated_fat?: string;
-  fiber?: string;
-  sodium?: string;
-  potassium?: string;
-  calcium?: string;
-  vitamin_a?: string;
-  vitamin_c?: string;
-  iron?: string;
-}
-
 interface FatSecretSearchResponse {
   foods: {
-    food: FatSecretFood[];
+    food: IFoodDetails[];
   };
 }
 
 interface FatSecretDetailResponse {
-  food: FatSecretFood;
+  food: IFoodDetails;
 }
 
-// TODO: Implement a simple token caching mechanism here for production use
 let cachedToken: string | null = null;
 let tokenExpiresAt: number = 0;
 
@@ -108,9 +75,9 @@ export default defineEventHandler(async (event) => {
     const firstFood = searchData.foods.food[0];
     const foodId = firstFood.food_id;
 
-    // 3. Second API call: food.get.v2 to get detailed nutritional information
+    // 3. Second API call: food.get.v5 to get detailed nutritional information
     const detailParams = {
-      method: "food.get.v2",
+      method: "food.get",
       food_id: foodId,
       format: "json",
     };

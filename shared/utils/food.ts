@@ -1,22 +1,36 @@
-export interface IFoodDetails {
-  food_name: string;
-  serving_qty: number;
-  serving_weight_grams: number;
-  nf_calories: number;
-  nf_total_fat: number;
-  nf_cholesterol: number;
-  nf_sodium: number;
-  nf_total_carbohydrate: number;
-  nf_sugars: number;
-  nf_protein: number;
-  photo: {
-    thumb: string;
-    highres: string | null;
-    is_user_uploaded: boolean;
-  }
+interface IFoodServing {
+  serving_id: string;
+  measurement_description: string;
+  metric_serving_amount: string;
+  metric_serving_unit: string;
+  number_of_units: string;
+  calories: string;
+  carbohydrate: string;
+  protein: string;
+  fat: string;
+  saturated_fat?: string;
+  fiber?: string;
+  sodium?: string;
+  potassium?: string;
+  calcium?: string;
+  vitamin_a?: string;
+  vitamin_c?: string;
+  iron?: string;
 }
 
-export const searchFood = async (foodName: string): Promise<IFoodDetails | null> => {
+export interface IFoodDetails {
+  food_id: string;
+  food_name: string;
+  brand_name?: string;
+  food_type: string;
+  servings: {
+    serving: IFoodServing | IFoodServing[];
+  };
+}
+
+export const searchFood = async (
+  foodName: string
+): Promise<IFoodDetails | null> => {
   if (!foodName.trim()) return null;
 
   try {
