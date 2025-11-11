@@ -129,13 +129,17 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
   const details = await searchFood(foodName);
   if (details) {
     foodDetails.value = details;
-    foodItem.calories = details.nf_calories;
-    foodItem.totalFat = details.nf_total_fat;
-    foodItem.sodium = details.nf_sodium;
-    foodItem.totalCarbohydrate = details.nf_total_carbohydrate;
-    foodItem.cholesterol = details.nf_cholesterol;
-    foodItem.sugars = details.nf_sugars;
-    foodItem.protein = details.nf_protein;
+    const serving = details.servings.serving[0];
+
+    if (serving) {
+      foodItem.calories = serving.calories || 0;
+      foodItem.totalFat = serving.fat || 0;
+      foodItem.sodium = serving.sodium || 0;
+      foodItem.totalCarbohydrate = serving.carbohydrate || 0;
+      foodItem.sugars = serving.sugar || 0;
+      foodItem.protein = serving.protein || 0;
+      foodItem.cholesterol = serving.cholesterol || 0;
+    }
     if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
   }
 

@@ -8,18 +8,24 @@ interface INutritionFacts {
   unit: string;
 }
 
+const serving = computed<IFoodServing | null>(() => {
+  if (!foodData.value || !foodData.value.servings.serving[0])
+    return null;
+  return foodData.value.servings.serving[0];
+});
+
 const nutritionFacts = computed<INutritionFacts[]>(() => [
-  { label: "Calories", value: foodData.value?.nf_calories, unit: "kcal" },
-  { label: "Fat", value: foodData.value?.nf_total_fat, unit: "g" },
-  { label: "Cholesterol", value: foodData.value?.nf_cholesterol, unit: "mg" },
-  { label: "Sodium", value: foodData.value?.nf_sodium, unit: "mg" },
+  { label: "Calories", value: serving.value?.calories, unit: "kcal" },
+  { label: "Fat", value: serving.value?.fat, unit: "g" },
+  { label: "Cholesterol", value: serving.value?.cholesterol, unit: "mg" },
+  { label: "Sodium", value: serving.value?.sodium, unit: "mg" },
   {
     label: "Carbohydrates",
-    value: foodData.value?.nf_total_carbohydrate,
+    value: serving.value?.carbohydrate,
     unit: "g",
   },
-  { label: "Sugars", value: foodData.value?.nf_sugars, unit: "g" },
-  { label: "Protein", value: foodData.value?.nf_protein, unit: "g" },
+  { label: "Sugars", value: serving.value?.sugar, unit: "g" },
+  { label: "Protein", value: serving.value?.protein, unit: "g" },
 ]);
 
 defineExpose({
@@ -28,9 +34,9 @@ defineExpose({
 
 const isValidQuantity = computed(() => {
   if (!foodData.value) return false;
-  const qty = foodData.value.serving_qty;
-  const weight = foodData.value.serving_weight_grams;
-  if (qty <= 1) return false;
+  const qty = serving.value?.number_of_units || 1;
+  const weight = serving.value?.metric_serving_amount || 0;
+  if (qty && qty <= 1) return false;
   if (weight === null) return true;
   // Check if qty is not "near" the weight. "Near" is defined as a difference of less than 10.
   return Math.abs(qty - weight) >= 10;
@@ -48,11 +54,11 @@ const isValidQuantity = computed(() => {
           class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
         >
           {{
-            (isValidQuantity ? foodData.serving_qty + " " : "") +
+            (isValidQuantity ? serving?.number_of_units + " " : "") +
             (foodData.food_name.charAt(0).toUpperCase() +
               foodData.food_name.slice(1)) +
             " " +
-            foodData.serving_weight_grams
+            serving?.metric_serving_amount
           }}g
         </h1>
         <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl p-2">

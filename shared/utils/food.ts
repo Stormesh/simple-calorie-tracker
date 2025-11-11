@@ -1,21 +1,23 @@
-interface IFoodServing {
+export interface IFoodServing {
   serving_id: string;
   measurement_description: string;
-  metric_serving_amount: string;
+  metric_serving_amount: number;
   metric_serving_unit: string;
-  number_of_units: string;
-  calories: string;
-  carbohydrate: string;
-  protein: string;
-  fat: string;
-  saturated_fat?: string;
-  fiber?: string;
-  sodium?: string;
-  potassium?: string;
-  calcium?: string;
-  vitamin_a?: string;
-  vitamin_c?: string;
-  iron?: string;
+  number_of_units: number;
+  calories: number;
+  carbohydrate: number;
+  protein: number;
+  fat: number;
+  saturated_fat?: number;
+  cholesterol?: number;
+  sugar?: number;
+  fiber?: number;
+  sodium?: number;
+  potassium?: number;
+  calcium?: number;
+  vitamin_a?: number;
+  vitamin_c?: number;
+  iron?: number;
 }
 
 export interface IFoodDetails {
@@ -24,7 +26,7 @@ export interface IFoodDetails {
   brand_name?: string;
   food_type: string;
   servings: {
-    serving: IFoodServing | IFoodServing[];
+    serving: IFoodServing[];
   };
 }
 
