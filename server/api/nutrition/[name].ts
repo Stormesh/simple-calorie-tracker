@@ -1,4 +1,5 @@
 import { getAccessToken } from "~~/server/utils/fatsecret-oauth2";
+import { fatsecretApiRequest } from "~~/server/utils/fatsecret-oauth1";
 import type { IFoodDetails, IFoodServing } from "~~/shared/utils/food";
 
 const FATSECRET_API_URL = "https://platform.fatsecret.com/rest/server.api";
@@ -69,28 +70,40 @@ export default defineEventHandler(async (event) => {
   const search_expression = getRouterParam(event, "name");
   const config = useRuntimeConfig(event);
 
-  if (!cachedToken || Date.now() >= tokenExpiresAt) {
-    const tokenData = await getAccessToken(
-      config.apiKey as string,
-      config.apiSecret as string
-    );
-    cachedToken = tokenData.access_token;
-    tokenExpiresAt = Date.now() + tokenData.expires_in * 1000 - 5 * 60 * 1000;
-    console.log("New FatSecret token acquired.");
+  if (!search_expression) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Search expression is required.",
+    });
   }
 
-  const searchParams = {
-    method: "foods.search",
-    search_expression: search_expression,
-    max_results: 10,
-    page_number: 0,
-    format: "json",
-  };
+  const useOAuth2 = !!config.apiClientSecret;
+
+  let searchData: FatSecretSearchResponse;
+  let detailData: FatSecretDetailResponse;
 
   try {
-    const searchData = await $fetch<FatSecretSearchResponse>(
-      FATSECRET_API_URL,
-      {
+    if (useOAuth2) {
+      if (!cachedToken || Date.now() >= tokenExpiresAt) {
+        const tokenData = await getAccessToken(
+          config.apiKey as string,
+          config.apiClientSecret as string
+        );
+        cachedToken = tokenData.access_token;
+        tokenExpiresAt =
+          Date.now() + tokenData.expires_in * 1000 - 5 * 60 * 1000;
+        console.log("New FatSecret OAuth2 token acquired.");
+      }
+
+      const searchParams = {
+        method: "foods.search",
+        search_expression: search_expression,
+        max_results: 10,
+        page_number: 0,
+        format: "json",
+      };
+
+      searchData = await $fetch<FatSecretSearchResponse>(FATSECRET_API_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cachedToken}`,
@@ -104,8 +117,28 @@ export default defineEventHandler(async (event) => {
             ])
           )
         ).toString(),
-      }
-    );
+      });
+    } else if (config.apiSecret) {
+      console.log("Using FatSecret OAuth1.");
+      const searchParams = {
+        method: "foods.search",
+        search_expression: search_expression,
+        max_results: "10",
+        page_number: "0",
+        format: "json",
+      };
+
+      searchData = await fatsecretApiRequest<FatSecretSearchResponse>(
+        config.apiKey as string,
+        config.apiSecret as string,
+        searchParams
+      );
+    } else {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "FatSecret API credentials are not configured.",
+      });
+    }
 
     if (
       !searchData ||
@@ -119,15 +152,14 @@ export default defineEventHandler(async (event) => {
     const firstFood = searchData.foods.food[0];
     const foodId = firstFood.food_id;
 
-    const detailParams = {
-      method: "food.get",
-      food_id: foodId,
-      format: "json",
-    };
+    if (useOAuth2) {
+      const detailParams = {
+        method: "food.get",
+        food_id: foodId,
+        format: "json",
+      };
 
-    const detailData = await $fetch<FatSecretDetailResponse>(
-      FATSECRET_API_URL,
-      {
+      detailData = await $fetch<FatSecretDetailResponse>(FATSECRET_API_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cachedToken}`,
@@ -141,8 +173,20 @@ export default defineEventHandler(async (event) => {
             ])
           )
         ).toString(),
-      }
-    );
+      });
+    } else {
+      const detailParams = {
+        method: "food.get",
+        food_id: foodId,
+        format: "json",
+      };
+
+      detailData = await fatsecretApiRequest<FatSecretDetailResponse>(
+        config.apiKey as string,
+        config.apiSecret as string,
+        detailParams
+      );
+    }
 
     const food = detailData.food;
     if (food.servings) {

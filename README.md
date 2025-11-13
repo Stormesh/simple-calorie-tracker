@@ -1,7 +1,7 @@
 # Calorie Tracker
 ![Logo](./public/maxhp_banner.png)
 
-A simple calorie tracking application built with Nuxt and powered by the Nutritionix API.
+A simple calorie tracking application built with Nuxt and powered by the FatSecret API.
 
 ## Features
 
@@ -14,7 +14,7 @@ A simple calorie tracking application built with Nuxt and powered by the Nutriti
 *   [Nuxt](https://nuxt.com/)
 *   [Vue.js](https://vuejs.org/)
 *   [Tailwind CSS](https://tailwindcss.com/)
-*   [Nutritionix API](https://www.nutritionix.com/business/api)
+*   [FatSecret API](https://platform.fatsecret.com/)
 *   [TypeScript](https://www.typescriptlang.org/)
 
 ## Getting Started
@@ -37,10 +37,11 @@ A simple calorie tracking application built with Nuxt and powered by the Nutriti
     npm install
     ```
 
-3.  You will need API credentials from Nutritionix. Create a `.env` file in the root of the project and add your credentials:
+3.  You will need API credentials from FatSecret. Create a `.env` file in the root of the project and add your credentials:
     ```
-    NUXT_PUBLIC_NUTRITIONIX_APP_ID=your_app_id
-    NUXT_PUBLIC_NUTRITIONIX_APP_KEY=your_app_key
+    FATSECRET_API_KEY=your_api_key
+    FATSECRET_API_SECRET=your_api_secret
+    FATSECRET_API_CLIENT_SECRET=your_api_client_secret (OAuth2 only)
     ```
 
 ### Running the Application
@@ -61,4 +62,4 @@ The application will be available at `http://localhost:3000`.
 
 ---
 
-Powered by [Nutritionix API](https://www.nutritionix.com/business/api)
+Powered by [FatSecret](https://platform.fatsecret.com/).
