@@ -4,18 +4,20 @@ import type { IFoodDetails, IFoodServing } from "~~/shared/utils/food";
 
 const FATSECRET_API_URL = "https://platform.fatsecret.com/rest/server.api";
 
-interface FatSecretSearchResponse {
+interface IFatSecretSearchResponse {
   foods: {
     food: IFoodDetails[];
   };
 }
 
-interface FatSecretDetailResponse {
+interface IFatSecretDetailResponse {
   food: IFoodDetails;
 }
 
 let cachedToken: string | null = null;
 let tokenExpiresAt: number = 0;
+
+const cache = new FoodCache();
 
 const parseNutrient = (value: string | number | undefined | null): number => {
   if (value === null || value === undefined) {
@@ -66,7 +68,7 @@ const parseServings = (servings: {
   return { serving: parsedServings };
 };
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<IFoodDetails | null> => {
   const search_expression = getRouterParam(event, "name");
   const config = useRuntimeConfig(event);
 
@@ -77,10 +79,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const cachedFood = cache.get(search_expression);
+  if (cachedFood) {
+    return cachedFood.data;
+  }
+
   const useOAuth2 = !!config.apiClientSecret;
 
-  let searchData: FatSecretSearchResponse;
-  let detailData: FatSecretDetailResponse;
+  let searchData: IFatSecretSearchResponse;
+  let detailData: IFatSecretDetailResponse;
 
   try {
     if (useOAuth2) {
@@ -103,7 +110,7 @@ export default defineEventHandler(async (event) => {
         format: "json",
       };
 
-      searchData = await $fetch<FatSecretSearchResponse>(FATSECRET_API_URL, {
+      searchData = await $fetch<IFatSecretSearchResponse>(FATSECRET_API_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cachedToken}`,
@@ -128,7 +135,7 @@ export default defineEventHandler(async (event) => {
         format: "json",
       };
 
-      searchData = await fatsecretApiRequest<FatSecretSearchResponse>(
+      searchData = await fatsecretApiRequest<IFatSecretSearchResponse>(
         config.apiKey as string,
         config.apiSecret as string,
         searchParams
@@ -146,7 +153,7 @@ export default defineEventHandler(async (event) => {
       searchData.foods.food.length === 0
     ) {
       console.log(`No foods found for search expression: ${search_expression}`);
-      return { foods: [] };
+      return null;
     }
 
     const firstFood = searchData.foods.food[0];
@@ -159,7 +166,7 @@ export default defineEventHandler(async (event) => {
         format: "json",
       };
 
-      detailData = await $fetch<FatSecretDetailResponse>(FATSECRET_API_URL, {
+      detailData = await $fetch<IFatSecretDetailResponse>(FATSECRET_API_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cachedToken}`,
@@ -181,7 +188,7 @@ export default defineEventHandler(async (event) => {
         format: "json",
       };
 
-      detailData = await fatsecretApiRequest<FatSecretDetailResponse>(
+      detailData = await fatsecretApiRequest<IFatSecretDetailResponse>(
         config.apiKey as string,
         config.apiSecret as string,
         detailParams
@@ -192,6 +199,8 @@ export default defineEventHandler(async (event) => {
     if (food.servings) {
       food.servings = parseServings(food.servings);
     }
+  
+    cache.set(search_expression, food);
 
     return food;
   } catch (error) {
