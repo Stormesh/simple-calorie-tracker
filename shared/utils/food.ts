@@ -30,6 +30,20 @@ export interface IFoodDetails {
   };
 }
 
+interface IFatSecretSearchFood {
+  food_id: string;
+  food_name: string;
+  food_description: string;
+  food_type: string;
+}
+
+export interface IFatSecretSearchParams {
+  food: IFatSecretSearchFood[];
+  max_results: string;
+  page_number: string;
+  total_results: string;
+}
+
 export const searchFood = async (
   foodName: string
 ): Promise<IFoodDetails | null> => {
@@ -37,7 +51,27 @@ export const searchFood = async (
 
   try {
     const response = await $fetch<IFoodDetails>(
-      `/api/nutrition/${encodeURIComponent(foodName)}`
+      `/api/nutrition/search/${encodeURIComponent(foodName)}`
+    );
+
+    if (response && typeof response === "object" && "error" in response) {
+      console.error("API Error:", response.error);
+      return null;
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch food data:", error);
+    return null;
+  }
+};
+
+export const getFood = async (foodId: string): Promise<IFoodDetails | null> => {
+  if (!foodId.trim()) return null;
+
+  try {
+    const response = await $fetch<IFoodDetails>(
+      `/api/nutrition/${encodeURIComponent(foodId)}`
     );
 
     if (response && typeof response === "object" && "error" in response) {

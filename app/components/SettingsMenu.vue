@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ResetModal, BMRModal } from "#components";
+import { ModalReset, ModalBMR } from "#components";
 import type { DropdownMenuItem } from "@nuxt/ui";
 const overlay = useOverlay();
 
-const resetModal = overlay.create(ResetModal);
-const bmrModal = overlay.create(BMRModal);
+const resetModal = overlay.create(ModalReset);
+const bmrModal = overlay.create(ModalBMR);
 
 const resetOpen = () => {
   resetModal.open({
