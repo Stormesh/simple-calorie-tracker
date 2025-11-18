@@ -126,7 +126,8 @@ const changeFoodDetails = async (index: number, scroll: boolean = false) => {
   foodState.loading = true;
 
   const foodName = foodItem.foodName || "";
-  const details = await searchFood(foodName);
+  const food = await searchFood(foodName);
+  const details = await getFood(food?.food[0]?.food_id || "");
   if (details) {
     foodDetails.value = details;
     const serving = details.servings.serving[0];

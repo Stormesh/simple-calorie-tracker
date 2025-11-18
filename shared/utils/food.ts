@@ -46,11 +46,11 @@ export interface IFatSecretSearchParams {
 
 export const searchFood = async (
   foodName: string
-): Promise<IFoodDetails | null> => {
+): Promise<IFatSecretSearchParams | null> => {
   if (!foodName.trim()) return null;
 
   try {
-    const response = await $fetch<IFoodDetails>(
+    const response = await $fetch<IFatSecretSearchParams>(
       `/api/nutrition/search/${encodeURIComponent(foodName)}`
     );
 
