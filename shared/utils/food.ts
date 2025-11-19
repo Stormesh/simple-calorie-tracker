@@ -30,15 +30,15 @@ export interface IFoodDetails {
   };
 }
 
-interface IFatSecretSearchFood {
+interface IFoodSearchInfo {
   food_id: string;
   food_name: string;
   food_description: string;
   food_type: string;
 }
 
-export interface IFatSecretSearchParams {
-  food: IFatSecretSearchFood[];
+export interface IFoodSearchResult {
+  food: IFoodSearchInfo[];
   max_results: string;
   page_number: string;
   total_results: string;
@@ -46,11 +46,11 @@ export interface IFatSecretSearchParams {
 
 export const searchFood = async (
   foodName: string
-): Promise<IFatSecretSearchParams | null> => {
+): Promise<IFoodSearchResult | null> => {
   if (!foodName.trim()) return null;
 
   try {
-    const response = await $fetch<IFatSecretSearchParams>(
+    const response = await $fetch<IFoodSearchResult>(
       `/api/nutrition/search/${encodeURIComponent(foodName)}`
     );
 

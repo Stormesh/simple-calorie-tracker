@@ -1,5 +1,7 @@
+type Food = IFoodDetails | IFoodSearchResult;
+
 interface IFoodCache {
-  data: IFoodDetails;
+  data: Food;
   timestamp: number;
 }
 
@@ -21,7 +23,7 @@ export class FoodCache {
     return cacheItem;
   }
 
-  public set(key: string, value: IFoodDetails): void {
+  public set(key: string, value: Food): void {
     if (this.cache.size >= MAX_CACHE_SIZE) {
       this.cleanup();
     }

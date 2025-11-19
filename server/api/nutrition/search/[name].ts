@@ -1,17 +1,16 @@
-import { getAccessToken } from "~~/server/utils/fatsecret-oauth2";
-import { fatsecretApiRequest } from "~~/server/utils/fatsecret-oauth1";
-
 const FATSECRET_API_URL = "https://platform.fatsecret.com/rest/server.api";
 
-interface IFatSecretSearchResponse {
-  foods: IFatSecretSearchParams;
+interface IFoodSearchResponse {
+  foods: IFoodSearchResult;
 }
 
 let cachedToken: string | null = null;
 let tokenExpiresAt: number = 0;
 
+const cache = new FoodCache();
+
 export default defineEventHandler(
-  async (event): Promise<IFatSecretSearchParams | null> => {
+  async (event): Promise<IFoodSearchResult | null> => {
     const search_expression = getRouterParam(event, "name");
     const config = useRuntimeConfig(event);
 
@@ -22,9 +21,14 @@ export default defineEventHandler(
       });
     }
 
+    const cachedFood = cache.get(search_expression);
+    if (cachedFood) {
+      return cachedFood.data as IFoodSearchResult;
+    }
+
     const useOAuth2 = !!config.apiClientSecret;
 
-    let searchData: IFatSecretSearchResponse;
+    let searchData: IFoodSearchResponse;
 
     try {
       if (useOAuth2) {
@@ -47,7 +51,7 @@ export default defineEventHandler(
           format: "json",
         };
 
-        searchData = await $fetch<IFatSecretSearchResponse>(FATSECRET_API_URL, {
+        searchData = await $fetch<IFoodSearchResponse>(FATSECRET_API_URL, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${cachedToken}`,
@@ -72,7 +76,7 @@ export default defineEventHandler(
           format: "json",
         };
 
-        searchData = await fatsecretApiRequest<IFatSecretSearchResponse>(
+        searchData = await fatsecretApiRequest<IFoodSearchResponse>(
           config.apiKey as string,
           config.apiSecret as string,
           searchParams
@@ -96,6 +100,9 @@ export default defineEventHandler(
       }
 
       const foods = searchData.foods;
+
+      cache.set(search_expression, foods);
+
       return foods;
     } catch (error) {
       console.error("FatSecret API Request Error:", error);

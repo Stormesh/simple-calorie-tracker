@@ -76,7 +76,7 @@ export default defineEventHandler(
 
     const cachedFood = cache.get(search_expression);
     if (cachedFood) {
-      return cachedFood.data;
+      return cachedFood.data as IFoodDetails;
     }
 
     const useOAuth2 = !!config.apiClientSecret;
