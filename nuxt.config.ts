@@ -11,6 +11,13 @@ export default defineNuxtConfig({
     apiSecret: process.env.FATSECRET_API_SECRET,
     apiClientSecret: process.env.FATSECRET_API_CLIENT_SECRET,
   },
+  nitro: {
+    preset: "cloudflare-pages",
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true
+    }
+  },
   app: {
     head: {
       title: "MaxHP - Level Up Your Health",
