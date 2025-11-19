@@ -102,6 +102,7 @@ export default defineEventHandler(
       throw createError({
         statusCode: 500,
         statusMessage: "Failed to fetch data from FatSecret.",
+        message: error instanceof Error ? error.message : String(error),
       });
     }
   }
