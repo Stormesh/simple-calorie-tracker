@@ -22,11 +22,13 @@ const parseNutrient = (value: string | number | undefined | null): number => {
 };
 
 const parseServings = (servings: {
-  serving: IFoodServing[];
+  serving: IFoodServing | IFoodServing[];
 }): {
   serving: IFoodServing[];
 } => {
-  const servingArray = servings.serving;
+  const servingArray = Array.isArray(servings.serving)
+    ? servings.serving
+    : [servings.serving];
 
   const nutrientKeys: (keyof IFoodServing)[] = [
     "number_of_units",

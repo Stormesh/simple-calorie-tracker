@@ -2,6 +2,8 @@ export const foodsList = ["Breakfast", "Lunch", "Dinner", "Snacks"];
 
 export interface IFoodTemplate {
   foodName: string;
+  foodId: string;
+  servingId: string;
   calories: number;
   totalFat: number;
   cholesterol: number;
@@ -13,6 +15,8 @@ export interface IFoodTemplate {
 
 export const foodTemplateDefault = () => ({
   foodName: "",
+  foodId: "",
+  servingId: "",
   calories: 0,
   totalFat: 0,
   cholesterol: 0,
@@ -36,5 +40,7 @@ export const resetCookies = (cookieNames: string[]) => {
 };
 
 export const foodDetails = ref<IFoodDetails | null>(null);
+
+export const selectedServingId = ref<string | null>(null);
 
 export const isFoodLoading = ref(false);

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { FoodSearchModal } from "#components";
+
 interface IFoodProps {
   title: string;
   foodDetailsRef: Element | null;
@@ -117,34 +119,65 @@ const resetFoods = () => {
   foods.value = foodArrayDefault();
 };
 
-const changeFoodDetails = async (index: number, scroll: boolean = false) => {
+const overlay = useOverlay();
+
+const openFoodSearch = (index: number) => {
+  const searchModal = overlay.create(FoodSearchModal);
+  searchModal.open({
+    cookieName: `foods-${title}`,
+    index,
+  });
+};
+
+const showFoodDetails = async (index: number) => {
   const foodItem = foods.value[index],
     foodState = foodStates.value[index];
   if (!foodItem || !foodState) return;
 
-  foodState.focused = false;
+  const foodId = foodItem.foodId || "";
+  if (!foodId.trim()) return;
+
   foodState.loading = true;
 
-  const foodName = foodItem.foodName || "";
-  const food = await searchFood(foodName);
-  const details = await getFood(food?.food[0]?.food_id || "");
+  const details = await getFood(foodId);
   if (details) {
     foodDetails.value = details;
-    const serving = details.servings.serving[0];
-
-    if (serving) {
-      foodItem.calories = serving.calories || 0;
-      foodItem.totalFat = serving.fat || 0;
-      foodItem.sodium = serving.sodium || 0;
-      foodItem.totalCarbohydrate = serving.carbohydrate || 0;
-      foodItem.sugars = serving.sugar || 0;
-      foodItem.protein = serving.protein || 0;
-      foodItem.cholesterol = serving.cholesterol || 0;
-    }
-    if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+    selectedServingId.value = foodItem.servingId || null;
+    foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
   }
 
   foodState.loading = false;
+};
+
+const searchAndSelectServing = async (index: number, scroll: boolean = false) => {
+  const foodItem = foods.value[index],
+    foodState = foodStates.value[index];
+  if (!foodItem || !foodState) return;
+
+  const foodName = foodItem.foodName || "";
+  if (!foodName.trim()) return;
+
+  foodState.focused = false;
+  foodState.loading = true;
+
+  const food = await searchFood(foodName);
+  if (!food?.food?.[0]) {
+    foodState.loading = false;
+    return;
+  }
+
+  const details = await getFood(food.food[0].food_id);
+  foodState.loading = false;
+
+  if (details) {
+    const searchModal = overlay.create(FoodSearchModal);
+    searchModal.open({
+      cookieName: `foods-${title}`,
+      index,
+      initialFoodDetails: details,
+    });
+    if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+  }
 };
 
 const onFocus = (index: number, focus: boolean) => {
@@ -167,7 +200,9 @@ const onFocus = (index: number, focus: boolean) => {
             :index="index"
             :calories="food.calories"
             :food-state="foodStates[index]"
-            :change-food-details="changeFoodDetails"
+            :change-food-details="showFoodDetails"
+            :open-food-search="openFoodSearch"
+            :search-and-select-serving="searchAndSelectServing"
             :on-focus="onFocus"
             :reset-food-if-empty="resetFoodIfEmpty"
             :delete-item="deleteItem"

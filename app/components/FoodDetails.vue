@@ -8,10 +8,16 @@ interface INutritionFacts {
   unit: string;
 }
 
-const serving = computed<IFoodServing | null>(() => {
-  if (!foodData.value || !foodData.value.servings.serving[0])
+const serving = computed(() => {
+  if (!foodData.value || !foodData.value.servings.serving.length)
     return null;
-  return foodData.value.servings.serving[0];
+  if (selectedServingId.value) {
+    const match = foodData.value.servings.serving.find(
+      (s) => s.serving_id === selectedServingId.value
+    );
+    if (match) return match;
+  }
+  return foodData.value.servings.serving[0] ?? null;
 });
 
 const nutritionFacts = computed<INutritionFacts[]>(() => [
