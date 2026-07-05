@@ -22,20 +22,24 @@ const resetCookies = () => {
 
 <template>
   <ModalTemplate title="Reset">
-    <p class="text-xl m-1 text-center">
-      Are you sure you want to reset all foods?
-    </p>
-    <div>
+    <div class="flex flex-col items-center gap-2 py-2">
+      <Icon name="mdi:alert-octagon" size="3rem" class="text-hp-orange" />
+      <p class="text-base text-white/80 text-center">
+        Are you sure you want to reset all foods?
+      </p>
+      <p class="text-xs text-white/40 text-center">This action cannot be undone</p>
+    </div>
+    <div class="flex justify-center gap-4 mt-2">
       <UButton
         icon="heroicons:check"
-        label="Yes"
-        class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-rose-700 active:bg-rose-600 text-white font-bold py-2 px-4 mx-2 rounded-lg"
+        label="Yes, Reset"
+        class="btn-gaming text-sm cursor-pointer bg-hp-red/80 hover:bg-hp-red text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-gaming-900/50 border border-hp-red/30 transition-all"
         @click="resetCookies"
       />
       <UButton
         icon="heroicons:x-mark"
-        label="No"
-        class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-teal-600 active:bg-teal-500 text-white font-bold py-2 px-4 mx-2 rounded-lg"
+        label="Cancel"
+        class="btn-gaming text-sm cursor-pointer bg-gaming-950/60 hover:bg-gaming-700/60 text-white font-bold py-2 px-5 rounded-xl border border-gaming-700/30 transition-all"
         @click="emit('close', false)"
       />
     </div>

@@ -1,26 +1,26 @@
 export default defineAppConfig({
     ui: {
         colors: {
-            primary: "slate"
+            primary: "gaming"
         },
         progress: {
             variants: {
                 color: {
                     red: {
-                        indicator: "bg-red-500",
-                        steps: "text-red-700"
+                        indicator: "bg-gradient-to-r from-hp-red to-red-600",
+                        steps: "text-hp-red"
                     },
                     orange: {
-                        indicator: "bg-orange-500",
-                        steps: "text-orange-700"
+                        indicator: "bg-gradient-to-r from-hp-orange to-orange-600",
+                        steps: "text-hp-orange"
                     },
                     yellow: {
-                        indicator: "bg-yellow-500",
-                        steps: "text-yellow-700"
+                        indicator: "bg-gradient-to-r from-hp-yellow to-yellow-600",
+                        steps: "text-hp-yellow"
                     },
                     green: {
-                        indicator: "bg-green-500",
-                        steps: "text-green-700"
+                        indicator: "bg-gradient-to-r from-hp-green to-emerald-600",
+                        steps: "text-hp-green"
                     }
                 }
             }

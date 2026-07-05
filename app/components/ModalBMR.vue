@@ -116,90 +116,124 @@ const closeModal = () => {
     <UForm
       ref="form"
       :state="bmrForm"
-      class="p-4"
+      class="w-full"
       @submit.prevent="calculateBMR"
     >
-      <div class="flex flex-col gap-0.5 flex-wrap">
-        <h3 class="text-lg font-semibold">Unit System</h3>
-        <URadioGroup
-          v-model="bmrForm.unitSystem"
-          size="xl"
-          :items="UNIT_SYSTEM_OPTIONS"
-          class="mb-4"
-        />
-        <UInput
-          v-model.number="bmrForm.weight"
-          :placeholder="
-            bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
-          "
-          type="number"
-          required
-          size="xl"
-          step="0.1"
-          class="w-full"
-        />
-        <UInput
-          v-model.number="bmrForm.height"
-          :placeholder="
-            bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
-          "
-          type="number"
-          required
-          size="xl"
-          step="0.1"
-          class="w-full"
-        />
-        <UInput
-          v-model.number="bmrForm.age"
-          placeholder="Age"
-          type="number"
-          required
-          size="xl"
-          class="w-full"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Activity Level</h3>
-        <USelect
-          v-model="bmrForm.activity"
-          legend="Activity Level"
-          size="xl"
-          :items="ACTIVITY"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Target</h3>
-        <USelect
-          v-model="bmrForm.target"
-          size="xl"
-          :items="targetOptions"
-          class="w-60"
-        />
-        <h3 class="mt-4 text-lg font-semibold">Gender</h3>
-        <URadioGroup
-          v-model="bmrForm.gender"
-          size="xl"
-          :items="GENDER_OPTIONS"
-        />
+      <div class="flex flex-col gap-3 w-full">
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Unit System</h3>
+          <URadioGroup
+            v-model="bmrForm.unitSystem"
+            size="sm"
+            :items="UNIT_SYSTEM_OPTIONS"
+            class="text-white"
+          />
+        </div>
+
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Body Stats</h3>
+          <UInput
+            v-model.number="bmrForm.weight"
+            :placeholder="
+              bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
+            "
+            type="number"
+            required
+            size="md"
+            step="0.1"
+            class="w-full"
+            :ui="{
+              base: 'bg-gaming-950/80 border-gaming-700/30 text-white placeholder:text-white/30 rounded-lg input-gaming',
+            }"
+          />
+          <UInput
+            v-model.number="bmrForm.height"
+            :placeholder="
+              bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
+            "
+            type="number"
+            required
+            size="md"
+            step="0.1"
+            class="w-full"
+            :ui="{
+              base: 'bg-gaming-950/80 border-gaming-700/30 text-white placeholder:text-white/30 rounded-lg input-gaming',
+            }"
+          />
+          <UInput
+            v-model.number="bmrForm.age"
+            placeholder="Age"
+            type="number"
+            required
+            size="md"
+            class="w-full"
+            :ui="{
+              base: 'bg-gaming-950/80 border-gaming-700/30 text-white placeholder:text-white/30 rounded-lg input-gaming',
+            }"
+          />
+        </div>
+
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Activity Level</h3>
+          <USelect
+            v-model="bmrForm.activity"
+            size="md"
+            :items="ACTIVITY"
+            class="w-full"
+            :ui="{
+              base: 'bg-gaming-950/80 border-gaming-700/30 text-white rounded-lg',
+            }"
+          />
+        </div>
+
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Target</h3>
+          <USelect
+            v-model="bmrForm.target"
+            size="md"
+            :items="targetOptions"
+            class="w-full"
+            :ui="{
+              base: 'bg-gaming-950/80 border-gaming-700/30 text-white rounded-lg',
+            }"
+          />
+        </div>
+
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Gender</h3>
+          <URadioGroup
+            v-model="bmrForm.gender"
+            size="sm"
+            :items="GENDER_OPTIONS"
+            class="text-white"
+          />
+        </div>
       </div>
 
-      <div class="flex justify-center gap-4 mt-4">
+      <div class="flex justify-center gap-4 mt-6">
         <UButton
           icon="heroicons:calculator"
           label="Calculate"
-          class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-teal-600 active:bg-teal-500 text-white font-bold py-2 px-4 rounded-lg"
+          class="btn-gaming text-sm cursor-pointer bg-gaming-600 hover:bg-gaming-500 active:bg-gaming-400 text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-gaming-900/50 hover:shadow-gaming-500/30 transition-all border border-gaming-500/30"
           type="submit"
           @submit.prevent="calculateBMR"
         />
         <UButton
           icon="heroicons:x-mark"
           label="Cancel"
-          class="text-lg cursor-pointer bg-slate-600 dark:bg-sky-700 hover:bg-rose-700 active:bg-rose-600 text-white font-bold py-2 px-4 rounded-lg"
+          class="btn-gaming text-sm cursor-pointer bg-gaming-950/60 hover:bg-hp-red/30 active:bg-hp-red/50 text-white font-bold py-2 px-5 rounded-xl border border-gaming-700/30 hover:border-hp-red/50 transition-all"
           @click="closeModal"
         />
       </div>
 
       <div
         v-if="bmrForm.bmr !== null"
-        class="mt-4 text-center text-xl font-semibold"
+        class="mt-4 text-center"
       >
-        Your TDEE: {{ bmrForm.bmr }} calories/day
+          <div class="inline-block bg-gaming-950/60 rounded-xl px-6 py-3 border border-gaming-700/30">
+          <span class="text-xs text-gaming-400 uppercase tracking-wider block">Your TDEE</span>
+          <span class="text-xl font-black text-gaming-400 glow-text">{{ bmrForm.bmr }} <span class="text-sm font-normal text-white/60">calories/day</span></span>
+        </div>
       </div>
     </UForm>
   </ModalTemplate>

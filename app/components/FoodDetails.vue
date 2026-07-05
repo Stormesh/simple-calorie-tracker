@@ -45,27 +45,26 @@ const isValidQuantity = computed(() => {
 
 <template>
   <div ref="rootElement" class="flex justify-center items-center">
-    <div class="m-4 w-sm max-w-md">
-      <div v-if="isFoodLoading" class="flex justify-center items-center">
-        <icon name="line-md:loading-loop" size="5rem" />
+    <div class="m-4 w-sm max-w-md animate-fade-in-up">
+      <div v-if="isFoodLoading" class="flex justify-center items-center py-12">
+        <Icon name="line-md:loading-loop" size="3rem" class="text-gaming-400" />
       </div>
       <div v-else-if="foodData && !isFoodLoading">
-        <h1
-          class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
-        >
-          {{
-            (isValidQuantity ? serving?.number_of_units + " " : "") +
-            (foodData.food_name.charAt(0).toUpperCase() +
-              foodData.food_name.slice(1)) +
-            " " +
-            serving?.metric_serving_amount
-          }}g
-        </h1>
-        <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl p-2">
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 md:text-lg">
+        <div class="section-header text-lg md:text-xl font-black text-gaming-400 text-center py-2 px-6 rounded-t-xl bg-gaming-950/60 border-t border-x border-gaming-700/30 tracking-widest">
+          <span class="glow-text">
+            {{ foodData.food_name.charAt(0).toUpperCase() + foodData.food_name.slice(1) }}
+          </span>
+          <span class="text-white/40 text-sm font-mono ml-2">
+            {{ (isValidQuantity ? serving?.number_of_units + " " : "") + serving?.metric_serving_amount }}g
+          </span>
+        </div>
+        <div class="glass-light rounded-b-xl rounded-t-none p-4 shadow-lg shadow-gaming-950/40">
+          <div class="grid grid-cols-2 gap-3">
             <template v-for="(fact, index) in nutritionFacts" :key="index">
-              <div class="font-bold text-right">{{ fact.label }}:</div>
-              <div>{{ Math.round(fact.value || 0) + fact.unit }}</div>
+              <div class="flex flex-col items-center p-2 rounded-lg bg-gaming-950/40 border border-gaming-800/20">
+                <span class="text-xs font-mono text-gaming-400 uppercase tracking-wider">{{ fact.label }}</span>
+                <span class="text-base font-bold text-white">{{ Math.round(fact.value || 0) }}<span class="text-xs text-gaming-400 ml-0.5">{{ fact.unit }}</span></span>
+              </div>
             </template>
           </div>
         </div>

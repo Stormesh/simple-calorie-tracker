@@ -155,26 +155,26 @@ const onFocus = (index: number, focus: boolean) => {
 </script>
 
 <template>
-  <div class="flex-col flex justify-center m-4">
-    <h1
-      class="text-2xl bg-slate-500 dark:bg-sky-700 rounded-t-xl text-white text-center font-black"
-    >
-      {{ title }}
-    </h1>
-    <div class="bg-slate-300 dark:bg-slate-800 rounded-b-xl shadow-md">
-      <div v-for="(food, index) in foods" :key="index">
-        <FoodInput
-          v-model:food-name="food.foodName"
-          :index="index"
-          :calories="food.calories"
-          :food-state="foodStates[index]"
-          :change-food-details="changeFoodDetails"
-          :on-focus="onFocus"
-          :reset-food-if-empty="resetFoodIfEmpty"
-          :delete-item="deleteItem"
-        />
+  <div class="flex-col flex justify-center m-4 animate-fade-in-up">
+    <div class="section-header text-lg md:text-xl font-black text-gaming-300 text-center py-2 px-6 rounded-t-xl bg-gaming-900/60 border-t border-x border-gaming-700/30 tracking-widest">
+      <span class="shimmer-text">{{ title }}</span>
+    </div>
+    <div class="glass-light rounded-b-xl rounded-t-none shadow-lg shadow-gaming-900/30">
+      <div class="divide-y divide-gaming-800/30">
+        <div v-for="(food, index) in foods" :key="index" class="animate-slide-in" :style="{ animationDelay: `${index * 50}ms` }">
+          <FoodInput
+            v-model:food-name="food.foodName"
+            :index="index"
+            :calories="food.calories"
+            :food-state="foodStates[index]"
+            :change-food-details="changeFoodDetails"
+            :on-focus="onFocus"
+            :reset-food-if-empty="resetFoodIfEmpty"
+            :delete-item="deleteItem"
+          />
+        </div>
       </div>
-      <div class="flex justify-center overflow-hidden">
+      <div class="flex justify-center overflow-hidden pt-1 pb-3 gap-2">
         <FoodListButton
           label="Add food"
           name="addFood"
@@ -189,10 +189,10 @@ const onFocus = (index: number, focus: boolean) => {
         />
       </div>
     </div>
-    <div>
-      <div class="grid grid-cols-1 text-xl text-center">
-        <div class="font-bold">Calories:</div>
-        <div>{{ Math.round(totalNutrients.totalCalories) }}kcal</div>
+    <div class="mt-2">
+      <div class="flex items-center justify-center gap-2 text-base">
+        <span class="text-gaming-400 font-mono text-xs uppercase tracking-widest">Total</span>
+        <span class="text-white font-black text-lg">{{ Math.round(totalNutrients.totalCalories) }}<span class="text-gaming-400 text-sm font-normal"> kcal</span></span>
       </div>
     </div>
   </div>

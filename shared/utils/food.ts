@@ -45,13 +45,13 @@ export interface IFoodSearchResult {
 }
 
 export const searchFood = async (
-  foodName: string
+  foodName: string,
 ): Promise<IFoodSearchResult | null> => {
   if (!foodName.trim()) return null;
 
   try {
     const response = await $fetch<IFoodSearchResult>(
-      `/api/nutrition/search/${encodeURIComponent(foodName)}`
+      `/api/nutrition/search/${encodeURIComponent(foodName)}`,
     );
 
     if (response && typeof response === "object" && "error" in response) {
@@ -66,12 +66,23 @@ export const searchFood = async (
   }
 };
 
-export const getFood = async (foodId: string): Promise<IFoodDetails | null> => {
+export const getFood = async (
+  foodId: string,
+  amount?: number,
+  unit?: string,
+): Promise<IFoodDetails | null> => {
   if (!foodId.trim()) return null;
 
   try {
     const response = await $fetch<IFoodDetails>(
-      `/api/nutrition/${encodeURIComponent(foodId)}`
+      `/api/nutrition/${encodeURIComponent(foodId)}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          amount,
+          unit,
+        }),
+      },
     );
 
     if (response && typeof response === "object" && "error" in response) {

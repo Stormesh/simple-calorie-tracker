@@ -1,15 +1,7 @@
 <template>
-  <!-- Light mode -->
-  <NuxtImg
-    src="nutritionix.png"
-    alt="Nutritionix"
-    class="dark:hidden h-12 md:h-16 z-20"
-  />
-
-  <!-- Dark mode -->
   <NuxtImg
     src="nutritionix_dark.png"
     alt="Nutritionix"
-    class="hidden dark:block h-12 md:h-16 z-20"
+    class="h-10 md:h-12 opacity-60 hover:opacity-100 transition-opacity duration-300"
   />
 </template>

@@ -15,57 +15,58 @@ const foodName = defineModel<string>("foodName");
 <template>
   <div class="py-1.5 mx-2">
     <div
-      class="h-10 flex relative bg-stone-50 dark:bg-slate-900 rounded-lg overflow-hidden shadow"
-      :class="foodState?.focused && 'ring-2 ring-slate-500 dark:ring-sky-700'"
+      class="h-11 flex relative bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 input-gaming"
+      :class="foodState?.focused ? 'ring-2 ring-gaming-500/70 glow-border' : 'ring-1 ring-gaming-800/30'"
     >
       <form
-        class="container inline-block p-2"
+        class="flex-1 inline-flex items-center px-3"
         @submit.prevent="changeFoodDetails(index)"
       >
+        <Icon name="mdi:food-apple" size="1.2rem" class="text-gaming-500 mr-2 shrink-0" />
         <input
           v-model="foodName"
-          class="focus:outline-none focus:placeholder-shown:scale-110 focus:placeholder-shown:translate-x-3 transition-transform container"
+          class="bg-transparent focus:outline-none text-white placeholder:text-white/30 text-sm w-full font-medium tracking-wide"
           type="text"
           name="foodName"
           aria-label="Enter food"
-          placeholder="Enter food"
+          placeholder="Enter food name..."
           @focus="onFocus(index, true)"
           @blur="onFocus(index, false)"
           @change="resetFoodIfEmpty(index)"
         >
       </form>
-      <div v-if="foodState?.loading" class="absolute right-24 top-2">
-        <Icon name="line-md:loading-loop" size="2rem" />
+      <div v-if="foodState?.loading" class="flex items-center px-3">
+        <Icon name="line-md:loading-loop" size="1.5rem" class="text-gaming-400" />
       </div>
       <div
         v-else-if="calories > 0"
-        class="absolute right-20 top-2 select-none pointer-events-none transition-opacity"
-        :class="foodState?.focused ? 'opacity-0' : 'opacity-65'"
+        class="flex items-center px-3 select-none pointer-events-none transition-all duration-200"
+        :class="foodState?.focused ? 'opacity-0 w-0 px-0 overflow-hidden' : 'opacity-80'"
       >
-        <div>{{ Math.round(calories) }}kcal</div>
+        <span class="text-xs font-bold text-gaming-400 font-mono">{{ Math.round(calories) }}<span class="text-gaming-600">kcal</span></span>
       </div>
       <button
-        class="min-h-fit inline-block hover:bg-teal-600 active:bg-teal-500 transition-colors group cursor-pointer"
+        class="px-2.5 flex items-center justify-center hover:bg-gaming-700/50 active:bg-gaming-600/50 transition-all duration-200 group cursor-pointer border-l border-gaming-800/30"
         name="showFoodDetails"
         aria-label="Show food details"
         @click="changeFoodDetails(index, true)"
       >
         <Icon
           name="ic:outline-keyboard-arrow-down"
-          size="2.5rem"
-          class="text-black group-hover:text-white dark:text-white group-hover:translate-y-1 transition-transform duration-150"
+          size="1.5rem"
+          class="text-white/40 group-hover:text-gaming-400 group-hover:translate-y-0.5 transition-all duration-200"
         />
       </button>
       <button
-        class="min-h-fit inline-block hover:bg-rose-800 active:bg-rose-700 transition-colors group cursor-pointer"
+        class="px-2.5 flex items-center justify-center hover:bg-hp-red/30 active:bg-hp-red/50 transition-all duration-200 group cursor-pointer border-l border-gaming-800/30 rounded-r-xl"
         name="deleteFood"
         aria-label="Delete food"
         @click="deleteItem(index)"
       >
         <Icon
           name="ic:outline-delete"
-          size="2.5rem"
-          class="text-black group-hover:text-white dark:text-white group-hover:scale-110 transition-all duration-150"
+          size="1.3rem"
+          class="text-white/40 group-hover:text-hp-red group-hover:scale-110 transition-all duration-200"
         />
       </button>
     </div>

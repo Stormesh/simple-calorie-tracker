@@ -15,45 +15,51 @@ const caloriesLeft = computed(() => {
 const getCaloriePercentage = () => {
   return (caloriesLeft.value / maxBmr.value) * 100;
 };
+
+const hpColor = computed(() => {
+  const pct = getCaloriePercentage();
+  if (pct > 75) return 'green';
+  if (pct > 50) return 'yellow';
+  if (pct > 25) return 'orange';
+  return 'red';
+});
 </script>
 
 <template>
   <div
-    class="sticky flex items-center justify-center top-2 flex-col w-full z-10 select-none"
+    class="sticky flex items-center justify-center top-18 flex-col w-full z-40 select-none pt-4 pb-2"
   >
-    <div
-      class="absolute text-center text-lg font-bold z-20 dark:text-shadow-[0_0_3px_#000] select-none"
-    >
-      <span
-        :class="getCaloriePercentage() <= 0 && 'dark:text-red-500 text-red-700'"
-        >{{ caloriesLeft }}</span
-      >
-      / {{ maxBmr }} HP
-    </div>
-    <div class="flex relative flex-wrap items-center w-80 md:w-sm lg:w-2xl mx-auto">
-      <NuxtImg
-        src="/heart.png"
-        alt="Heart"
-        height="48"
-        width="48"
-        class="-left-5 absolute z-10 mx-auto w-12 h-12"
-      />
-      <UProgress
-        v-model="caloriesLeft"
-        height="24"
-        class="mx-auto my-4"
-        size="2xl"
-        :max="maxBmr"
-        :color="
-          getCaloriePercentage() > 75
-            ? 'green'
-            : getCaloriePercentage() > 50
-            ? 'yellow'
-            : getCaloriePercentage() > 25
-            ? 'orange'
-            : 'red'
-        "
-      />
+    <div class="relative flex items-center w-80 md:w-sm lg:w-2xl mx-auto">
+      <div class="absolute -left-3 z-10 animate-heartbeat">
+        <NuxtImg
+          src="/heart.png"
+          alt="Heart"
+          height="48"
+          width="48"
+          class="w-10 h-10 md:w-12 md:h-12 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+        />
+      </div>
+      <div class="flex-1 ml-6">
+        <div class="relative glass-light rounded-full p-0.5 hp-bar glow-border">
+          <UProgress
+            v-model="caloriesLeft"
+            height="20"
+            class="rounded-full overflow-hidden"
+            size="2xl"
+            :max="maxBmr"
+            :color="hpColor"
+          />
+        </div>
+        <div class="flex justify-between mt-1 px-1">
+          <span class="text-xs font-semibold text-white/60 font-mono tracking-wider">HP</span>
+          <span class="text-xs font-bold text-white/80 font-mono tracking-wider">
+            <span :class="getCaloriePercentage() <= 0 ? 'text-hp-red' : 'text-gaming-300'">
+              {{ caloriesLeft }}
+            </span>
+            <span class="text-white/40"> / {{ maxBmr }}</span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </template>

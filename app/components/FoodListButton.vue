@@ -10,7 +10,7 @@ const { label, name, icon } = defineProps<IButtonProps>();
 
 <template>
   <UButton
-    class="mx-2 px-4 py-2 bg-slate-600 hover:bg-slate-500 active:bg-slate-400 dark:bg-sky-700 dark:hover:bg-sky-600 dark:active:bg-sky-500 font-bold translate-y-2 hover:translate-y-0 transition-all text-white text-lg rounded-none rounded-t-xl cursor-pointer"
+    class="btn-gaming px-4 py-2 bg-gaming-700/60 hover:bg-gaming-600/80 active:bg-gaming-500/80 font-semibold text-white text-sm rounded-lg shadow-lg shadow-gaming-900/30 hover:shadow-gaming-500/20 transition-all duration-300 cursor-pointer border border-gaming-600/30 hover:border-gaming-500/50 tracking-wide"
     :label
     :name
     :icon

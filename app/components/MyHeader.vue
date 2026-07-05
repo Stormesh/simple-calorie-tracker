@@ -1,20 +1,12 @@
 <template>
   <header
-    class="flex justify-between items-center px-5 md:px-10 bg-slate-50 dark:bg-slate-900 shadow-md dark:border-b-2 dark:border-sky-700 h-16"
+    class="header-glass flex justify-between items-center px-5 md:px-10 h-16 sticky top-0 z-50"
   >
-    <!-- Light mode -->
-    <NuxtImg
-      src="maxhp_side.png"
-      alt="Logo"
-      class="dark:hidden h-10 md:h-16 z-20"
-    />
-
-    <!-- Dark mode -->
     <NuxtImg
       src="maxhp_side_dark.png"
       alt="Logo"
-      class="hidden dark:block h-10 md:h-16 z-20"
+      class="h-10 md:h-16 z-20"
     />
-    <FatSecretLogo />
+    <FatSecretLogo class="mr-3.5" />
   </header>
 </template>

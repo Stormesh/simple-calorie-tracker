@@ -37,18 +37,19 @@ const items = ref<DropdownMenuItem[]>([
 </script>
 
 <template>
-  <div class="sticky z-20 top-0">
+  <div class="fixed z-60 top-3 right-3">
     <UDropdownMenu
       arrow
       :ui="{
-        content: 'bg-slate-100 dark:bg-slate-800 rounded-lg shadow-md',
+        content: 'bg-gaming-950/90 backdrop-blur-xl border border-gaming-700/30 rounded-xl shadow-2xl shadow-gaming-900/50 text-white',
+        item: 'hover:bg-gaming-800/50 text-white data-[highlighted]:bg-gaming-700/50 rounded-lg mx-1',
       }"
       :items="items"
     >
       <UButton
         icon="mdi:gear"
-        size="xl"
-        class="cursor-pointer text-lg m-2 bg-slate-600 hover:bg-slate-500 active:bg-slate-400 dark:bg-sky-700 dark:hover:bg-sky-600 dark:active:bg-sky-500 text-white font-bold p-2 rounded-lg absolute right-0"
+        size="lg"
+        class="cursor-pointer bg-gaming-700/80 hover:bg-gaming-600 text-white p-2.5 rounded-xl shadow-lg shadow-gaming-900/50 hover:shadow-gaming-500/30 transition-all duration-300 hover:scale-105 active:scale-95 animate-pulse-glow"
         aria-label="Settings"
       />
     </UDropdownMenu>

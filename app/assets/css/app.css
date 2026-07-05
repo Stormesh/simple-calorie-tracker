@@ -1,2 +1,302 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+@theme {
+  --color-gaming-50: #fef2f2;
+  --color-gaming-100: #fee2e2;
+  --color-gaming-200: #fecaca;
+  --color-gaming-300: #fca5a5;
+  --color-gaming-400: #f87171;
+  --color-gaming-500: #ef4444;
+  --color-gaming-600: #dc2626;
+  --color-gaming-700: #b91c1c;
+  --color-gaming-800: #991b1b;
+  --color-gaming-900: #7f1d1d;
+  --color-gaming-950: #450a0a;
+
+  --color-cyber-50: #fdf2f8;
+  --color-cyber-100: #fce7f3;
+  --color-cyber-200: #fbcfe8;
+  --color-cyber-300: #f9a8d4;
+  --color-cyber-400: #f472b6;
+  --color-cyber-500: #ec4899;
+  --color-cyber-600: #db2777;
+  --color-cyber-700: #be185d;
+  --color-cyber-800: #9d174d;
+  --color-cyber-900: #831843;
+  --color-cyber-950: #500724;
+
+  --color-hp-green: #22c55e;
+  --color-hp-yellow: #eab308;
+  --color-hp-orange: #f97316;
+  --color-hp-red: #ef4444;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gaming-600) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gaming-600);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gaming-500);
+}
+
+::selection {
+  background-color: var(--color-gaming-600);
+  color: white;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.glass {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(239, 68, 68, 0.08);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.3);
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 20px rgba(244, 114, 182, 0.5), 0 0 40px rgba(244, 114, 182, 0.3);
+}
+
+.glow-border {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2), inset 0 0 15px rgba(239, 68, 68, 0.03);
+}
+
+.glow-border-cyan {
+  box-shadow: 0 0 15px rgba(244, 114, 182, 0.2), inset 0 0 15px rgba(244, 114, 182, 0.03);
+}
+
+.glow-border-gold {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.05);
+}
+
+.btn-gaming {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-gaming::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-gaming:hover::after {
+  opacity: 1;
+}
+
+.btn-gaming:active {
+  transform: scale(0.96);
+}
+
+.hp-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.hp-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transform: translateX(-100%);
+  animation: hpBarShine 3s ease-in-out infinite;
+}
+
+@keyframes hpBarShine {
+  0%, 100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5), 0 0 30px rgba(239, 68, 68, 0.2);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.section-header {
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.section-header::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin-top: 4px;
+  border-radius: 9999px;
+}
+
+.input-gaming {
+  transition: all 0.3s ease;
+}
+
+.input-gaming:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4), 0 0 12px rgba(239, 68, 68, 0.15);
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-gaming-500), transparent);
+}
+
+.stat-card-over {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-over::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-hp-red), transparent);
+}
+
+.modal-gaming {
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(18, 10, 10, 0.98));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.bg-gaming-gradient {
+  background: linear-gradient(135deg, #080808 0%, #120a0a 25%, #0a0a0a 50%, #120a0a 75%, #080808 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.header-glass {
+  background: rgba(8, 8, 8, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #fca5a5, #f87171, #ef4444, #dc2626, #ef4444, #f87171, #fca5a5);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
