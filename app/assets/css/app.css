@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 @import "@nuxt/ui";
 
@@ -61,7 +61,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .glass {
@@ -79,23 +79,33 @@ body {
 }
 
 .glow-text {
-  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.3);
+  text-shadow:
+    0 0 20px rgba(239, 68, 68, 0.5),
+    0 0 40px rgba(239, 68, 68, 0.3);
 }
 
 .glow-text-cyan {
-  text-shadow: 0 0 20px rgba(244, 114, 182, 0.5), 0 0 40px rgba(244, 114, 182, 0.3);
+  text-shadow:
+    0 0 20px rgba(244, 114, 182, 0.5),
+    0 0 40px rgba(244, 114, 182, 0.3);
 }
 
 .glow-border {
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2), inset 0 0 15px rgba(239, 68, 68, 0.03);
+  box-shadow:
+    0 0 15px rgba(239, 68, 68, 0.2),
+    inset 0 0 15px rgba(239, 68, 68, 0.03);
 }
 
 .glow-border-cyan {
-  box-shadow: 0 0 15px rgba(244, 114, 182, 0.2), inset 0 0 15px rgba(244, 114, 182, 0.03);
+  box-shadow:
+    0 0 15px rgba(244, 114, 182, 0.2),
+    inset 0 0 15px rgba(244, 114, 182, 0.03);
 }
 
 .glow-border-gold {
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.05);
+  box-shadow:
+    0 0 15px rgba(245, 158, 11, 0.3),
+    inset 0 0 15px rgba(245, 158, 11, 0.05);
 }
 
 .btn-gaming {
@@ -105,7 +115,7 @@ body {
 }
 
 .btn-gaming::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), transparent);
@@ -127,16 +137,22 @@ body {
 }
 
 .hp-bar::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
   transform: translateX(-100%);
   animation: hpBarShine 3s ease-in-out infinite;
 }
 
 @keyframes hpBarShine {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(-100%);
   }
   50% {
@@ -145,11 +161,14 @@ body {
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
   }
   50% {
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5), 0 0 30px rgba(239, 68, 68, 0.2);
+    box-shadow:
+      0 0 16px rgba(239, 68, 68, 0.5),
+      0 0 30px rgba(239, 68, 68, 0.2);
   }
 }
 
@@ -188,14 +207,14 @@ body {
 }
 
 .section-header {
-  font-family: 'Orbitron', monospace;
+  font-family: "Orbitron", monospace;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   position: relative;
 }
 
 .section-header::after {
-  content: '';
+  content: "";
   display: block;
   width: 40px;
   height: 2px;
@@ -208,7 +227,9 @@ body {
 }
 
 .input-gaming:focus {
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4), 0 0 12px rgba(239, 68, 68, 0.15);
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.4),
+    0 0 12px rgba(239, 68, 68, 0.15);
 }
 
 .stat-card {
@@ -217,13 +238,18 @@ body {
 }
 
 .stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-gaming-500), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gaming-500),
+    transparent
+  );
 }
 
 .stat-card-over {
@@ -232,30 +258,47 @@ body {
 }
 
 .stat-card-over::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-hp-red), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-hp-red),
+    transparent
+  );
 }
 
 .modal-gaming {
-  background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(18, 10, 10, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 10, 0.98),
+    rgba(18, 10, 10, 0.98)
+  );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
 .bg-gaming-gradient {
-  background: linear-gradient(135deg, #080808 0%, #120a0a 25%, #0a0a0a 50%, #120a0a 75%, #080808 100%);
+  background: linear-gradient(
+    135deg,
+    #080808 0%,
+    #120a0a 25%,
+    #0a0a0a 50%,
+    #120a0a 75%,
+    #080808 100%
+  );
   background-size: 400% 400%;
   animation: gradientShift 20s ease infinite;
 }
 
 @keyframes gradientShift {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -271,7 +314,8 @@ body {
 }
 
 @keyframes heartbeat {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -279,8 +323,26 @@ body {
   }
 }
 
-.animate-heartbeat {
-  animation: heartbeat 1.5s ease-in-out infinite;
+@keyframes heartGlow {
+  0%,
+  100% {
+    filter: drop-shadow(
+      0 0 var(--glow-rest-size, 6px)
+        rgba(239, 68, 68, var(--glow-rest-opacity, 0.3))
+    );
+  }
+  50% {
+    filter: drop-shadow(
+      0 0 var(--glow-peak-size, 24px)
+        rgba(239, 68, 68, var(--glow-peak-opacity, 0.8))
+    );
+  }
+}
+
+.animate-heart {
+  animation:
+    heartbeat 1.5s ease-in-out infinite,
+    heartGlow 1.5s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -293,7 +355,16 @@ body {
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg, #fca5a5, #f87171, #ef4444, #dc2626, #ef4444, #f87171, #fca5a5);
+  background: linear-gradient(
+    90deg,
+    #fca5a5,
+    #f87171,
+    #ef4444,
+    #dc2626,
+    #ef4444,
+    #f87171,
+    #fca5a5
+  );
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;

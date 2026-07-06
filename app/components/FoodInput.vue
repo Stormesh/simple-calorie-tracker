@@ -16,7 +16,7 @@ const foodName = defineModel<string>("foodName");
 </script>
 
 <template>
-  <div class="py-1.5 mx-2 max-w-md">
+  <div class="py-1.5 mx-2 md:max-w-sm max-w-xs">
     <!-- Empty row: editable input -->
     <div
       v-if="calories === 0"
