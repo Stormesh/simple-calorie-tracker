@@ -4,6 +4,7 @@ export interface IFoodTemplate {
   foodName: string;
   foodId: string;
   servingId: string;
+  grams: number;
   calories: number;
   totalFat: number;
   cholesterol: number;
@@ -17,6 +18,7 @@ export const foodTemplateDefault = () => ({
   foodName: "",
   foodId: "",
   servingId: "",
+  grams: 0,
   calories: 0,
   totalFat: 0,
   cholesterol: 0,

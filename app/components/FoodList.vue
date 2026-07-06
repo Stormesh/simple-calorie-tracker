@@ -27,7 +27,7 @@ const foodStateDefault = () => ({
 });
 
 const foodStates = ref<IFoodState[]>(
-  Array.from({ length: foods.value.length }, foodStateDefault)
+  Array.from({ length: foods.value.length }, foodStateDefault),
 );
 
 const maxFoodsReached = computed(() => {
@@ -48,7 +48,7 @@ watch(
   () => foods.value.length,
   (newLength) => {
     foodStates.value = Array.from({ length: newLength }, foodStateDefault);
-  }
+  },
 );
 
 const resetFood = (index: number) => {
@@ -84,7 +84,7 @@ const totalNutrients = computed(() => {
       totalCarbohydrate: 0,
       sugars: 0,
       protein: 0,
-    }
+    },
   );
 });
 
@@ -109,7 +109,7 @@ const addItem = () => {
     return showToast(
       "Max Foods Reached",
       `You can only add up to ${MAX_FOODS} foods for ${title}`,
-      "ic:outline-error"
+      "ic:outline-error",
     );
   }
   foods.value.push(foodTemplateDefault());
@@ -149,7 +149,10 @@ const showFoodDetails = async (index: number) => {
   foodState.loading = false;
 };
 
-const searchAndSelectServing = async (index: number, scroll: boolean = false) => {
+const searchAndSelectServing = async (
+  index: number,
+  scroll: boolean = false,
+) => {
   const foodItem = foods.value[index],
     foodState = foodStates.value[index];
   if (!foodItem || !foodState) return;
@@ -189,16 +192,26 @@ const onFocus = (index: number, focus: boolean) => {
 
 <template>
   <div class="flex-col flex justify-center m-4 animate-fade-in-up">
-    <div class="section-header text-lg md:text-xl font-black text-gaming-300 text-center py-2 px-6 rounded-t-xl bg-gaming-900/60 border-t border-x border-gaming-700/30 tracking-widest">
+    <div
+      class="section-header text-lg md:text-xl font-black text-gaming-300 text-center py-2 px-6 rounded-t-xl bg-gaming-900/60 border-t border-x border-gaming-700/30 tracking-widest"
+    >
       <span class="shimmer-text">{{ title }}</span>
     </div>
-    <div class="glass-light rounded-b-xl rounded-t-none shadow-lg shadow-gaming-900/30">
+    <div
+      class="glass-light rounded-b-xl rounded-t-none shadow-lg shadow-gaming-900/30"
+    >
       <div class="divide-y divide-gaming-800/30">
-        <div v-for="(food, index) in foods" :key="index" class="animate-slide-in" :style="{ animationDelay: `${index * 50}ms` }">
+        <div
+          v-for="(food, index) in foods"
+          :key="index"
+          class="animate-slide-in"
+          :style="{ animationDelay: `${index * 50}ms` }"
+        >
           <FoodInput
             v-model:food-name="food.foodName"
             :index="index"
             :calories="food.calories"
+            :grams="food.grams ?? 0"
             :food-state="foodStates[index]"
             :change-food-details="showFoodDetails"
             :open-food-search="openFoodSearch"
@@ -226,8 +239,14 @@ const onFocus = (index: number, focus: boolean) => {
     </div>
     <div class="mt-2">
       <div class="flex items-center justify-center gap-2 text-base">
-        <span class="text-gaming-400 font-mono text-xs uppercase tracking-widest">Total</span>
-        <span class="text-white font-black text-lg">{{ Math.round(totalNutrients.totalCalories) }}<span class="text-gaming-400 text-sm font-normal"> kcal</span></span>
+        <span
+          class="text-gaming-400 font-mono text-xs uppercase tracking-widest"
+          >Total</span
+        >
+        <span class="text-white font-black text-lg"
+          >{{ Math.round(totalNutrients.totalCalories)
+          }}<span class="text-gaming-400 text-sm font-normal"> kcal</span></span
+        >
       </div>
     </div>
   </div>
