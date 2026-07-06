@@ -5,14 +5,7 @@ info:
 
 http:
   method: GET
-  url: localhost:3000/api/nutrition/{{foodId}}
-  headers:
-    - name: ""
-      value: ""
-  params:
-    - name: ""
-      value: ""
-      type: query
+  url: http://localhost:3000/api/nutrition/{{foodId}}
   auth: inherit
 
 settings:
