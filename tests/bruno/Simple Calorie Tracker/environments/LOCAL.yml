@@ -1,0 +1,6 @@
+name: LOCAL
+variables:
+  - name: foodId
+    value: "39926"
+  - name: foodName
+    value: burger

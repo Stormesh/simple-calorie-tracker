@@ -1,0 +1,22 @@
+info:
+  name: Food Id
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: localhost:3000/api/nutrition/{{foodId}}
+  headers:
+    - name: ""
+      value: ""
+  params:
+    - name: ""
+      value: ""
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
