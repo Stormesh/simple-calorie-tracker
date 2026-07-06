@@ -171,6 +171,7 @@ const close = () => {
                 placeholder="Search for a food..."
                 class="w-full bg-gaming-950/80 border border-gaming-700/40 rounded-xl py-2.5 pl-10 pr-10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-gaming-500/50 input-gaming"
                 @input="onSearchInput"
+                @keydown.enter="doSearch"
               />
               <button
                 v-if="searchQuery"

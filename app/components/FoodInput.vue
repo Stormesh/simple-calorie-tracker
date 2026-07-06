@@ -17,9 +17,21 @@ const foodName = defineModel<string>("foodName");
 
 <template>
   <div class="py-1.5 mx-2 md:max-w-sm max-w-xs">
+    <!-- Loading state -->
+    <div
+      v-if="foodState?.loading"
+      class="h-11 flex items-center justify-center bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 ring-1 ring-gaming-800/30"
+    >
+      <Icon
+        name="line-md:loading-loop"
+        size="1.4rem"
+        class="text-gaming-400"
+      />
+    </div>
+
     <!-- Empty row: editable input -->
     <div
-      v-if="calories === 0"
+      v-else-if="calories === 0"
       class="h-11 flex relative bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 input-gaming"
       :class="
         foodState?.focused
@@ -43,6 +55,7 @@ const foodName = defineModel<string>("foodName");
           name="foodName"
           aria-label="Enter food"
           placeholder="Search food..."
+          :disabled="foodState?.loading"
           @focus="onFocus(index, true)"
           @blur="onFocus(index, false)"
           @change="resetFoodIfEmpty(index)"
