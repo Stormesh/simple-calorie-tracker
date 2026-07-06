@@ -17,6 +17,13 @@ A simple calorie tracking application built with Nuxt and powered by the FatSecr
 *   [FatSecret API](https://platform.fatsecret.com/)
 *   [TypeScript](https://www.typescriptlang.org/)
 
+## Preview
+![P1](./public/preview1.jpg)
+--
+![P2](./public/preview2.jpg)
+--
+![P3](./public/preview3.jpg)
+
 ## Getting Started
 
 ### Prerequisites
