@@ -10,6 +10,7 @@ interface IModalProps {
   cookieName: string;
   index: number;
   initialFoodDetails?: IFoodDetails;
+  editMode?: boolean;
 }
 
 const props = defineProps<IModalProps>();
@@ -41,33 +42,33 @@ const selectedServing = computed(
 );
 
 const scaledNutrition = computed(() => {
-  const s = selectedServing.value;
-  if (!s) return null;
-  const q = quantity.value || 0;
+  const serving = selectedServing.value;
+  if (!serving) return null;
+  const quantityValue = quantity.value || 0;
   return {
-    grams: Math.round((s.metric_serving_amount || 0) * q * 10) / 10,
-    calories: Math.round((s.calories || 0) * q),
-    fat: Math.round((s.fat || 0) * q * 10) / 10,
-    protein: Math.round((s.protein || 0) * q * 10) / 10,
-    carbohydrate: Math.round((s.carbohydrate || 0) * q * 10) / 10,
-    sugar: Math.round((s.sugar || 0) * q * 10) / 10,
-    sodium: Math.round((s.sodium || 0) * q * 10) / 10,
-    cholesterol: Math.round((s.cholesterol || 0) * q * 10) / 10,
+    grams: Math.round((serving.metric_serving_amount || 0) * quantityValue * 10) / 10,
+    calories: Math.round((serving.calories || 0) * quantityValue),
+    fat: Math.round((serving.fat || 0) * quantityValue * 10) / 10,
+    protein: Math.round((serving.protein || 0) * quantityValue * 10) / 10,
+    carbohydrate: Math.round((serving.carbohydrate || 0) * quantityValue * 10) / 10,
+    sugar: Math.round((serving.sugar || 0) * quantityValue * 10) / 10,
+    sodium: Math.round((serving.sodium || 0) * quantityValue * 10) / 10,
+    cholesterol: Math.round((serving.cholesterol || 0) * quantityValue * 10) / 10,
   };
 });
 
 let debounceTimer: ReturnType<typeof setTimeout>;
 
 const doSearch = async () => {
-  const q = searchQuery.value.trim();
-  if (!q) return;
+  const query = searchQuery.value.trim();
+  if (!query) return;
 
   isSearching.value = true;
   hasSearched.value = true;
   selectedFoodDetails.value = null;
 
   try {
-    const data = await searchFood(q);
+    const data = await searchFood(query);
     results.value = (data?.food || []) as ISearchResult[];
   } catch {
     results.value = [];
@@ -101,23 +102,23 @@ const backToResults = () => {
 };
 
 const submitFood = () => {
-  const s = scaledNutrition.value;
-  const food = selectedFoodDetails.value;
-  if (!s || !food) return;
+  const scaled = scaledNutrition.value;
+  const selectedFood = selectedFoodDetails.value;
+  if (!scaled || !selectedFood) return;
 
   const foodItem = foods.value[props.index];
   if (foodItem) {
-    foodItem.foodName = food.food_name;
-    foodItem.foodId = food.food_id;
+    foodItem.foodName = selectedFood.food_name;
+    foodItem.foodId = selectedFood.food_id;
     foodItem.servingId = selectedServing.value?.serving_id || "";
-    foodItem.grams = s.grams;
-    foodItem.calories = s.calories;
-    foodItem.totalFat = s.fat;
-    foodItem.cholesterol = s.cholesterol;
-    foodItem.sodium = s.sodium;
-    foodItem.totalCarbohydrate = s.carbohydrate;
-    foodItem.sugars = s.sugar;
-    foodItem.protein = s.protein;
+    foodItem.grams = scaled.grams;
+    foodItem.calories = scaled.calories;
+    foodItem.totalFat = scaled.fat;
+    foodItem.cholesterol = scaled.cholesterol;
+    foodItem.sodium = scaled.sodium;
+    foodItem.totalCarbohydrate = scaled.carbohydrate;
+    foodItem.sugars = scaled.sugar;
+    foodItem.protein = scaled.protein;
   }
 
   emit("close", true);
@@ -367,7 +368,7 @@ const close = () => {
               @click="close"
             />
             <UButton
-              label="Add Food"
+              :label="editMode ? 'Edit Food' : 'Add Food'"
               icon="heroicons:check"
               class="flex-1 btn-gaming text-sm cursor-pointer bg-gaming-600 hover:bg-gaming-500 text-white font-bold py-2.5 rounded-xl shadow-lg shadow-gaming-900/50 border border-gaming-500/30 transition-all"
               @click="submitFood"

@@ -149,6 +149,30 @@ const showFoodDetails = async (index: number) => {
   foodState.loading = false;
 };
 
+const editFood = async (index: number) => {
+  const foodItem = foods.value[index],
+    foodState = foodStates.value[index];
+  if (!foodItem || !foodState) return;
+
+  const foodId = foodItem.foodId || "";
+  if (!foodId.trim()) return;
+
+  foodState.loading = true;
+
+  const details = await getFood(foodId);
+  if (details) {
+    const searchModal = overlay.create(FoodSearchModal);
+    searchModal.open({
+      cookieName: `foods-${title}`,
+      index,
+      initialFoodDetails: details,
+      editMode: true,
+    });
+  }
+
+  foodState.loading = false;
+};
+
 const searchAndSelectServing = async (
   index: number,
   scroll: boolean = false,
@@ -215,6 +239,7 @@ const onFocus = (index: number, focus: boolean) => {
             :food-state="foodStates[index]"
             :change-food-details="showFoodDetails"
             :open-food-search="openFoodSearch"
+            :edit-food="editFood"
             :search-and-select-serving="searchAndSelectServing"
             :on-focus="onFocus"
             :reset-food-if-empty="resetFoodIfEmpty"

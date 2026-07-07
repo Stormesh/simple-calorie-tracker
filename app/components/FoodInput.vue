@@ -6,6 +6,7 @@ defineProps<{
   grams: number;
   changeFoodDetails: (index: number, scroll?: boolean) => Promise<void>;
   openFoodSearch: (index: number) => void;
+  editFood: (index: number) => Promise<void>;
   searchAndSelectServing: (index: number, scroll?: boolean) => Promise<void>;
   onFocus: (index: number, focus: boolean) => void;
   resetFoodIfEmpty: (index: number) => void;
@@ -22,11 +23,7 @@ const foodName = defineModel<string>("foodName");
       v-if="foodState?.loading"
       class="h-11 flex items-center justify-center bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 ring-1 ring-gaming-800/30"
     >
-      <Icon
-        name="line-md:loading-loop"
-        size="1.4rem"
-        class="text-gaming-400"
-      />
+      <Icon name="line-md:loading-loop" size="1.4rem" class="text-gaming-400" />
     </div>
 
     <!-- Empty row: editable input -->
@@ -102,14 +99,14 @@ const foodName = defineModel<string>("foodName");
       </div>
       <button
         class="px-2.5 flex items-center justify-center hover:bg-gaming-700/50 transition-all duration-200 border-l border-gaming-800/30"
-        name="showFoodDetails"
-        aria-label="Show food details"
-        @click.stop="changeFoodDetails(index, true)"
+        name="editFood"
+        aria-label="Edit food"
+        @click.stop="editFood(index)"
       >
         <Icon
-          name="ic:outline-keyboard-arrow-down"
+          name="ic:outline-edit"
           size="1.3rem"
-          class="text-white/40 group-hover:text-gaming-400 group-hover:translate-y-0.5 transition-all duration-200"
+          class="text-white/40 group-hover:text-gaming-400 transition-all duration-200"
         />
       </button>
       <button
