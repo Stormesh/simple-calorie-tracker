@@ -129,6 +129,10 @@ const openFoodSearch = (index: number) => {
   });
 };
 
+const scrollToDetails = () => {
+  foodDetailsRef?.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
 const showFoodDetails = async (index: number) => {
   const foodItem = foods.value[index],
     foodState = foodStates.value[index];
@@ -143,7 +147,7 @@ const showFoodDetails = async (index: number) => {
   if (details) {
     foodDetails.value = details;
     selectedServingId.value = foodItem.servingId || null;
-    foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+    scrollToDetails();
   }
 
   foodState.loading = false;
@@ -203,7 +207,7 @@ const searchAndSelectServing = async (
       index,
       initialFoodDetails: details,
     });
-    if (scroll) foodDetailsRef?.scrollIntoView({ behavior: "smooth" });
+    if (scroll) scrollToDetails();
   }
 };
 
