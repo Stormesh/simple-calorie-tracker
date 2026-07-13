@@ -1,0 +1,22 @@
+info:
+  name: Community Flag
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:3000/api/community/flag
+  auth: inherit
+  headers:
+    Content-Type: application/json
+  body: json
+  json: {
+    "foodId": "{{communityFoodId}}",
+    "reason": "Inappropriate content"
+  }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

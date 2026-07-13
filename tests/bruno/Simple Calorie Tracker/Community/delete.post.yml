@@ -1,0 +1,24 @@
+info:
+  name: Community Delete
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: http://localhost:3000/api/community/delete
+  headers:
+    - name: moderator-token
+      value: "{{moderatorToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "foodId": "community-9e5153f5-56b6-4503-b624-d03b2515b1d1"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -23,10 +23,10 @@ const generateSignature = (
   consumerSecret: string,
   tokenSecret: string = ""
 ): string => {
-  const sortedParams = Object.keys(params)
-    .sort()
+  const sortedParams = Object.entries(params)
+    .sort(([a], [b]) => a.localeCompare(b))
     .map(
-      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+      ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
     )
     .join("&");
 
@@ -75,12 +75,10 @@ export const fatsecretApiRequest = async <T = unknown>(
 
   const authHeader =
     "OAuth " +
-    Object.keys(authHeaderParams)
+    Object.entries(authHeaderParams)
       .map(
-        (key) =>
-          `${encodeURIComponent(key)}="${encodeURIComponent(
-            authHeaderParams[key]
-          )}"`
+        ([key, value]) =>
+          `${encodeURIComponent(key)}="${encodeURIComponent(value)}"`
       )
       .join(", ");
 

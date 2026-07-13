@@ -1,3 +1,55 @@
+export interface ICustomFoodServing {
+  servingDescription: string;
+  servingGrams: number;
+  calories: number;
+  totalFat: number;
+  cholesterol: number;
+  sodium: number;
+  totalCarbohydrate: number;
+  sugars: number;
+  protein: number;
+}
+
+export interface ICustomFood {
+  id: string;
+  foodName: string;
+  servings: ICustomFoodServing[];
+  servingDescription?: string;
+  servingGrams?: number;
+  calories?: number;
+  totalFat?: number;
+  cholesterol?: number;
+  sodium?: number;
+  totalCarbohydrate?: number;
+  sugars?: number;
+  protein?: number;
+  createdAt: string;
+  submittedBy?: string;
+}
+
+export function getCustomFoodServings(food: ICustomFood): ICustomFoodServing[] {
+  if (food.servings && food.servings.length > 0) {
+    return food.servings;
+  }
+  return [{
+    servingDescription: food.servingDescription || "100g",
+    servingGrams: food.servingGrams || 100,
+    calories: food.calories || 0,
+    totalFat: food.totalFat || 0,
+    cholesterol: food.cholesterol || 0,
+    sodium: food.sodium || 0,
+    totalCarbohydrate: food.totalCarbohydrate || 0,
+    sugars: food.sugars || 0,
+    protein: food.protein || 0,
+  }];
+}
+
+export interface ICustomFoodCollection {
+  version: number;
+  exportedAt: string;
+  foods: ICustomFood[];
+}
+
 export interface IFoodServing {
   serving_id: string;
   measurement_description: string;

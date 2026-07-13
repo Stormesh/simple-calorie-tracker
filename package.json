@@ -15,20 +15,24 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.9.0",
     "@tailwindcss/vite": "^4.3.2",
-    "eslint": "^9.39.4",
+    "@vueuse/nuxt": "14.3.0",
+    "eslint": "^9.39.5",
     "nuxt": "^4.4.8",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.9.3",
     "vue": "^3.5.39",
     "vue-router": "^4.6.4",
-    "wrangler": "^4.107.0"
+    "wrangler": "^4.110.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260711.1",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/ic": "^1.2.4",
     "@iconify-json/line-md": "^1.2.16",
     "@iconify-json/lucide": "^1.2.116",
     "@iconify-json/mdi": "^1.2.3",
-    "@types/node": "^24.13.2"
+    "@types/node": "^24.13.3",
+    "leo-profanity": "^1.9.0",
+    "vue-tsc": "^3.3.7"
   }
 }

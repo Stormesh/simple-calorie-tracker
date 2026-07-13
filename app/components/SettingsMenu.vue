@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ModalReset, ModalBMR } from "#components";
+import { ModalReset, ModalBMR, FoodLibrary } from "#components";
 import type { DropdownMenuItem } from "@nuxt/ui";
 const overlay = useOverlay();
 
 const resetModal = overlay.create(ModalReset);
 const bmrModal = overlay.create(ModalBMR);
+const foodLibraryModal = overlay.create(FoodLibrary);
 
 const resetOpen = () => {
   resetModal.open({
@@ -16,7 +17,19 @@ const bmrOpen = () => {
   bmrModal.open();
 };
 
+const foodLibraryOpen = () => {
+  foodLibraryModal.open();
+};
+
 const items = ref<DropdownMenuItem[]>([
+  {
+    label: "My Food Library",
+    icon: "mdi:food-apple",
+    class: "cursor-pointer",
+    onSelect: () => {
+      foodLibraryOpen();
+    },
+  },
   {
     label: "Reset",
     icon: "heroicons:arrow-path",
@@ -41,7 +54,8 @@ const items = ref<DropdownMenuItem[]>([
     <UDropdownMenu
       arrow
       :ui="{
-        content: 'bg-gaming-950/90 backdrop-blur-xl border border-gaming-700/30 rounded-xl shadow-2xl shadow-gaming-900/50 text-white',
+        content:
+          'bg-gaming-950/90 backdrop-blur-xl border border-gaming-700/30 rounded-xl shadow-2xl shadow-gaming-900/50 text-white',
         item: 'hover:bg-gaming-800/50 text-white data-[highlighted]:bg-gaming-700/50 rounded-lg mx-1',
       }"
       :items="items"

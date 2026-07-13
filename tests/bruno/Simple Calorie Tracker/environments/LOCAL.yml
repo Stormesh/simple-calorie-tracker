@@ -4,3 +4,15 @@ variables:
     value: "39926"
   - name: foodName
     value: burger
+  - name: communityQuery
+    value: e
+  - name: communityFoodName
+    value: Test Chicken Breast
+  - name: communityNickname
+    value: testuser
+  - name: communityFoodId
+    value: community-00000000-0000-0000-0000-000000000000
+  - name: moderatorToken
+    value: VzkwbwpAqGx60gCKuGCMPAEeWEe4p3pusG8WTh7bCDn
+  - name: nutritionixQuery
+    value: chicken breast

@@ -12,6 +12,8 @@ export interface IFoodTemplate {
   totalCarbohydrate: number;
   sugars: number;
   protein: number;
+  isCustom?: boolean;
+  servingDescription?: string;
 }
 
 export const foodTemplateDefault = () => ({
@@ -26,6 +28,8 @@ export const foodTemplateDefault = () => ({
   totalCarbohydrate: 0,
   sugars: 0,
   protein: 0,
+  isCustom: false,
+  servingDescription: "",
 });
 
 const FOOD_LENGTH = 4;

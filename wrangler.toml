@@ -1,0 +1,10 @@
+name = "stormesh-simple-calorie-counter"
+compatibility_date = "2025-07-15"
+compatibility_flags = ["nodejs_compat", "no_nodejs_compat_v2"]
+
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "maxhp-community"
+database_id = "356180b3-c64a-4a8a-80bf-accf20d4b787"

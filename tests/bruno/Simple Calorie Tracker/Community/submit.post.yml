@@ -1,0 +1,31 @@
+info:
+  name: Community Submit
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:3000/api/community/submit
+  auth: inherit
+  headers:
+    Content-Type: application/json
+  body: json
+  json: {
+    "foodName": "{{communityFoodName}}",
+    "servingDescription": "100g",
+    "servingGrams": 100,
+    "calories": 250,
+    "totalFat": 10,
+    "cholesterol": 20,
+    "sodium": 300,
+    "totalCarbohydrate": 30,
+    "sugars": 5,
+    "protein": 15,
+    "nickname": "{{communityNickname}}"
+  }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

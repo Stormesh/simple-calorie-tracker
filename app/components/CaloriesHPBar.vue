@@ -52,10 +52,10 @@ const heartStyle = computed(() => {
     <div class="relative flex items-center w-80 md:w-sm lg:w-2xl mx-auto">
       <div class="absolute -left-3 z-10 animate-heart" :style="heartStyle">
         <NuxtImg
-          src="/heart.png"
+          src="/heart_small.png"
           alt="Heart"
-          height="48"
-          width="48"
+          height="52"
+          width="52"
           class="w-10 h-10 md:w-12 md:h-12"
         />
       </div>

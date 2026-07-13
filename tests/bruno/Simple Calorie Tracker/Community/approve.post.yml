@@ -1,0 +1,22 @@
+info:
+  name: Community Approve
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: http://localhost:3000/api/community/approve
+  auth: inherit
+  headers:
+    Content-Type: application/json
+    moderator-token: "{{moderatorToken}}"
+  body: json
+  json: {
+    "foodId": "{{communityFoodId}}"
+  }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

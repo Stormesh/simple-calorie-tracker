@@ -21,6 +21,8 @@ const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
   },
 });
 
+const { getFoodById } = useCustomFoods();
+
 const foodStateDefault = () => ({
   loading: false,
   focused: false,
@@ -143,11 +145,60 @@ const showFoodDetails = async (index: number) => {
 
   foodState.loading = true;
 
-  const details = await getFood(foodId);
-  if (details) {
-    foodDetails.value = details;
+  if (foodItem.isCustom) {
+    const originalFood = getFoodById(foodItem.foodId);
+    const servings = originalFood
+      ? getCustomFoodServings(originalFood)
+      : null;
+
+    foodDetails.value = {
+      food_id: foodItem.foodId,
+      food_name: foodItem.foodName,
+      brand_name: "Custom Food",
+      food_type: "Custom",
+      servings: {
+        serving: servings
+          ? servings.map((s, idx) => ({
+              serving_id: `${foodItem.foodId}-${idx}`,
+              measurement_description: s.servingDescription || "serving",
+              metric_serving_amount: s.servingGrams,
+              metric_serving_unit: "g",
+              number_of_units: 1,
+              calories: s.calories,
+              carbohydrate: s.totalCarbohydrate,
+              protein: s.protein,
+              fat: s.totalFat,
+              cholesterol: s.cholesterol,
+              sodium: s.sodium,
+              sugar: s.sugars,
+            }))
+          : [
+              {
+                serving_id: foodItem.servingId,
+                measurement_description: foodItem.servingDescription || "serving",
+                metric_serving_amount: foodItem.grams,
+                metric_serving_unit: "g",
+                number_of_units: 1,
+                calories: foodItem.calories,
+                carbohydrate: foodItem.totalCarbohydrate,
+                protein: foodItem.protein,
+                fat: foodItem.totalFat,
+                cholesterol: foodItem.cholesterol,
+                sodium: foodItem.sodium,
+                sugar: foodItem.sugars,
+              },
+            ],
+      },
+    };
     selectedServingId.value = foodItem.servingId || null;
     scrollToDetails();
+  } else {
+    const details = await getFood(foodId);
+    if (details) {
+      foodDetails.value = details;
+      selectedServingId.value = foodItem.servingId || null;
+      scrollToDetails();
+    }
   }
 
   foodState.loading = false;
@@ -163,15 +214,23 @@ const editFood = async (index: number) => {
 
   foodState.loading = true;
 
-  const details = await getFood(foodId);
-  if (details) {
+  if (foodItem.isCustom) {
     const searchModal = overlay.create(FoodSearchModal);
     searchModal.open({
       cookieName: `foods-${title}`,
       index,
-      initialFoodDetails: details,
-      editMode: true,
     });
+  } else {
+    const details = await getFood(foodId);
+    if (details) {
+      const searchModal = overlay.create(FoodSearchModal);
+      searchModal.open({
+        cookieName: `foods-${title}`,
+        index,
+        initialFoodDetails: details,
+        editMode: true,
+      });
+    }
   }
 
   foodState.loading = false;
