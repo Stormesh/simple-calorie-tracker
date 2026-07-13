@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const emit = defineEmits<{ close: [boolean] }>();
-const form = ref();
 
 const GENDER_OPTIONS = [
   { label: "Male", value: "male" },
@@ -102,8 +101,10 @@ const calculateBMR = () => {
     BMR_AGE_MULTIPLIER * a +
     (bmrForm.value.gender === "male" ? MALE_BMR_CONSTANT : FEMALE_BMR_CONSTANT);
   bmrForm.value.bmr = Math.round(
-    calculatedBMR * bmrForm.value.activity + bmrForm.value.target
+    calculatedBMR * bmrForm.value.activity + bmrForm.value.target,
   );
+
+  saveWeight(getTodayString(), bmrForm.value.weight);
 };
 
 const closeModal = () => {
@@ -120,8 +121,14 @@ const closeModal = () => {
       @submit.prevent="calculateBMR"
     >
       <div class="flex flex-col gap-3 w-full">
-        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
-          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Unit System</h3>
+        <div
+          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
+        >
+          <h3
+            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
+          >
+            Unit System
+          </h3>
           <URadioGroup
             v-model="bmrForm.unitSystem"
             size="sm"
@@ -130,8 +137,14 @@ const closeModal = () => {
           />
         </div>
 
-        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2">
-          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Body Stats</h3>
+        <div
+          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2"
+        >
+          <h3
+            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
+          >
+            Body Stats
+          </h3>
           <UInput
             v-model.number="bmrForm.weight"
             :placeholder="
@@ -149,7 +162,9 @@ const closeModal = () => {
           <UInput
             v-model.number="bmrForm.height"
             :placeholder="
-              bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'
+              bmrForm.unitSystem === 'metric'
+                ? 'Height (cm)'
+                : 'Height (inches)'
             "
             type="number"
             required
@@ -173,8 +188,14 @@ const closeModal = () => {
           />
         </div>
 
-        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
-          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Activity Level</h3>
+        <div
+          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
+        >
+          <h3
+            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
+          >
+            Activity Level
+          </h3>
           <USelect
             v-model="bmrForm.activity"
             size="md"
@@ -186,8 +207,14 @@ const closeModal = () => {
           />
         </div>
 
-        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
-          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Target</h3>
+        <div
+          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
+        >
+          <h3
+            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
+          >
+            Target
+          </h3>
           <USelect
             v-model="bmrForm.target"
             size="md"
@@ -199,8 +226,14 @@ const closeModal = () => {
           />
         </div>
 
-        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
-          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">Gender</h3>
+        <div
+          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
+        >
+          <h3
+            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
+          >
+            Gender
+          </h3>
           <URadioGroup
             v-model="bmrForm.gender"
             size="sm"
@@ -226,13 +259,19 @@ const closeModal = () => {
         />
       </div>
 
-      <div
-        v-if="bmrForm.bmr !== null"
-        class="mt-4 text-center"
-      >
-          <div class="inline-block bg-gaming-950/60 rounded-xl px-6 py-3 border border-gaming-700/30">
-          <span class="text-xs text-gaming-400 uppercase tracking-wider block">Your TDEE</span>
-          <span class="text-xl font-black text-gaming-400 glow-text">{{ bmrForm.bmr }} <span class="text-sm font-normal text-white/60">calories/day</span></span>
+      <div v-if="bmrForm.bmr !== null" class="mt-4 text-center">
+        <div
+          class="inline-block bg-gaming-950/60 rounded-xl px-6 py-3 border border-gaming-700/30"
+        >
+          <span class="text-xs text-gaming-400 uppercase tracking-wider block"
+            >Your TDEE</span
+          >
+          <span class="text-xl font-black text-gaming-400 glow-text"
+            >{{ bmrForm.bmr }}
+            <span class="text-sm font-normal text-white/60"
+              >calories/day</span
+            ></span
+          >
         </div>
       </div>
     </UForm>

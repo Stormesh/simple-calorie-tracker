@@ -8,9 +8,7 @@ const bmrModal = overlay.create(ModalBMR);
 const foodLibraryModal = overlay.create(FoodLibrary);
 
 const resetOpen = () => {
-  resetModal.open({
-    cookieNames: foodsList.map((foodList) => `foods-${foodList}`),
-  });
+  resetModal.open();
 };
 
 const bmrOpen = () => {
@@ -50,7 +48,7 @@ const items = ref<DropdownMenuItem[]>([
 </script>
 
 <template>
-  <div class="fixed z-60 top-3 right-3">
+  <div>
     <UDropdownMenu
       arrow
       :ui="{

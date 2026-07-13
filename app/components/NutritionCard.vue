@@ -38,7 +38,7 @@ defineProps<INutritionCardProps>();
     <div v-if="nutrition.max" class="w-full mt-2 h-1 rounded-full bg-gaming-950/80 overflow-hidden">
       <div
         class="h-full rounded-full transition-all duration-500"
-        :class="Math.round(nutrition.value) > nutrition.max ? 'bg-gradient-to-r from-hp-red to-red-600' : 'bg-gradient-to-r from-gaming-500 to-gaming-400'"
+        :class="Math.round(nutrition.value) > nutrition.max ? 'bg-linear-to-r from-hp-red to-red-600' : 'bg-linear-to-r from-gaming-500 to-gaming-400'"
         :style="{ width: `${Math.min((nutrition.value / nutrition.max) * 100, 100)}%` }"
       />
     </div>

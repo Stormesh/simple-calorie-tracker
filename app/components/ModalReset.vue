@@ -1,21 +1,13 @@
 <script setup lang="ts">
-interface IResetProps {
-  cookieNames: string[];
-}
-
 const emit = defineEmits<{ close: [boolean] }>();
 
-const cookiesReset = ref(false);
+const resetDone = ref(false);
+const dayLogs = useDayLogs();
 
-const { cookieNames } = defineProps<IResetProps>();
-
-const resetCookies = () => {
-  if (cookiesReset.value) return;
-
-  cookieNames.forEach((cookieName) => {
-    useCookie(cookieName).value = null;
-  });
-  cookiesReset.value = true;
+const resetFoods = () => {
+  if (resetDone.value) return;
+  dayLogs.resetDay();
+  resetDone.value = true;
   window.location.reload();
 };
 </script>
@@ -27,14 +19,16 @@ const resetCookies = () => {
       <p class="text-base text-white/80 text-center">
         Are you sure you want to reset all foods?
       </p>
-      <p class="text-xs text-white/40 text-center">This action cannot be undone</p>
+      <p class="text-xs text-white/40 text-center">
+        This action cannot be undone
+      </p>
     </div>
     <div class="flex justify-center gap-4 mt-2">
       <UButton
         icon="heroicons:check"
         label="Yes, Reset"
         class="btn-gaming text-sm cursor-pointer bg-hp-red/80 hover:bg-hp-red text-white font-bold py-2 px-5 rounded-xl shadow-lg shadow-gaming-900/50 border border-hp-red/30 transition-all"
-        @click="resetCookies"
+        @click="resetFoods"
       />
       <UButton
         icon="heroicons:x-mark"
