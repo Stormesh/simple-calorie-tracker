@@ -8,6 +8,10 @@ export interface IDayLog {
 }
 
 const STORAGE_PREFIX = "maxhp-day-log:";
+const ALL_KEY = `${STORAGE_PREFIX}all`;
+const MIGRATED_FLAG = "maxhp-migrated";
+
+const STORAGE_FORMAT_FLAG = `${STORAGE_PREFIX}format-v2`;
 
 export function formatLocalDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -34,8 +38,59 @@ function formatDateLabel(dateStr: string): string {
   });
 }
 
-export function getStorageKey(date: string): string {
-  return `${STORAGE_PREFIX}${date}`;
+let allRef: ReturnType<typeof useLocalStorage<Record<string, IDayLog>>> | null =
+  null;
+let oldMigrated = false;
+
+function getAllRef() {
+  if (!allRef) {
+    allRef = useLocalStorage<Record<string, IDayLog>>(ALL_KEY, {});
+  }
+  if (!oldMigrated) {
+    oldMigrated = true;
+    migrateOldIndividualKeys();
+  }
+  return allRef;
+}
+
+function migrateOldIndividualKeys() {
+  if (!import.meta.client) return;
+
+  const ref = allRef;
+  if (!ref) return;
+
+  const formatFlag = useLocalStorage<boolean>(STORAGE_FORMAT_FLAG, false);
+  if (formatFlag.value) return;
+
+  const all = ref.value;
+  if (Object.keys(all).length > 0) {
+    formatFlag.value = true;
+    return;
+  }
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key?.startsWith(STORAGE_PREFIX)) continue;
+    if (
+      key === ALL_KEY ||
+      key === STORAGE_FORMAT_FLAG ||
+      key === `${STORAGE_PREFIX}migrated`
+    )
+      continue;
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const date = key.slice(STORAGE_PREFIX.length);
+        all[date] = JSON.parse(raw);
+      }
+    } catch {}
+  }
+
+  if (Object.keys(all).length > 0) {
+    ref.value = { ...all };
+  }
+
+  formatFlag.value = true;
 }
 
 export function saveDayToStorage(date: string) {
@@ -57,16 +112,12 @@ export function saveDayToStorage(date: string) {
     updatedAt: new Date().toISOString(),
   };
 
-  localStorage.setItem(getStorageKey(date), JSON.stringify(log));
+  const all = getAllRef().value;
+  getAllRef().value = { ...all, [date]: log };
 }
 
 export function loadDayFromStorage(date: string): IDayLog | null {
-  try {
-    const raw = localStorage.getItem(getStorageKey(date));
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return getAllRef().value[date] ?? null;
 }
 
 export function restoreDayToCookies(date: string) {
@@ -83,47 +134,29 @@ export function restoreDayToCookies(date: string) {
 }
 
 export function getAllDayLogs(): IDayLog[] {
-  const logs: IDayLog[] = [];
-
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(STORAGE_PREFIX)) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (raw) {
-          logs.push(JSON.parse(raw));
-        }
-      } catch {}
-    }
-  }
-
-  return logs.sort((a, b) => b.date.localeCompare(a.date));
+  return Object.values(getAllRef().value).sort((a, b) =>
+    b.date.localeCompare(a.date),
+  );
 }
 
 export function removeDayFromStorage(date: string) {
-  localStorage.removeItem(getStorageKey(date));
+  const all = getAllRef().value;
+  const { [date]: _, ...rest } = all;
+  getAllRef().value = rest;
 }
 
 export function getAvailableDates(): string[] {
-  const dates: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith(STORAGE_PREFIX)) {
-      dates.push(key.slice(STORAGE_PREFIX.length));
-    }
-  }
-  return dates.sort();
+  return Object.keys(getAllRef().value).sort();
 }
 
-const MIGRATED_FLAG = "maxhp-migrated";
-
 export function migrateCookieData() {
-  if (localStorage.getItem(MIGRATED_FLAG)) return;
+  const migrated = useLocalStorage<boolean>(MIGRATED_FLAG, false);
+  if (migrated.value) return;
 
   const today = getTodayString();
-  const key = getStorageKey(today);
+  const existing = loadDayFromStorage(today);
 
-  if (!localStorage.getItem(key)) {
+  if (!existing) {
     const hasData = foodsList.some((meal) => {
       const cookie = useCookie<IFoodTemplate[]>(`foods-${meal}`);
       return cookie.value?.some((f) => f.foodName && f.calories > 0);
@@ -134,7 +167,7 @@ export function migrateCookieData() {
     }
   }
 
-  localStorage.setItem(MIGRATED_FLAG, "1");
+  migrated.value = true;
 }
 
 export function switchDate(date: string) {
@@ -165,8 +198,8 @@ export function resetCurrentDay() {
 }
 
 export function saveWeight(date: string, weight: number | null) {
-  const key = getStorageKey(date);
-  const existing = loadDayFromStorage(date);
+  const all = getAllRef().value;
+  const existing = all[date];
   const log: IDayLog = existing || {
     date,
     foods: {},
@@ -174,7 +207,7 @@ export function saveWeight(date: string, weight: number | null) {
   };
   log.weightLog = weight ?? undefined;
   log.updatedAt = new Date().toISOString();
-  localStorage.setItem(key, JSON.stringify(log));
+  getAllRef().value = { ...all, [date]: log };
   notifyWeightChange();
 }
 
