@@ -4,9 +4,6 @@ interface IFoodSearchResponse {
   foods: IFoodSearchResult;
 }
 
-let cachedToken: string | null = null;
-let tokenExpiresAt: number = 0;
-
 const cache = new FoodCache();
 
 export default defineEventHandler(
@@ -32,16 +29,10 @@ export default defineEventHandler(
 
     try {
       if (useOAuth2) {
-        if (!cachedToken || Date.now() >= tokenExpiresAt) {
-          const tokenData = await getAccessToken(
-            config.apiKey as string,
-            config.apiClientSecret as string
-          );
-          cachedToken = tokenData.access_token;
-          tokenExpiresAt =
-            Date.now() + tokenData.expires_in * 1000 - 5 * 60 * 1000;
-          console.log("New FatSecret OAuth2 token acquired.");
-        }
+        const token = await getValidToken(
+          config.apiKey as string,
+          config.apiClientSecret as string,
+        );
 
         const searchParams = {
           method: "foods.search",
@@ -54,7 +45,7 @@ export default defineEventHandler(
         searchData = await $fetch<IFoodSearchResponse>(FATSECRET_API_URL, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${cachedToken}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams(
@@ -62,8 +53,8 @@ export default defineEventHandler(
               Object.entries(searchParams).map(([key, value]) => [
                 key,
                 String(value),
-              ])
-            )
+              ]),
+            ),
           ).toString(),
         });
       } else if (config.apiSecret) {
@@ -79,7 +70,7 @@ export default defineEventHandler(
         searchData = await fatsecretApiRequest<IFoodSearchResponse>(
           config.apiKey as string,
           config.apiSecret as string,
-          searchParams
+          searchParams,
         );
       } else {
         throw createError({
@@ -94,7 +85,7 @@ export default defineEventHandler(
         searchData.foods.food.length === 0
       ) {
         console.log(
-          `No foods found for search expression: ${search_expression}`
+          `No foods found for search expression: ${search_expression}`,
         );
         return null;
       }
@@ -112,5 +103,5 @@ export default defineEventHandler(
         message: error instanceof Error ? error.message : String(error),
       });
     }
-  }
+  },
 );

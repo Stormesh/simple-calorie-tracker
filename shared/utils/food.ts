@@ -31,17 +31,19 @@ export function getCustomFoodServings(food: ICustomFood): ICustomFoodServing[] {
   if (food.servings && food.servings.length > 0) {
     return food.servings;
   }
-  return [{
-    servingDescription: food.servingDescription || "100g",
-    servingGrams: food.servingGrams || 100,
-    calories: food.calories || 0,
-    totalFat: food.totalFat || 0,
-    cholesterol: food.cholesterol || 0,
-    sodium: food.sodium || 0,
-    totalCarbohydrate: food.totalCarbohydrate || 0,
-    sugars: food.sugars || 0,
-    protein: food.protein || 0,
-  }];
+  return [
+    {
+      servingDescription: food.servingDescription || "100g",
+      servingGrams: food.servingGrams || 100,
+      calories: food.calories || 0,
+      totalFat: food.totalFat || 0,
+      cholesterol: food.cholesterol || 0,
+      sodium: food.sodium || 0,
+      totalCarbohydrate: food.totalCarbohydrate || 0,
+      sugars: food.sugars || 0,
+      protein: food.protein || 0,
+    },
+  ];
 }
 
 export interface ICustomFoodCollection {
@@ -96,18 +98,15 @@ export interface IFoodSearchResult {
   total_results: string;
 }
 
-export const searchFood = async (
-  foodName: string,
-): Promise<IFoodSearchResult | null> => {
-  if (!foodName.trim()) return null;
-
+async function fetchFromApi<T>(
+  url: string,
+  options?: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: BodyInit },
+): Promise<T | null> {
   try {
-    const response = await $fetch<IFoodSearchResult>(
-      `/api/nutrition/search/${encodeURIComponent(foodName)}`,
-    );
+    const response = await $fetch<T>(url, options);
 
     if (response && typeof response === "object" && "error" in response) {
-      console.error("API Error:", response.error);
+      console.error("API Error:", (response as Record<string, unknown>).error);
       return null;
     }
 
@@ -116,6 +115,16 @@ export const searchFood = async (
     console.error("Failed to fetch food data:", error);
     return null;
   }
+}
+
+export const searchFood = async (
+  foodName: string,
+): Promise<IFoodSearchResult | null> => {
+  if (!foodName.trim()) return null;
+
+  return fetchFromApi<IFoodSearchResult>(
+    `/api/nutrition/search/${encodeURIComponent(foodName)}`,
+  );
 };
 
 export const getFood = async (
@@ -125,26 +134,11 @@ export const getFood = async (
 ): Promise<IFoodDetails | null> => {
   if (!foodId.trim()) return null;
 
-  try {
-    const response = await $fetch<IFoodDetails>(
-      `/api/nutrition/${encodeURIComponent(foodId)}`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          amount,
-          unit,
-        }),
-      },
-    );
-
-    if (response && typeof response === "object" && "error" in response) {
-      console.error("API Error:", response.error);
-      return null;
-    }
-
-    return response;
-  } catch (error) {
-    console.error("Failed to fetch food data:", error);
-    return null;
-  }
+  return fetchFromApi<IFoodDetails>(
+    `/api/nutrition/${encodeURIComponent(foodId)}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ amount, unit }),
+    },
+  );
 };

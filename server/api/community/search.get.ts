@@ -1,3 +1,5 @@
+import type { D1Result } from "@cloudflare/workers-types";
+
 interface ICustomFoodServing {
   servingDescription: string;
   servingGrams: number;
@@ -8,6 +10,27 @@ interface ICustomFoodServing {
   totalCarbohydrate: number;
   sugars: number;
   protein: number;
+}
+
+interface CommunityFoodRow {
+  id: string;
+  food_name: string;
+  serving_description: string;
+  serving_grams: number;
+  calories: number;
+  total_fat: number;
+  cholesterol: number;
+  sodium: number;
+  total_carbohydrate: number;
+  sugars: number;
+  protein: number;
+  submitted_by: string | null;
+  servings: string | null;
+  created_at: string;
+}
+
+interface CountResult {
+  count: number;
 }
 
 export default defineEventHandler(async (event) => {
@@ -27,8 +50,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  let results;
-  let total;
+  let results: D1Result<CommunityFoodRow>;
+  let total: number;
 
   if (q) {
     const searchTerm = `%${q}%`;
@@ -41,15 +64,15 @@ export default defineEventHandler(async (event) => {
        LIMIT ? OFFSET ?`,
       )
       .bind(searchTerm, limit, offset)
-      .all();
+      .all<CommunityFoodRow>();
 
     const countResult = await db
       .prepare(
         `SELECT COUNT(*) as count FROM community_foods WHERE hidden = 0 AND food_name LIKE ?`,
       )
       .bind(searchTerm)
-      .first();
-    total = (countResult as any)?.count || 0;
+      .first<CountResult>();
+    total = countResult?.count ?? 0;
   } else {
     results = await db
       .prepare(
@@ -60,25 +83,29 @@ export default defineEventHandler(async (event) => {
        LIMIT ? OFFSET ?`,
       )
       .bind(limit, offset)
-      .all();
+      .all<CommunityFoodRow>();
 
     const countResult = await db
       .prepare(`SELECT COUNT(*) as count FROM community_foods WHERE hidden = 0`)
-      .first();
-    total = (countResult as any)?.count || 0;
+      .first<CountResult>();
+    total = countResult?.count ?? 0;
   }
 
-  const parseServings = (row: any): ICustomFoodServing[] | undefined => {
+  const parseServings = (
+    row: Pick<CommunityFoodRow, "servings">,
+  ): ICustomFoodServing[] | undefined => {
     if (row.servings) {
       try {
         const parsed = JSON.parse(row.servings);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch {}
+      } catch (e) {
+        console.error("Failed to parse servings for community food:", e);
+      }
     }
     return undefined;
   };
 
-  const foods = (results.results || []).map((row: any) => ({
+  const foods = results.results.map((row) => ({
     id: row.id,
     foodName: row.food_name,
     servings: parseServings(row),

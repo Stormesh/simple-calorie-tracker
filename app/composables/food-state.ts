@@ -1,21 +1,3 @@
-export const foodsList = ["Breakfast", "Lunch", "Dinner", "Snacks"];
-
-export interface IFoodTemplate {
-  foodName: string;
-  foodId: string;
-  servingId: string;
-  grams: number;
-  calories: number;
-  totalFat: number;
-  cholesterol: number;
-  sodium: number;
-  totalCarbohydrate: number;
-  sugars: number;
-  protein: number;
-  isCustom?: boolean;
-  servingDescription?: string;
-}
-
 export const foodTemplateDefault = () => ({
   foodName: "",
   foodId: "",
@@ -44,9 +26,3 @@ export const resetCookies = (cookieNames: string[]) => {
   });
   window.location.reload();
 };
-
-export const foodDetails = ref<IFoodDetails | null>(null);
-
-export const selectedServingId = ref<string | null>(null);
-
-export const isFoodLoading = ref(false);

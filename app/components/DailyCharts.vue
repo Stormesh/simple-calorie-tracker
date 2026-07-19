@@ -48,11 +48,12 @@ interface IChartDataset {
   data: (number | null)[];
   backgroundColor?:
     | string
+    | string[]
     | CanvasGradient
     | ((ctx: {
         chart: { ctx: CanvasRenderingContext2D };
       }) => string | CanvasGradient);
-  borderColor?: string;
+  borderColor?: string | string[];
   borderWidth?: number;
   borderRadius?: number;
   barPercentage?: number;
@@ -168,34 +169,24 @@ function loadChartData() {
     ],
   };
 
-  if (!hasWeight) return;
-
   // --- Calories vs Target ---
-  const underData = dayTotals.map((t) =>
-    t.calories <= target ? t.calories : target,
-  );
-  const overData = dayTotals.map((t) =>
-    t.calories > target ? t.calories - target : 0,
-  );
+  const caloriesData = dayTotals.map((t) => t.calories);
   const targetData = dayTotals.map(() => target);
+  const bgColors = dayTotals.map((t) =>
+    t.calories > target ? "rgba(239, 68, 68, 0.8)" : "rgba(34, 197, 94, 0.8)",
+  );
+  const borderColors = dayTotals.map((t) =>
+    t.calories > target ? "rgb(239, 68, 68)" : "rgb(34, 197, 94)",
+  );
 
   caloriesChartData.value = {
     labels,
     datasets: [
       {
-        label: "Under target",
-        data: underData,
-        backgroundColor: "rgba(34, 197, 94, 0.8)",
-        borderColor: "rgb(34, 197, 94)",
-        borderWidth: 1,
-        borderRadius: 3,
-        barPercentage: 0.7,
-      },
-      {
-        label: "Over target",
-        data: overData,
-        backgroundColor: "rgba(239, 68, 68, 0.8)",
-        borderColor: "rgb(239, 68, 68)",
+        label: "Calories",
+        data: caloriesData,
+        backgroundColor: bgColors,
+        borderColor: borderColors,
         borderWidth: 1,
         borderRadius: 3,
         barPercentage: 0.7,
@@ -331,12 +322,18 @@ const caloriesOptions = {
 };
 
 onMounted(() => {
-  loadChartData();
   onWeightChange(loadChartData);
 });
-watch(aggregatedNutrients, loadChartData, { deep: true });
-watch(() => bmrState.value.bmr, loadChartData);
-watch(() => dayLogs.currentDate.value, loadChartData);
+
+watch(
+  [
+    aggregatedNutrients,
+    () => bmrState.value.bmr,
+    () => dayLogs.currentDate.value,
+  ],
+  loadChartData,
+  { deep: true, immediate: true },
+);
 </script>
 
 <template>

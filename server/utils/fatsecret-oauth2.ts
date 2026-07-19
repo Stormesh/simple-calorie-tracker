@@ -10,12 +10,12 @@ interface FatSecretTokenResponse {
 export const getAccessToken = async (
   clientId: string,
   clientSecret: string,
-  scope: string = "basic"
+  scope: string = "basic",
 ): Promise<FatSecretTokenResponse> => {
   // 1. Combine Client ID and Secret into a Basic Auth string
   // Format: base64(client_id:client_secret)
   const authString = Buffer.from(`${clientId}:${clientSecret}`).toString(
-    "base64"
+    "base64",
   );
 
   try {
@@ -39,7 +39,8 @@ export const getAccessToken = async (
     console.error("FatSecret OAuth 2.0 Token Error:", error);
     // Handle specific errors like 'invalid_client' (often due to wrong IP or credentials)
     throw new Error(
-      "Failed to obtain FatSecret Access Token. Check IP Whitelist and Credentials."
+      "Failed to obtain FatSecret Access Token. Check IP Whitelist and Credentials.",
+      { cause: error },
     );
   }
 };

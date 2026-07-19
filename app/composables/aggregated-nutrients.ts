@@ -1,4 +1,8 @@
 export const useAggregatedNutrients = () => {
+  const foodCookies = foodsList.map((meal) =>
+    useCookie<IFoodTemplate[]>(`foods-${meal}`),
+  );
+
   const aggregatedNutrients = computed(() => {
     const totals = {
       totalCalories: 0,
@@ -12,10 +16,9 @@ export const useAggregatedNutrients = () => {
       protein: 0,
     };
 
-    foodsList.forEach((listName) => {
-      const foodsCookie = useCookie<IFoodTemplate[]>(`foods-${listName}`);
-      if (foodsCookie.value) {
-        foodsCookie.value.forEach((food) => {
+    foodCookies.forEach((cookie) => {
+      if (cookie.value) {
+        cookie.value.forEach((food) => {
           totals.totalCalories += food.calories;
           totals.totalFat += food.totalFat;
           totals.cholesterol += food.cholesterol;

@@ -43,7 +43,7 @@ const emptyServing = (): ICustomFoodServing => ({
 });
 
 const existingServings = props.editFood
-  ? getCustomFoodServings(props.editFood).map(s => ({ ...s }))
+  ? getCustomFoodServings(props.editFood).map((s) => ({ ...s }))
   : [emptyServing()];
 
 const form = ref({
@@ -57,7 +57,7 @@ const nickname = ref("");
 const isFormValid = computed(() => {
   if (form.value.foodName.trim() === "") return false;
   if (form.value.servings.length === 0) return false;
-  return form.value.servings.every(s => s.servingGrams > 0);
+  return form.value.servings.every((s) => s.servingGrams > 0);
 });
 
 const addServing = () => {
@@ -78,7 +78,7 @@ const submit = () => {
     editId?: string;
   } = {
     foodName: form.value.foodName.trim(),
-    servings: form.value.servings.map(s => ({
+    servings: form.value.servings.map((s) => ({
       ...s,
       servingDescription: s.servingDescription.trim() || "serving",
     })),
@@ -101,11 +101,11 @@ const close = () => {
 <template>
   <UModal
     :open="open"
-    @close="close"
     :ui="{
       content:
         'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
     }"
+    @close="close"
   >
     <template #content>
       <div class="overflow-hidden rounded-2xl flex flex-col max-h-[85vh]">

@@ -1,5 +1,3 @@
-import type { IFoodTemplate } from "./food-state";
-
 export interface IDayLog {
   date: string;
   foods: Record<string, IFoodTemplate[]>;
@@ -36,6 +34,15 @@ function formatDateLabel(dateStr: string): string {
     month: "short",
     day: "numeric",
   });
+}
+
+const mealCookieCache = new Map<string, Ref<IFoodTemplate[]>>();
+
+function useMealCookie(meal: string): Ref<IFoodTemplate[]> {
+  if (!mealCookieCache.has(meal)) {
+    mealCookieCache.set(meal, useCookie<IFoodTemplate[]>(`foods-${meal}`));
+  }
+  return mealCookieCache.get(meal)!;
 }
 
 let allRef: ReturnType<typeof useLocalStorage<Record<string, IDayLog>>> | null =
@@ -83,7 +90,9 @@ function migrateOldIndividualKeys() {
         const date = key.slice(STORAGE_PREFIX.length);
         all[date] = JSON.parse(raw);
       }
-    } catch {}
+    } catch (e) {
+      console.error("Failed to migrate day log entry:", e);
+    }
   }
 
   if (Object.keys(all).length > 0) {
@@ -97,8 +106,7 @@ export function saveDayToStorage(date: string) {
   const dayData: Record<string, IFoodTemplate[]> = {};
 
   foodsList.forEach((meal) => {
-    const cookie = useCookie<IFoodTemplate[]>(`foods-${meal}`);
-    const val = cookie.value;
+    const val = useMealCookie(meal).value;
     dayData[meal] =
       val && val.some((f) => f.foodName) ? JSON.parse(JSON.stringify(val)) : [];
   });
@@ -124,7 +132,7 @@ export function restoreDayToCookies(date: string) {
   const dayLog = loadDayFromStorage(date);
 
   foodsList.forEach((meal) => {
-    const cookie = useCookie<IFoodTemplate[]>(`foods-${meal}`);
+    const cookie = useMealCookie(meal);
     if (dayLog?.foods?.[meal] && dayLog.foods[meal].length > 0) {
       cookie.value = dayLog.foods[meal];
     } else {
@@ -158,8 +166,9 @@ export function migrateCookieData() {
 
   if (!existing) {
     const hasData = foodsList.some((meal) => {
-      const cookie = useCookie<IFoodTemplate[]>(`foods-${meal}`);
-      return cookie.value?.some((f) => f.foodName && f.calories > 0);
+      return useMealCookie(meal).value?.some(
+        (f) => f.foodName && f.calories > 0,
+      );
     });
 
     if (hasData) {
@@ -192,8 +201,7 @@ export function resetCurrentDay() {
 
   removeDayFromStorage(date);
   foodsList.forEach((meal) => {
-    const cookie = useCookie<IFoodTemplate[]>(`foods-${meal}`);
-    cookie.value = foodArrayDefault();
+    useMealCookie(meal).value = foodArrayDefault();
   });
 }
 
@@ -216,20 +224,30 @@ export function loadWeight(date: string): number | null {
   return dayLog?.weightLog ?? null;
 }
 
-let weightVersion = 0;
-const weightWatchers = new Set<() => void>();
+let midnightWatcherStarted = false;
 
-export function notifyWeightChange() {
-  weightVersion++;
-  weightWatchers.forEach((fn) => fn());
-}
+function initMidnightWatcher() {
+  if (midnightWatcherStarted) return;
+  midnightWatcherStarted = true;
 
-export function onWeightChange(fn: () => void) {
-  weightWatchers.add(fn);
-  return () => weightWatchers.delete(fn);
+  function scheduleNext() {
+    const now = new Date();
+    const msUntilMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+      now.getTime();
+
+    setTimeout(() => {
+      switchDate(getTodayString());
+      scheduleNext();
+    }, msUntilMidnight);
+  }
+
+  scheduleNext();
 }
 
 export const useDayLogs = () => {
+  initMidnightWatcher();
+
   const currentDate = useCookie<string>("current-date", {
     default: () => getTodayString(),
   });

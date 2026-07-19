@@ -21,12 +21,13 @@ const generateSignature = (
   baseUrl: string,
   params: Record<string, string>,
   consumerSecret: string,
-  tokenSecret: string = ""
+  tokenSecret: string = "",
 ): string => {
   const sortedParams = Object.entries(params)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(
-      ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
     )
     .join("&");
 
@@ -37,7 +38,7 @@ const generateSignature = (
   ].join("&");
 
   const signingKey = `${encodeURIComponent(
-    consumerSecret
+    consumerSecret,
   )}&${encodeURIComponent(tokenSecret)}`;
 
   const signature = createHmac("sha1", signingKey)
@@ -50,7 +51,7 @@ const generateSignature = (
 export const fatsecretApiRequest = async <T = unknown>(
   consumerKey: string,
   consumerSecret: string,
-  params: Record<string, string>
+  params: Record<string, string>,
 ): Promise<T> => {
   const oauthParams: Record<string, string> = {
     oauth_consumer_key: consumerKey,
@@ -65,7 +66,7 @@ export const fatsecretApiRequest = async <T = unknown>(
     "POST",
     API_URL,
     oauthParams,
-    consumerSecret
+    consumerSecret,
   );
 
   const authHeaderParams: Record<string, string> = {
@@ -78,7 +79,7 @@ export const fatsecretApiRequest = async <T = unknown>(
     Object.entries(authHeaderParams)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}="${encodeURIComponent(value)}"`
+          `${encodeURIComponent(key)}="${encodeURIComponent(value)}"`,
       )
       .join(", ");
 
@@ -94,6 +95,6 @@ export const fatsecretApiRequest = async <T = unknown>(
     return response as T;
   } catch (error) {
     console.error("FatSecret OAuth 1.0a Request Error:", error);
-    throw new Error("Failed to make FatSecret API request.");
+    throw new Error("Failed to make FatSecret API request.", { cause: error });
   }
 };

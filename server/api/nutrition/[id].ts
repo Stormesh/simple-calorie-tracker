@@ -1,15 +1,8 @@
-import { getAccessToken } from "~~/server/utils/fatsecret-oauth2";
-import { fatsecretApiRequest } from "~~/server/utils/fatsecret-oauth1";
-import type { IFoodDetails, IFoodServing } from "~~/shared/utils/food";
-
 const FATSECRET_API_URL = "https://platform.fatsecret.com/rest/server.api";
 
 interface IFatSecretDetailResponse {
   food: IFoodDetails;
 }
-
-let cachedToken: string | null = null;
-let tokenExpiresAt: number = 0;
 
 const cache = new FoodCache();
 
@@ -54,7 +47,7 @@ const parseServings = (servings: {
     for (const key of nutrientKeys) {
       if (key in newServing) {
         (newServing as Record<string, string | number>)[key] = parseNutrient(
-          newServing[key]
+          newServing[key],
         );
       }
     }
@@ -93,21 +86,15 @@ export default defineEventHandler(
 
     try {
       if (useOAuth2) {
-        if (!cachedToken || Date.now() >= tokenExpiresAt) {
-          const tokenData = await getAccessToken(
-            config.apiKey as string,
-            config.apiClientSecret as string
-          );
-          cachedToken = tokenData.access_token;
-          tokenExpiresAt =
-            Date.now() + tokenData.expires_in * 1000 - 5 * 60 * 1000;
-          console.log("New FatSecret OAuth2 token acquired.");
-        }
+        const token = await getValidToken(
+          config.apiKey as string,
+          config.apiClientSecret as string,
+        );
 
         detailData = await $fetch<IFatSecretDetailResponse>(FATSECRET_API_URL, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${cachedToken}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams(
@@ -115,15 +102,15 @@ export default defineEventHandler(
               Object.entries(detailParams).map(([key, value]) => [
                 key,
                 String(value),
-              ])
-            )
+              ]),
+            ),
           ).toString(),
         });
       } else {
         detailData = await fatsecretApiRequest<IFatSecretDetailResponse>(
           config.apiKey as string,
           config.apiSecret as string,
-          detailParams
+          detailParams,
         );
       }
 
@@ -143,5 +130,5 @@ export default defineEventHandler(
         message: error instanceof Error ? error.message : String(error),
       });
     }
-  }
+  },
 );

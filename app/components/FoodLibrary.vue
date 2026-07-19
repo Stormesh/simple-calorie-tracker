@@ -128,11 +128,11 @@ const close = () => {
 
 <template>
   <UModal
-    @close="close"
     :ui="{
       content:
         'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-2xl',
     }"
+    @close="close"
   >
     <template #content>
       <div class="overflow-hidden rounded-2xl flex flex-col max-h-[85vh]">
@@ -225,7 +225,8 @@ const close = () => {
                 {{ food.foodName }}
               </div>
               <div class="text-xs text-white/40">
-                {{ getCustomFoodServings(food)[0]!.calories }} kcal · {{ getCustomFoodServings(food)[0]!.servingDescription }} ({{
+                {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
+                {{ getCustomFoodServings(food)[0]!.servingDescription }} ({{
                   getCustomFoodServings(food)[0]!.servingGrams
                 }}g)
               </div>

@@ -87,9 +87,17 @@ const handleFlag = async (food: ICustomFood) => {
   const result = await flagFood(food.id);
   if (result) {
     flaggedFoods.value.add(food.id);
-    toast.add({ title: "Food flagged", description: "A moderator will review this entry", icon: "heroicons:flag" });
+    toast.add({
+      title: "Food flagged",
+      description: "A moderator will review this entry",
+      icon: "heroicons:flag",
+    });
   } else {
-    toast.add({ title: "Failed to flag", description: "You may have already flagged this food", icon: "heroicons:exclamation-triangle" });
+    toast.add({
+      title: "Failed to flag",
+      description: "You may have already flagged this food",
+      icon: "heroicons:exclamation-triangle",
+    });
   }
 };
 
@@ -260,11 +268,11 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
 <template>
   <UModal
-    @close="close"
     :ui="{
       content:
         'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
     }"
+    @close="close"
   >
     <template #content>
       <div class="overflow-hidden rounded-2xl flex flex-col max-h-[85vh]">
@@ -416,86 +424,18 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   </button>
                 </div>
 
-                <div
-                  class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-                >
-                  Quantity
-                </div>
-                <div class="flex items-center gap-3 mb-4">
-                  <button
-                    class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                    @click="
-                      quantity = Math.max(0.25, +(quantity - 0.25).toFixed(2))
-                    "
-                  >
-                    <Icon name="heroicons:minus" size="1rem" />
-                  </button>
-                  <input
-                    v-model.number="quantity"
-                    type="number"
-                    min="0.25"
-                    step="0.25"
-                    class="w-20 text-center bg-gaming-950/80 border border-gaming-700/40 rounded-xl py-2 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gaming-500/50 input-gaming"
-                  />
-                  <button
-                    class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                    @click="
-                      quantity = Math.min(99, +(quantity + 0.25).toFixed(2))
-                    "
-                  >
-                    <Icon name="heroicons:plus" size="1rem" />
-                  </button>
-                </div>
+                <FoodQuantityAdjuster v-model="quantity" />
 
-                <div
+                <FoodNutritionPreview
                   v-if="scaledNutrition"
-                  class="bg-gaming-950/60 rounded-xl p-3 border border-gaming-800/20 mb-4"
-                >
-                  <div
-                    class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-                  >
-                    Nutrition for {{ quantity }} ×
-                    {{ selectedServing?.measurement_description }}
-                  </div>
-                  <div class="grid grid-cols-3 gap-2">
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-gaming-300">
-                        {{ scaledNutrition.calories }}
-                      </div>
-                      <div class="text-[10px] text-white/40">kcal</div>
-                    </div>
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-white">
-                        {{ scaledNutrition.fat }}g
-                      </div>
-                      <div class="text-[10px] text-white/40">Fat</div>
-                    </div>
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-white">
-                        {{ scaledNutrition.protein }}g
-                      </div>
-                      <div class="text-[10px] text-white/40">Protein</div>
-                    </div>
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-white">
-                        {{ scaledNutrition.carbohydrate }}g
-                      </div>
-                      <div class="text-[10px] text-white/40">Carbs</div>
-                    </div>
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-white">
-                        {{ scaledNutrition.sugar }}g
-                      </div>
-                      <div class="text-[10px] text-white/40">Sugar</div>
-                    </div>
-                    <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                      <div class="text-sm font-bold text-white">
-                        {{ scaledNutrition.sodium }}mg
-                      </div>
-                      <div class="text-[10px] text-white/40">Sodium</div>
-                    </div>
-                  </div>
-                </div>
+                  :title="`Nutrition for ${quantity} × ${selectedServing?.measurement_description}`"
+                  :calories="scaledNutrition.calories"
+                  :fat="scaledNutrition.fat"
+                  :protein="scaledNutrition.protein"
+                  :carbohydrate="scaledNutrition.carbohydrate"
+                  :sugar="scaledNutrition.sugar"
+                  :sodium="scaledNutrition.sodium"
+                />
 
                 <div class="flex gap-3">
                   <UButton
@@ -566,7 +506,8 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                     </div>
                     <div class="text-xs text-white/40 truncate">
                       {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
-                      {{ getCustomFoodServings(food)[0]!.servingDescription }} ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
+                      {{ getCustomFoodServings(food)[0]!.servingDescription }}
+                      ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
                     </div>
                   </div>
                   <div class="flex items-center gap-1 shrink-0">
@@ -627,91 +568,25 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   </div>
                   <div class="text-[11px] text-white/40">
                     {{ Math.round(serving.calories) }} kcal
-                    {{ serving.servingGrams ? `· ${serving.servingGrams}g` : "" }}
+                    {{
+                      serving.servingGrams ? `· ${serving.servingGrams}g` : ""
+                    }}
                   </div>
                 </button>
               </div>
 
-              <div
-                class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-              >
-                Quantity
-              </div>
-              <div class="flex items-center gap-3 mb-4">
-                <button
-                  class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                  @click="
-                    quantity = Math.max(0.25, +(quantity - 0.25).toFixed(2))
-                  "
-                >
-                  <Icon name="heroicons:minus" size="1rem" />
-                </button>
-                <input
-                  v-model.number="quantity"
-                  type="number"
-                  min="0.25"
-                  step="0.25"
-                  class="w-20 text-center bg-gaming-950/80 border border-gaming-700/40 rounded-xl py-2 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gaming-500/50 input-gaming"
-                />
-                <button
-                  class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                  @click="
-                    quantity = Math.min(99, +(quantity + 0.25).toFixed(2))
-                  "
-                >
-                  <Icon name="heroicons:plus" size="1rem" />
-                </button>
-              </div>
+              <FoodQuantityAdjuster v-model="quantity" />
 
-              <div
+              <FoodNutritionPreview
                 v-if="customScaledNutrition"
-                class="bg-gaming-950/60 rounded-xl p-3 border border-gaming-800/20 mb-4"
-              >
-                <div
-                  class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-                >
-                  Nutrition for {{ quantity }} ×
-                  {{ selectedCustomServing?.servingDescription || "serving" }}
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-gaming-300">
-                      {{ customScaledNutrition.calories }}
-                    </div>
-                    <div class="text-[10px] text-white/40">kcal</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.fat }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Fat</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.protein }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Protein</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.carbohydrate }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Carbs</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.sugar }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Sugar</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.sodium }}mg
-                    </div>
-                    <div class="text-[10px] text-white/40">Sodium</div>
-                  </div>
-                </div>
-              </div>
+                :title="`Nutrition for ${quantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
+                :calories="customScaledNutrition.calories"
+                :fat="customScaledNutrition.fat"
+                :protein="customScaledNutrition.protein"
+                :carbohydrate="customScaledNutrition.carbohydrate"
+                :sugar="customScaledNutrition.sugar"
+                :sodium="customScaledNutrition.sodium"
+              />
 
               <div class="flex gap-3">
                 <UButton
@@ -791,7 +666,8 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                     </div>
                     <div class="text-xs text-white/40 truncate">
                       {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
-                      {{ getCustomFoodServings(food)[0]!.servingDescription }} ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
+                      {{ getCustomFoodServings(food)[0]!.servingDescription }}
+                      ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
                       <span v-if="food.submittedBy">
                         · by {{ food.submittedBy }}</span
                       >
@@ -882,91 +758,25 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   </div>
                   <div class="text-[11px] text-white/40">
                     {{ Math.round(serving.calories) }} kcal
-                    {{ serving.servingGrams ? `· ${serving.servingGrams}g` : "" }}
+                    {{
+                      serving.servingGrams ? `· ${serving.servingGrams}g` : ""
+                    }}
                   </div>
                 </button>
               </div>
 
-              <div
-                class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-              >
-                Quantity
-              </div>
-              <div class="flex items-center gap-3 mb-4">
-                <button
-                  class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                  @click="
-                    quantity = Math.max(0.25, +(quantity - 0.25).toFixed(2))
-                  "
-                >
-                  <Icon name="heroicons:minus" size="1rem" />
-                </button>
-                <input
-                  v-model.number="quantity"
-                  type="number"
-                  min="0.25"
-                  step="0.25"
-                  class="w-20 text-center bg-gaming-950/80 border border-gaming-700/40 rounded-xl py-2 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gaming-500/50 input-gaming"
-                />
-                <button
-                  class="w-9 h-9 rounded-xl bg-gaming-950/80 border border-gaming-700/40 flex items-center justify-center text-white hover:bg-gaming-700/40 transition-colors"
-                  @click="
-                    quantity = Math.min(99, +(quantity + 0.25).toFixed(2))
-                  "
-                >
-                  <Icon name="heroicons:plus" size="1rem" />
-                </button>
-              </div>
+              <FoodQuantityAdjuster v-model="quantity" />
 
-              <div
+              <FoodNutritionPreview
                 v-if="customScaledNutrition"
-                class="bg-gaming-950/60 rounded-xl p-3 border border-gaming-800/20 mb-4"
-              >
-                <div
-                  class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-                >
-                  Nutrition for {{ quantity }} ×
-                  {{ selectedCustomServing?.servingDescription || "serving" }}
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-gaming-300">
-                      {{ customScaledNutrition.calories }}
-                    </div>
-                    <div class="text-[10px] text-white/40">kcal</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.fat }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Fat</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.protein }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Protein</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.carbohydrate }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Carbs</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.sugar }}g
-                    </div>
-                    <div class="text-[10px] text-white/40">Sugar</div>
-                  </div>
-                  <div class="text-center p-1.5 rounded-lg bg-gaming-950/40">
-                    <div class="text-sm font-bold text-white">
-                      {{ customScaledNutrition.sodium }}mg
-                    </div>
-                    <div class="text-[10px] text-white/40">Sodium</div>
-                  </div>
-                </div>
-              </div>
+                :title="`Nutrition for ${quantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
+                :calories="customScaledNutrition.calories"
+                :fat="customScaledNutrition.fat"
+                :protein="customScaledNutrition.protein"
+                :carbohydrate="customScaledNutrition.carbohydrate"
+                :sugar="customScaledNutrition.sugar"
+                :sodium="customScaledNutrition.sodium"
+              />
 
               <div class="flex gap-3">
                 <UButton

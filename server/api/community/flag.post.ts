@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Food not found" });
   }
 
-  const currentFlags = ((food as any)?.flags || 0) as number;
+  const currentFlags = Number(food.flags);
   const newFlags = currentFlags + 1;
 
   if (newFlags >= FLAG_THRESHOLD) {

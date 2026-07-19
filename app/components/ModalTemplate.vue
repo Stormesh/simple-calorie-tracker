@@ -10,15 +10,15 @@ const { title } = defineProps<IModalProps>();
 
 <template>
   <UModal
+    :ui="{
+      content:
+        'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0',
+    }"
     @close="
       {
         emit('close', false);
       }
     "
-    :ui="{
-      content:
-        'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0',
-    }"
   >
     <template #content>
       <div class="rounded-2xl">

@@ -147,9 +147,7 @@ const showFoodDetails = async (index: number) => {
 
   if (foodItem.isCustom) {
     const originalFood = getFoodById(foodItem.foodId);
-    const servings = originalFood
-      ? getCustomFoodServings(originalFood)
-      : null;
+    const servings = originalFood ? getCustomFoodServings(originalFood) : null;
 
     foodDetails.value = {
       food_id: foodItem.foodId,
@@ -175,7 +173,8 @@ const showFoodDetails = async (index: number) => {
           : [
               {
                 serving_id: foodItem.servingId,
-                measurement_description: foodItem.servingDescription || "serving",
+                measurement_description:
+                  foodItem.servingDescription || "serving",
                 metric_serving_amount: foodItem.grams,
                 metric_serving_unit: "g",
                 number_of_units: 1,
@@ -275,6 +274,16 @@ const onFocus = (index: number, focus: boolean) => {
   if (!foodState) return;
   foodState.focused = focus;
 };
+
+provide(FOOD_LIST_KEY, {
+  changeFoodDetails: showFoodDetails,
+  openFoodSearch,
+  editFood,
+  searchAndSelectServing,
+  onFocus,
+  resetFoodIfEmpty,
+  deleteItem,
+});
 </script>
 
 <template>
@@ -300,13 +309,6 @@ const onFocus = (index: number, focus: boolean) => {
             :calories="food.calories"
             :grams="food.grams ?? 0"
             :food-state="foodStates[index]"
-            :change-food-details="showFoodDetails"
-            :open-food-search="openFoodSearch"
-            :edit-food="editFood"
-            :search-and-select-serving="searchAndSelectServing"
-            :on-focus="onFocus"
-            :reset-food-if-empty="resetFoodIfEmpty"
-            :delete-item="deleteItem"
           />
         </div>
       </div>

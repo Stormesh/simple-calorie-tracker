@@ -1,3 +1,21 @@
+interface FlaggedFoodRow {
+  id: string;
+  food_name: string;
+  serving_description: string;
+  serving_grams: number;
+  calories: number;
+  total_fat: number;
+  cholesterol: number;
+  sodium: number;
+  total_carbohydrate: number;
+  sugars: number;
+  protein: number;
+  submitted_by: string | null;
+  created_at: string;
+  flags: number;
+  hidden: number;
+}
+
 export default defineEventHandler(async (event) => {
   const token =
     getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
@@ -25,7 +43,7 @@ export default defineEventHandler(async (event) => {
     )
     .all();
 
-  const foods = (results.results || []).map((row: any) => ({
+  const foods = (results.results as unknown as FlaggedFoodRow[]).map((row) => ({
     id: row.id,
     foodName: row.food_name,
     servingDescription: row.serving_description,
