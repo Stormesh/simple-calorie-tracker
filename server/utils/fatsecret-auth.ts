@@ -3,10 +3,7 @@ import { getAccessToken } from "./fatsecret-oauth2";
 let cachedToken: string | null = null;
 let tokenExpiresAt: number = 0;
 
-export async function getValidToken(
-  apiKey: string,
-  apiClientSecret: string,
-): Promise<string> {
+export async function getValidToken(apiKey: string, apiClientSecret: string): Promise<string> {
   if (cachedToken && Date.now() < tokenExpiresAt) {
     return cachedToken;
   }

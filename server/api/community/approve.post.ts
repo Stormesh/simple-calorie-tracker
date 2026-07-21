@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const token =
-    getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
+  const token = getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
   const config = useRuntimeConfig(event);
   const moderatorSecret = config.moderatorSecret as string;
 

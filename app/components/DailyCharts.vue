@@ -50,9 +50,7 @@ interface IChartDataset {
     | string
     | string[]
     | CanvasGradient
-    | ((ctx: {
-        chart: { ctx: CanvasRenderingContext2D };
-      }) => string | CanvasGradient);
+    | ((ctx: { chart: { ctx: CanvasRenderingContext2D } }) => string | CanvasGradient);
   borderColor?: string | string[];
   borderWidth?: number;
   borderRadius?: number;
@@ -148,9 +146,7 @@ function loadChartData() {
         label: `Weight (${weightUnit})`,
         data: weightValues,
         borderColor: "#a78bfa",
-        backgroundColor: (ctx: {
-          chart: { ctx: CanvasRenderingContext2D };
-        }) => {
+        backgroundColor: (ctx: { chart: { ctx: CanvasRenderingContext2D } }) => {
           const canvas = ctx.chart.ctx;
           const gradient = canvas.createLinearGradient(0, 0, 0, 300);
           gradient.addColorStop(0, "rgba(167, 139, 250, 0.25)");
@@ -282,15 +278,11 @@ const stackedOptions = {
   },
 };
 
-const mixedCaloriesData = computed(
-  () => caloriesChartData.value as ChartData<"bar">,
-);
+const mixedCaloriesData = computed(() => caloriesChartData.value as ChartData<"bar">);
 const weightAsLine = computed(() => weightChartData.value as ChartData<"line">);
 const macroAsBar = computed(() => macroChartData.value as ChartData<"bar">);
 
-const weightUnitLabel = computed(() =>
-  bmrState.value.unitSystem === "imperial" ? "lbs" : "kg",
-);
+const weightUnitLabel = computed(() => (bmrState.value.unitSystem === "imperial" ? "lbs" : "kg"));
 
 const weightOptions = computed(() => ({
   ...chartOptions,
@@ -300,8 +292,7 @@ const weightOptions = computed(() => ({
       ...chartOptions.scales.y,
       ticks: {
         ...chartOptions.scales.y.ticks,
-        callback: (tickValue: string | number) =>
-          `${tickValue} ${weightUnitLabel.value}`,
+        callback: (tickValue: string | number) => `${tickValue} ${weightUnitLabel.value}`,
       },
     },
   },
@@ -326,11 +317,7 @@ onMounted(() => {
 });
 
 watch(
-  [
-    aggregatedNutrients,
-    () => bmrState.value.bmr,
-    () => dayLogs.currentDate.value,
-  ],
+  [aggregatedNutrients, () => bmrState.value.bmr, () => dayLogs.currentDate.value],
   loadChartData,
   { deep: true, immediate: true },
 );
@@ -342,37 +329,25 @@ watch(
       class="w-full max-w-4xl p-6 glass-light rounded-2xl shadow-lg shadow-gaming-900/30 border border-gaming-700/20"
     >
       <div class="text-center mb-6">
-        <span
-          class="section-header text-sm font-black text-gaming-400 tracking-[0.2em]"
+        <span class="section-header text-sm font-black text-gaming-400 tracking-[0.2em]"
           >DAILY ANALYTICS</span
         >
       </div>
 
       <div v-if="!hasData" class="py-12 text-center">
-        <Icon
-          name="mdi:chart-line"
-          size="3rem"
-          class="text-white/20 mx-auto mb-3"
-        />
-        <p class="text-white/40 text-sm font-mono">
-          Start logging food to see your trends
-        </p>
+        <Icon name="mdi:chart-line" size="3rem" class="text-white/20 mx-auto mb-3" />
+        <p class="text-white/40 text-sm font-mono">Start logging food to see your trends</p>
       </div>
 
       <div v-else class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div
-            class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20"
-          >
+          <div class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20">
             <h3
               class="text-xs font-semibold text-gaming-400 uppercase tracking-widest mb-3 text-center"
             >
               Weight Log
             </h3>
-            <div
-              v-if="!hasWeightData"
-              class="h-56 flex items-center justify-center"
-            >
+            <div v-if="!hasWeightData" class="h-56 flex items-center justify-center">
               <p class="text-white/30 text-xs font-mono">
                 Update your weight in the Diet Profile to see it here
               </p>
@@ -384,9 +359,7 @@ watch(
             </div>
           </div>
 
-          <div
-            class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20"
-          >
+          <div class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20">
             <h3
               class="text-xs font-semibold text-gaming-400 uppercase tracking-widest mb-3 text-center"
             >
@@ -400,9 +373,7 @@ watch(
           </div>
         </div>
 
-        <div
-          class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20"
-        >
+        <div class="bg-gaming-950/40 rounded-xl p-4 border border-gaming-800/20">
           <h3
             class="text-xs font-semibold text-gaming-400 uppercase tracking-widest mb-3 text-center"
           >

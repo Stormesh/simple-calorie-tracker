@@ -18,7 +18,9 @@ const cleanup = () => {
   }
 };
 
-export const checkRateLimit = (ip: string): { allowed: boolean; remaining: number; resetAt: number } => {
+export const checkRateLimit = (
+  ip: string,
+): { allowed: boolean; remaining: number; resetAt: number } => {
   cleanup();
 
   const now = Date.now();

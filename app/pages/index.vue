@@ -2,17 +2,11 @@
 import FoodDetails from "~/components/FoodDetails.vue";
 import DaySelector from "~/components/DaySelector.vue";
 import DailyCharts from "~/components/DailyCharts.vue";
-import {
-  migrateCookieData,
-  restoreDayToCookies,
-  getTodayString,
-} from "~/composables/day-logs";
+import { migrateCookieData, restoreDayToCookies, getTodayString } from "~/composables/day-logs";
 
 const foodDetailsRef = useTemplateRef("foodDetailsRef");
 
-const foodDetailsElement = computed(
-  () => foodDetailsRef.value?.rootElement || null,
-);
+const foodDetailsElement = computed(() => foodDetailsRef.value?.rootElement || null);
 
 const { aggregatedNutrients } = useAggregatedNutrients();
 

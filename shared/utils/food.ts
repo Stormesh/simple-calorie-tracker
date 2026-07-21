@@ -117,14 +117,10 @@ async function fetchFromApi<T>(
   }
 }
 
-export const searchFood = async (
-  foodName: string,
-): Promise<IFoodSearchResult | null> => {
+export const searchFood = async (foodName: string): Promise<IFoodSearchResult | null> => {
   if (!foodName.trim()) return null;
 
-  return fetchFromApi<IFoodSearchResult>(
-    `/api/nutrition/search/${encodeURIComponent(foodName)}`,
-  );
+  return fetchFromApi<IFoodSearchResult>(`/api/nutrition/search/${encodeURIComponent(foodName)}`);
 };
 
 export const getFood = async (
@@ -134,11 +130,8 @@ export const getFood = async (
 ): Promise<IFoodDetails | null> => {
   if (!foodId.trim()) return null;
 
-  return fetchFromApi<IFoodDetails>(
-    `/api/nutrition/${encodeURIComponent(foodId)}`,
-    {
-      method: "POST",
-      body: JSON.stringify({ amount, unit }),
-    },
-  );
+  return fetchFromApi<IFoodDetails>(`/api/nutrition/${encodeURIComponent(foodId)}`, {
+    method: "POST",
+    body: JSON.stringify({ amount, unit }),
+  });
 };

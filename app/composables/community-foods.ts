@@ -46,13 +46,10 @@ export const useCommunityFoods = () => {
     food: ICommunitySubmitBody,
   ): Promise<ICommunitySubmitResponse | null> => {
     try {
-      const result = await $fetch<ICommunitySubmitResponse>(
-        `/api/community/submit`,
-        {
-          method: "POST",
-          body: food,
-        },
-      );
+      const result = await $fetch<ICommunitySubmitResponse>(`/api/community/submit`, {
+        method: "POST",
+        body: food,
+      });
       return result;
     } catch (e) {
       console.error("Community submit failed:", e);

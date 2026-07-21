@@ -18,16 +18,16 @@ A gamified calorie tracker that turns your nutrition into an RPG health bar. Bui
 
 ## Tech Stack
 
-| Tool | Purpose |
-|---|---|
-| [Nuxt 4](https://nuxt.com/) | SSR / static framework (Nitro preset `cloudflare-pages`) |
-| [Nuxt UI v4](https://ui.nuxt.com/) | UI component library, primary color "gaming" |
-| [Tailwind CSS v4](https://tailwindcss.com/) | Utility-first CSS with custom `@theme` tokens |
-| [Vue 3](https://vuejs.org/) | UI framework (`<script setup lang="ts">`) |
-| [TypeScript](https://www.typescriptlang.org/) | Strict mode throughout |
-| [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/) | Analytics charts |
-| [FatSecret API](https://platform.fatsecret.com/) | Food search and nutrition data (OAuth1 + OAuth2) |
-| [Cloudflare D1](https://developers.cloudflare.com/d1/) | Community food database |
+| Tool                                                                           | Purpose                                                  |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| [Nuxt 4](https://nuxt.com/)                                                    | SSR / static framework (Nitro preset `cloudflare-pages`) |
+| [Nuxt UI v4](https://ui.nuxt.com/)                                             | UI component library, primary color "gaming"             |
+| [Tailwind CSS v4](https://tailwindcss.com/)                                    | Utility-first CSS with custom `@theme` tokens            |
+| [Vue 3](https://vuejs.org/)                                                    | UI framework (`<script setup lang="ts">`)                |
+| [TypeScript](https://www.typescriptlang.org/)                                  | Strict mode throughout                                   |
+| [Chart.js](https://www.chartjs.org/) + [vue-chartjs](https://vue-chartjs.org/) | Analytics charts                                         |
+| [FatSecret API](https://platform.fatsecret.com/)                               | Food search and nutrition data (OAuth1 + OAuth2)         |
+| [Cloudflare D1](https://developers.cloudflare.com/d1/)                         | Community food database                                  |
 
 ## Preview
 
@@ -45,17 +45,20 @@ A gamified calorie tracker that turns your nutrition into an RPG health bar. Bui
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/Stormesh/simple-calorie-tracker.git
    cd simple-calorie-tracker
    ```
 
 2. Install dependencies (postinstall runs `nuxt prepare`):
+
    ```bash
    pnpm install
    ```
 
 3. Create a `.env` file in the project root with your FatSecret API credentials:
+
    ```env
    FATSECRET_API_KEY=your_api_key
    FATSECRET_API_SECRET=your_api_secret
@@ -131,13 +134,13 @@ server/
 
 ### State Storage
 
-| Store | Type | Key |
-|---|---|---|
-| Day logs | `useLocalStorage` | `maxhp-day-log:all` |
-| Meal foods | `useCookie` | `foods-{Breakfast\|Lunch\|Dinner\|Snacks}` |
-| Current date | `useCookie` | `current-date` |
-| BMR form | `useCookie` | `bmr` |
-| Migration flag | `useLocalStorage` | `maxhp-format-v2` |
+| Store          | Type              | Key                                        |
+| -------------- | ----------------- | ------------------------------------------ |
+| Day logs       | `useLocalStorage` | `maxhp-day-log:all`                        |
+| Meal foods     | `useCookie`       | `foods-{Breakfast\|Lunch\|Dinner\|Snacks}` |
+| Current date   | `useCookie`       | `current-date`                             |
+| BMR form       | `useCookie`       | `bmr`                                      |
+| Migration flag | `useLocalStorage` | `maxhp-format-v2`                          |
 
 ### Configuration
 
@@ -159,12 +162,12 @@ Requires a Cloudflare D1 database named `maxhp-community` (configured in `wrangl
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `FATSECRET_API_KEY` | Yes | FatSecret consumer key |
-| `FATSECRET_API_SECRET` | Yes | FatSecret consumer secret |
-| `FATSECRET_API_CLIENT_SECRET` | No | FatSecret OAuth2 client secret |
-| `NUXT_MODERATOR_SECRET` | No | Community food moderation secret |
+| Variable                      | Required | Description                      |
+| ----------------------------- | -------- | -------------------------------- |
+| `FATSECRET_API_KEY`           | Yes      | FatSecret consumer key           |
+| `FATSECRET_API_SECRET`        | Yes      | FatSecret consumer secret        |
+| `FATSECRET_API_CLIENT_SECRET` | No       | FatSecret OAuth2 client secret   |
+| `NUXT_MODERATOR_SECRET`       | No       | Community food moderation secret |
 
 ---
 

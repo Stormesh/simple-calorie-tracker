@@ -8,5 +8,4 @@ export interface IFoodListContext {
   deleteItem: (index: number) => void;
 }
 
-export const FOOD_LIST_KEY: InjectionKey<IFoodListContext> =
-  Symbol("food-list");
+export const FOOD_LIST_KEY: InjectionKey<IFoodListContext> = Symbol("food-list");

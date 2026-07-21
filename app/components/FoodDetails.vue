@@ -59,10 +59,7 @@ const isValidQuantity = computed(() => {
           class="section-header text-lg md:text-xl font-black text-gaming-400 text-center py-2 px-6 rounded-t-xl bg-gaming-950/60 border-t border-x border-gaming-700/30 tracking-widest"
         >
           <span class="glow-text">
-            {{
-              foodData.food_name.charAt(0).toUpperCase() +
-              foodData.food_name.slice(1)
-            }}
+            {{ foodData.food_name.charAt(0).toUpperCase() + foodData.food_name.slice(1) }}
           </span>
           <span
             v-if="foodData.brand_name === 'Custom Food'"
@@ -76,23 +73,18 @@ const isValidQuantity = computed(() => {
             }}g
           </span>
         </div>
-        <div
-          class="glass-light rounded-b-xl rounded-t-none p-4 shadow-lg shadow-gaming-950/40"
-        >
+        <div class="glass-light rounded-b-xl rounded-t-none p-4 shadow-lg shadow-gaming-950/40">
           <div class="grid grid-cols-2 gap-3">
             <template v-for="(fact, index) in nutritionFacts" :key="index">
               <div
                 class="flex flex-col items-center p-2 rounded-lg bg-gaming-950/40 border border-gaming-800/20"
               >
-                <span
-                  class="text-xs font-mono text-gaming-400 uppercase tracking-wider"
-                  >{{ fact.label }}</span
-                >
+                <span class="text-xs font-mono text-gaming-400 uppercase tracking-wider">{{
+                  fact.label
+                }}</span>
                 <span class="text-base font-bold text-white"
                   >{{ Math.round(fact.value || 0)
-                  }}<span class="text-xs text-gaming-400 ml-0.5">{{
-                    fact.unit
-                  }}</span></span
+                  }}<span class="text-xs text-gaming-400 ml-0.5">{{ fact.unit }}</span></span
                 >
               </div>
             </template>

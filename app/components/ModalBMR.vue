@@ -70,10 +70,7 @@ const bmrForm = useBmr();
 
 const targetOptions = computed(() => {
   return TARGET.map((target) => ({
-    label:
-      bmrForm.value.unitSystem === "metric"
-        ? target.metricLabel
-        : target.imperialLabel,
+    label: bmrForm.value.unitSystem === "metric" ? target.metricLabel : target.imperialLabel,
     value: target.value,
   }));
 });
@@ -100,9 +97,7 @@ const calculateBMR = () => {
     BMR_HEIGHT_MULTIPLIER * h -
     BMR_AGE_MULTIPLIER * a +
     (bmrForm.value.gender === "male" ? MALE_BMR_CONSTANT : FEMALE_BMR_CONSTANT);
-  bmrForm.value.bmr = Math.round(
-    calculatedBMR * bmrForm.value.activity + bmrForm.value.target,
-  );
+  bmrForm.value.bmr = Math.round(calculatedBMR * bmrForm.value.activity + bmrForm.value.target);
 
   saveWeight(getTodayString(), bmrForm.value.weight);
 };
@@ -114,19 +109,10 @@ const closeModal = () => {
 
 <template>
   <ModalTemplate title="Diet Profile">
-    <UForm
-      ref="form"
-      :state="bmrForm"
-      class="w-full"
-      @submit.prevent="calculateBMR"
-    >
+    <UForm ref="form" :state="bmrForm" class="w-full" @submit.prevent="calculateBMR">
       <div class="flex flex-col gap-3 w-full">
-        <div
-          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
-        >
-          <h3
-            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-          >
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
             Unit System
           </h3>
           <URadioGroup
@@ -137,19 +123,13 @@ const closeModal = () => {
           />
         </div>
 
-        <div
-          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2"
-        >
-          <h3
-            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-          >
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
             Body Stats
           </h3>
           <UInput
             v-model.number="bmrForm.weight"
-            :placeholder="
-              bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'
-            "
+            :placeholder="bmrForm.unitSystem === 'metric' ? 'Weight (kg)' : 'Weight (lbs)'"
             type="number"
             required
             size="md"
@@ -161,11 +141,7 @@ const closeModal = () => {
           />
           <UInput
             v-model.number="bmrForm.height"
-            :placeholder="
-              bmrForm.unitSystem === 'metric'
-                ? 'Height (cm)'
-                : 'Height (inches)'
-            "
+            :placeholder="bmrForm.unitSystem === 'metric' ? 'Height (cm)' : 'Height (inches)'"
             type="number"
             required
             size="md"
@@ -188,12 +164,8 @@ const closeModal = () => {
           />
         </div>
 
-        <div
-          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
-        >
-          <h3
-            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-          >
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
             Activity Level
           </h3>
           <USelect
@@ -207,12 +179,8 @@ const closeModal = () => {
           />
         </div>
 
-        <div
-          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
-        >
-          <h3
-            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-          >
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
             Target
           </h3>
           <USelect
@@ -226,12 +194,8 @@ const closeModal = () => {
           />
         </div>
 
-        <div
-          class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20"
-        >
-          <h3
-            class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-          >
+        <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20">
+          <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
             Gender
           </h3>
           <URadioGroup
@@ -260,17 +224,11 @@ const closeModal = () => {
       </div>
 
       <div v-if="bmrForm.bmr !== null" class="mt-4 text-center">
-        <div
-          class="inline-block bg-gaming-950/60 rounded-xl px-6 py-3 border border-gaming-700/30"
-        >
-          <span class="text-xs text-gaming-400 uppercase tracking-wider block"
-            >Your TDEE</span
-          >
+        <div class="inline-block bg-gaming-950/60 rounded-xl px-6 py-3 border border-gaming-700/30">
+          <span class="text-xs text-gaming-400 uppercase tracking-wider block">Your TDEE</span>
           <span class="text-xl font-black text-gaming-400 glow-text"
             >{{ bmrForm.bmr }}
-            <span class="text-sm font-normal text-white/60"
-              >calories/day</span
-            ></span
+            <span class="text-sm font-normal text-white/60">calories/day</span></span
           >
         </div>
       </div>

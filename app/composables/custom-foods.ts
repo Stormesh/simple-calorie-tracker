@@ -44,10 +44,7 @@ export const useCustomFoods = () => {
     return newFood;
   };
 
-  const updateFood = (
-    id: string,
-    updates: Partial<Omit<ICustomFood, "id" | "createdAt">>,
-  ) => {
+  const updateFood = (id: string, updates: Partial<Omit<ICustomFood, "id" | "createdAt">>) => {
     const index = foods.value.findIndex((f) => f.id === id);
     if (index === -1) return false;
     foods.value[index] = { ...foods.value[index], ...updates } as ICustomFood;
@@ -87,9 +84,7 @@ export const useCustomFoods = () => {
         return result;
       }
 
-      const existingNames = new Set(
-        foods.value.map((f) => f.foodName.toLowerCase()),
-      );
+      const existingNames = new Set(foods.value.map((f) => f.foodName.toLowerCase()));
 
       for (const food of collection.foods) {
         if (!food.foodName || food.calories === undefined) {
@@ -113,9 +108,7 @@ export const useCustomFoods = () => {
         result.imported++;
       }
     } catch (e) {
-      result.errors.push(
-        `Parse error: ${e instanceof Error ? e.message : String(e)}`,
-      );
+      result.errors.push(`Parse error: ${e instanceof Error ? e.message : String(e)}`);
     }
     return result;
   };

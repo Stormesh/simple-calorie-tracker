@@ -103,9 +103,7 @@ export default defineEventHandler(async (event) => {
       firstServing ? firstServing.totalFat : body.totalFat || 0,
       firstServing ? firstServing.cholesterol : body.cholesterol || 0,
       firstServing ? firstServing.sodium : body.sodium || 0,
-      firstServing
-        ? firstServing.totalCarbohydrate
-        : body.totalCarbohydrate || 0,
+      firstServing ? firstServing.totalCarbohydrate : body.totalCarbohydrate || 0,
       firstServing ? firstServing.sugars : body.sugars || 0,
       firstServing ? firstServing.protein : body.protein || 0,
       body.nickname || null,

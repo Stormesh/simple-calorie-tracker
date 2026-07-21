@@ -34,20 +34,14 @@ const {
       v-else-if="calories === 0"
       class="h-11 flex relative bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 input-gaming"
       :class="
-        foodState?.focused
-          ? 'ring-2 ring-gaming-500/70 glow-border'
-          : 'ring-1 ring-gaming-800/30'
+        foodState?.focused ? 'ring-2 ring-gaming-500/70 glow-border' : 'ring-1 ring-gaming-800/30'
       "
     >
       <form
         class="flex-1 inline-flex items-center px-3"
         @submit.prevent="searchAndSelectServing(index, true)"
       >
-        <Icon
-          name="mdi:food-apple"
-          size="1.2rem"
-          class="text-gaming-500 mr-2 shrink-0"
-        />
+        <Icon name="mdi:food-apple" size="1.2rem" class="text-gaming-500 mr-2 shrink-0" />
         <input
           v-model="foodName"
           class="bg-transparent focus:outline-none text-white placeholder:text-white/30 text-sm w-full font-medium tracking-wide"
@@ -82,19 +76,12 @@ const {
       @click="changeFoodDetails(index, true)"
     >
       <div class="flex-1 inline-flex items-center px-3 gap-2 min-w-0">
-        <Icon
-          name="mdi:food-apple"
-          size="1.2rem"
-          class="text-gaming-500 shrink-0"
-        />
-        <span class="text-sm font-medium text-white truncate">{{
-          foodName
-        }}</span>
+        <Icon name="mdi:food-apple" size="1.2rem" class="text-gaming-500 shrink-0" />
+        <span class="text-sm font-medium text-white truncate">{{ foodName }}</span>
       </div>
       <div class="flex items-center px-3 border-l border-gaming-800/30 gap-2">
         <span class="text-xs font-bold text-gaming-400 font-mono"
-          >{{ Math.round(calories)
-          }}<span class="text-gaming-600">kcal</span></span
+          >{{ Math.round(calories) }}<span class="text-gaming-600">kcal</span></span
         >
         <span class="text-[11px] font-mono text-white/40"
           >({{ Math.round(grams) }}<span class="text-white/30">g</span>)</span

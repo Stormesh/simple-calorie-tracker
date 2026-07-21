@@ -6,102 +6,88 @@ interface IFoodSearchResponse {
 
 const cache = new FoodCache();
 
-export default defineEventHandler(
-  async (event): Promise<IFoodSearchResult | null> => {
-    const search_expression = getRouterParam(event, "name");
-    const config = useRuntimeConfig(event);
+export default defineEventHandler(async (event): Promise<IFoodSearchResult | null> => {
+  const search_expression = getRouterParam(event, "name");
+  const config = useRuntimeConfig(event);
 
-    if (!search_expression) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Search expression is required.",
+  if (!search_expression) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Search expression is required.",
+    });
+  }
+
+  const cachedFood = cache.get(search_expression);
+  if (cachedFood) {
+    return cachedFood.data as IFoodSearchResult;
+  }
+
+  const useOAuth2 = !!config.apiClientSecret;
+
+  let searchData: IFoodSearchResponse;
+
+  try {
+    if (useOAuth2) {
+      const token = await getValidToken(config.apiKey as string, config.apiClientSecret as string);
+
+      const searchParams = {
+        method: "foods.search",
+        search_expression: search_expression,
+        max_results: 10,
+        page_number: 0,
+        format: "json",
+      };
+
+      searchData = await $fetch<IFoodSearchResponse>(FATSECRET_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(
+          Object.fromEntries(
+            Object.entries(searchParams).map(([key, value]) => [key, String(value)]),
+          ),
+        ).toString(),
       });
-    }
+    } else if (config.apiSecret) {
+      console.log("Using FatSecret OAuth1.");
+      const searchParams = {
+        method: "foods.search",
+        search_expression: search_expression,
+        max_results: "10",
+        page_number: "0",
+        format: "json",
+      };
 
-    const cachedFood = cache.get(search_expression);
-    if (cachedFood) {
-      return cachedFood.data as IFoodSearchResult;
-    }
-
-    const useOAuth2 = !!config.apiClientSecret;
-
-    let searchData: IFoodSearchResponse;
-
-    try {
-      if (useOAuth2) {
-        const token = await getValidToken(
-          config.apiKey as string,
-          config.apiClientSecret as string,
-        );
-
-        const searchParams = {
-          method: "foods.search",
-          search_expression: search_expression,
-          max_results: 10,
-          page_number: 0,
-          format: "json",
-        };
-
-        searchData = await $fetch<IFoodSearchResponse>(FATSECRET_API_URL, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams(
-            Object.fromEntries(
-              Object.entries(searchParams).map(([key, value]) => [
-                key,
-                String(value),
-              ]),
-            ),
-          ).toString(),
-        });
-      } else if (config.apiSecret) {
-        console.log("Using FatSecret OAuth1.");
-        const searchParams = {
-          method: "foods.search",
-          search_expression: search_expression,
-          max_results: "10",
-          page_number: "0",
-          format: "json",
-        };
-
-        searchData = await fatsecretApiRequest<IFoodSearchResponse>(
-          config.apiKey as string,
-          config.apiSecret as string,
-          searchParams,
-        );
-      } else {
-        throw createError({
-          statusCode: 500,
-          statusMessage: "FatSecret API credentials are not configured.",
-        });
-      }
-
-      if (
-        !searchData ||
-        !searchData.foods ||
-        searchData.foods.food.length === 0
-      ) {
-        console.log(
-          `No foods found for search expression: ${search_expression}`,
-        );
-        return null;
-      }
-
-      const foods = searchData.foods;
-
-      cache.set(search_expression, foods);
-
-      return foods;
-    } catch (error) {
-      console.error("FatSecret API Request Error:", error);
+      searchData = await fatsecretApiRequest<IFoodSearchResponse>(
+        config.apiKey as string,
+        config.apiSecret as string,
+        searchParams,
+      );
+    } else {
       throw createError({
         statusCode: 500,
-        statusMessage: "Failed to fetch data from FatSecret.",
-        message: error instanceof Error ? error.message : String(error),
+        statusMessage: "FatSecret API credentials are not configured.",
       });
     }
-  },
-);
+
+    if (!searchData || !searchData.foods || searchData.foods.food.length === 0) {
+      console.log(`No foods found for search expression: ${search_expression}`);
+      return null;
+    }
+
+    const foods = searchData.foods;
+
+    cache.set(search_expression, foods);
+
+    return foods;
+  } catch (error) {
+    console.error("FatSecret API Request Error:", error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to fetch data from FatSecret.",
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+});

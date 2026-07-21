@@ -14,9 +14,7 @@ export const getAccessToken = async (
 ): Promise<FatSecretTokenResponse> => {
   // 1. Combine Client ID and Secret into a Basic Auth string
   // Format: base64(client_id:client_secret)
-  const authString = Buffer.from(`${clientId}:${clientSecret}`).toString(
-    "base64",
-  );
+  const authString = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
   try {
     // 2. Make the POST request to the token endpoint

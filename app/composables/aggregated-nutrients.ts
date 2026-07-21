@@ -1,7 +1,5 @@
 export const useAggregatedNutrients = () => {
-  const foodCookies = foodsList.map((meal) =>
-    useCookie<IFoodTemplate[]>(`foods-${meal}`),
-  );
+  const foodCookies = foodsList.map((meal) => useCookie<IFoodTemplate[]>(`foods-${meal}`));
 
   const aggregatedNutrients = computed(() => {
     const totals = {

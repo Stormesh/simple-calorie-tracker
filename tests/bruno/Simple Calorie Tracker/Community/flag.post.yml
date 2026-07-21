@@ -10,10 +10,7 @@ http:
   headers:
     Content-Type: application/json
   body: json
-  json: {
-    "foodId": "{{communityFoodId}}",
-    "reason": "Inappropriate content"
-  }
+  json: { "foodId": "{{communityFoodId}}", "reason": "Inappropriate content" }
 
 settings:
   encodeUrl: true

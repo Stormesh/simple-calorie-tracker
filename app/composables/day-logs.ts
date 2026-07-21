@@ -45,8 +45,7 @@ function useMealCookie(meal: string): Ref<IFoodTemplate[]> {
   return mealCookieCache.get(meal)!;
 }
 
-let allRef: ReturnType<typeof useLocalStorage<Record<string, IDayLog>>> | null =
-  null;
+let allRef: ReturnType<typeof useLocalStorage<Record<string, IDayLog>>> | null = null;
 let oldMigrated = false;
 
 function getAllRef() {
@@ -78,11 +77,7 @@ function migrateOldIndividualKeys() {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (!key?.startsWith(STORAGE_PREFIX)) continue;
-    if (
-      key === ALL_KEY ||
-      key === STORAGE_FORMAT_FLAG ||
-      key === `${STORAGE_PREFIX}migrated`
-    )
+    if (key === ALL_KEY || key === STORAGE_FORMAT_FLAG || key === `${STORAGE_PREFIX}migrated`)
       continue;
     try {
       const raw = localStorage.getItem(key);
@@ -107,8 +102,7 @@ export function saveDayToStorage(date: string) {
 
   foodsList.forEach((meal) => {
     const val = useMealCookie(meal).value;
-    dayData[meal] =
-      val && val.some((f) => f.foodName) ? JSON.parse(JSON.stringify(val)) : [];
+    dayData[meal] = val && val.some((f) => f.foodName) ? JSON.parse(JSON.stringify(val)) : [];
   });
 
   const existing = loadDayFromStorage(date);
@@ -142,9 +136,7 @@ export function restoreDayToCookies(date: string) {
 }
 
 export function getAllDayLogs(): IDayLog[] {
-  return Object.values(getAllRef().value).sort((a, b) =>
-    b.date.localeCompare(a.date),
-  );
+  return Object.values(getAllRef().value).sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function removeDayFromStorage(date: string) {
@@ -166,9 +158,7 @@ export function migrateCookieData() {
 
   if (!existing) {
     const hasData = foodsList.some((meal) => {
-      return useMealCookie(meal).value?.some(
-        (f) => f.foodName && f.calories > 0,
-      );
+      return useMealCookie(meal).value?.some((f) => f.foodName && f.calories > 0);
     });
 
     if (hasData) {
@@ -233,8 +223,7 @@ function initMidnightWatcher() {
   function scheduleNext() {
     const now = new Date();
     const msUntilMidnight =
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
-      now.getTime();
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
 
     setTimeout(() => {
       switchDate(getTodayString());

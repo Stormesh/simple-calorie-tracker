@@ -10,10 +10,11 @@ pnpm run generate  # static export (output: dist)
 pnpm run preview   # preview production build
 ```
 
-Before committing or deploying, run lint and fix any errors:
+Before committing or deploying, run format + lint and fix any errors:
 
 ```bash
-pnpm run lint
+pnpm run format    # auto-format with Prettier
+pnpm run lint      # check Prettier + ESLint
 ```
 
 No typecheck or test commands are configured.
@@ -59,13 +60,13 @@ server/
 
 ### Key composables
 
-| Composable | Purpose |
-|---|---|
-| `useDayLogs()` | Day navigation, date switching, weight save/load, midnight auto-switch |
-| `useBmr()` | BMR form state (stored in `bmr` cookie) |
-| `useAggregatedNutrients()` | Computed totals from meal cookies |
-| `useWeightChange()` | Computed deficit/surplus display |
-| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates |
+| Composable                                    | Purpose                                                                |
+| --------------------------------------------- | ---------------------------------------------------------------------- |
+| `useDayLogs()`                                | Day navigation, date switching, weight save/load, midnight auto-switch |
+| `useBmr()`                                    | BMR form state (stored in `bmr` cookie)                                |
+| `useAggregatedNutrients()`                    | Computed totals from meal cookies                                      |
+| `useWeightChange()`                           | Computed deficit/surplus display                                       |
+| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates                                        |
 
 ### State storage
 

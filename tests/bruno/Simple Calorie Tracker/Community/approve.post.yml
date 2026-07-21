@@ -11,9 +11,7 @@ http:
     Content-Type: application/json
     moderator-token: "{{moderatorToken}}"
   body: json
-  json: {
-    "foodId": "{{communityFoodId}}"
-  }
+  json: { "foodId": "{{communityFoodId}}" }
 
 settings:
   encodeUrl: true

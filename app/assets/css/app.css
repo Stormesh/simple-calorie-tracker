@@ -140,12 +140,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.15),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
   transform: translateX(-100%);
   animation: hpBarShine 3s ease-in-out infinite;
 }
@@ -244,12 +239,7 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-gaming-500),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--color-gaming-500), transparent);
 }
 
 .stat-card-over {
@@ -264,20 +254,11 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-hp-red),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--color-hp-red), transparent);
 }
 
 .modal-gaming {
-  background: linear-gradient(
-    135deg,
-    rgba(10, 10, 10, 0.98),
-    rgba(18, 10, 10, 0.98)
-  );
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(18, 10, 10, 0.98));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(239, 68, 68, 0.15);
@@ -327,14 +308,12 @@ body {
   0%,
   100% {
     filter: drop-shadow(
-      0 0 var(--glow-rest-size, 6px)
-        rgba(239, 68, 68, var(--glow-rest-opacity, 0.3))
+      0 0 var(--glow-rest-size, 6px) rgba(239, 68, 68, var(--glow-rest-opacity, 0.3))
     );
   }
   50% {
     filter: drop-shadow(
-      0 0 var(--glow-peak-size, 24px)
-        rgba(239, 68, 68, var(--glow-peak-opacity, 0.8))
+      0 0 var(--glow-peak-size, 24px) rgba(239, 68, 68, var(--glow-peak-opacity, 0.8))
     );
   }
 }
@@ -355,16 +334,7 @@ body {
 }
 
 .shimmer-text {
-  background: linear-gradient(
-    90deg,
-    #fca5a5,
-    #f87171,
-    #ef4444,
-    #dc2626,
-    #ef4444,
-    #f87171,
-    #fca5a5
-  );
+  background: linear-gradient(90deg, #fca5a5, #f87171, #ef4444, #dc2626, #ef4444, #f87171, #fca5a5);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;

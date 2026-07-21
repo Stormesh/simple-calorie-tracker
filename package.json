@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "lint": "eslint .",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -37,7 +38,10 @@
     "@iconify-json/lucide": "^1.2.116",
     "@iconify-json/mdi": "^1.2.3",
     "@types/node": "^24.13.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
     "leo-profanity": "^1.9.0",
+    "prettier": "^3.9.5",
     "vue-tsc": "^3.3.7"
   }
 }

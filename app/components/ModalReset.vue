@@ -16,12 +16,8 @@ const resetFoods = () => {
   <ModalTemplate title="Reset">
     <div class="flex flex-col items-center gap-2 py-2">
       <Icon name="mdi:alert-octagon" size="3rem" class="text-hp-orange" />
-      <p class="text-base text-white/80 text-center">
-        Are you sure you want to reset all foods?
-      </p>
-      <p class="text-xs text-white/40 text-center">
-        This action cannot be undone
-      </p>
+      <p class="text-base text-white/80 text-center">Are you sure you want to reset all foods?</p>
+      <p class="text-xs text-white/40 text-center">This action cannot be undone</p>
     </div>
     <div class="flex justify-center gap-4 mt-2">
       <UButton

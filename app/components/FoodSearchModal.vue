@@ -29,47 +29,35 @@ const results = ref<ISearchResult[]>([]);
 const isSearching = ref(false);
 const hasSearched = ref(false);
 
-const selectedFoodDetails = ref<IFoodDetails | null>(
-  props.initialFoodDetails || null,
-);
+const selectedFoodDetails = ref<IFoodDetails | null>(props.initialFoodDetails || null);
 const isFetchingDetails = ref(false);
 
 const selectedServingIndex = ref(0);
 const quantity = ref(1);
 
-const servings = computed(
-  () => selectedFoodDetails.value?.servings?.serving || [],
-);
+const servings = computed(() => selectedFoodDetails.value?.servings?.serving || []);
 
-const selectedServing = computed(
-  () => servings.value[selectedServingIndex.value] || null,
-);
+const selectedServing = computed(() => servings.value[selectedServingIndex.value] || null);
 
 const scaledNutrition = computed(() => {
   const serving = selectedServing.value;
   if (!serving) return null;
   const quantityValue = quantity.value || 0;
   return {
-    grams:
-      Math.round((serving.metric_serving_amount || 0) * quantityValue * 10) /
-      10,
+    grams: Math.round((serving.metric_serving_amount || 0) * quantityValue * 10) / 10,
     calories: Math.round((serving.calories || 0) * quantityValue),
     fat: Math.round((serving.fat || 0) * quantityValue * 10) / 10,
     protein: Math.round((serving.protein || 0) * quantityValue * 10) / 10,
-    carbohydrate:
-      Math.round((serving.carbohydrate || 0) * quantityValue * 10) / 10,
+    carbohydrate: Math.round((serving.carbohydrate || 0) * quantityValue * 10) / 10,
     sugar: Math.round((serving.sugar || 0) * quantityValue * 10) / 10,
     sodium: Math.round((serving.sodium || 0) * quantityValue * 10) / 10,
-    cholesterol:
-      Math.round((serving.cholesterol || 0) * quantityValue * 10) / 10,
+    cholesterol: Math.round((serving.cholesterol || 0) * quantityValue * 10) / 10,
   };
 });
 
 const { searchFoods: searchCustomFoods } = useCustomFoods();
 const customSearchQuery = ref("");
-const customResults = computed(() =>
-  searchCustomFoods(customSearchQuery.value),
-);
+const customResults = computed(() => searchCustomFoods(customSearchQuery.value));
 
 // --- Community tab state ---
 const { searchCommunity } = useCommunityFoods();
@@ -269,8 +257,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 <template>
   <UModal
     :ui="{
-      content:
-        'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
+      content: 'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
     }"
     @close="close"
   >
@@ -328,11 +315,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
               </div>
 
               <div v-if="isSearching" class="flex justify-center py-8">
-                <Icon
-                  name="line-md:loading-loop"
-                  size="2rem"
-                  class="text-gaming-400"
-                />
+                <Icon name="line-md:loading-loop" size="2rem" class="text-gaming-400" />
               </div>
 
               <div
@@ -352,11 +335,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   <div
                     class="w-8 h-8 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
                   >
-                    <Icon
-                      name="mdi:food-apple"
-                      size="1.1rem"
-                      class="text-gaming-400"
-                    />
+                    <Icon name="mdi:food-apple" size="1.1rem" class="text-gaming-400" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-semibold text-white truncate">
@@ -377,11 +356,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
             <div v-else class="p-4">
               <div v-if="isFetchingDetails" class="flex justify-center py-8">
-                <Icon
-                  name="line-md:loading-loop"
-                  size="2rem"
-                  class="text-gaming-400"
-                />
+                <Icon name="line-md:loading-loop" size="2rem" class="text-gaming-400" />
               </div>
 
               <template v-else>
@@ -397,9 +372,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   }}</span>
                 </div>
 
-                <div
-                  class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold"
-                >
+                <div class="text-xs text-white/40 mb-2 uppercase tracking-wider font-semibold">
                   Serving Size
                 </div>
 
@@ -476,11 +449,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                 v-if="customResults.length === 0"
                 class="text-center py-8 text-white/40 text-sm flex items-center justify-center"
               >
-                <Icon
-                  name="mdi:food-apple"
-                  size="2rem"
-                  class="mb-2 text-gaming-500/50"
-                />
+                <Icon name="mdi:food-apple" size="2rem" class="mb-2 text-gaming-500/50" />
                 No custom foods yet. Create one in My Food Library.
               </div>
 
@@ -494,11 +463,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   <div
                     class="w-8 h-8 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
                   >
-                    <Icon
-                      name="mdi:food-apple"
-                      size="1.1rem"
-                      class="text-gaming-400"
-                    />
+                    <Icon name="mdi:food-apple" size="1.1rem" class="text-gaming-400" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-semibold text-white truncate">
@@ -511,8 +476,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                     </div>
                   </div>
                   <div class="flex items-center gap-1 shrink-0">
-                    <span
-                      class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
+                    <span class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
                       >Custom</span
                     >
                     <Icon
@@ -548,10 +512,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
               >
                 Serving Size
               </div>
-              <div
-                v-if="customServings.length > 1"
-                class="grid grid-cols-2 gap-2 mb-4"
-              >
+              <div v-if="customServings.length > 1" class="grid grid-cols-2 gap-2 mb-4">
                 <button
                   v-for="(serving, idx) in customServings"
                   :key="idx"
@@ -568,9 +529,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   </div>
                   <div class="text-[11px] text-white/40">
                     {{ Math.round(serving.calories) }} kcal
-                    {{
-                      serving.servingGrams ? `· ${serving.servingGrams}g` : ""
-                    }}
+                    {{ serving.servingGrams ? `· ${serving.servingGrams}g` : "" }}
                   </div>
                 </button>
               </div>
@@ -623,17 +582,11 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
               </div>
 
               <div v-if="isSearchingCommunity" class="flex justify-center py-8">
-                <Icon
-                  name="line-md:loading-loop"
-                  size="2rem"
-                  class="text-gaming-400"
-                />
+                <Icon name="line-md:loading-loop" size="2rem" class="text-gaming-400" />
               </div>
 
               <div
-                v-else-if="
-                  hasSearchedCommunity && communityResults.length === 0
-                "
+                v-else-if="hasSearchedCommunity && communityResults.length === 0"
                 class="text-center py-8 text-white/40 text-sm"
               >
                 <Icon
@@ -654,11 +607,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   <div
                     class="w-8 h-8 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
                   >
-                    <Icon
-                      name="mdi:food-apple"
-                      size="1.1rem"
-                      class="text-gaming-400"
-                    />
+                    <Icon name="mdi:food-apple" size="1.1rem" class="text-gaming-400" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-semibold text-white truncate">
@@ -668,9 +617,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                       {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
                       {{ getCustomFoodServings(food)[0]!.servingDescription }}
                       ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
-                      <span v-if="food.submittedBy">
-                        · by {{ food.submittedBy }}</span
-                      >
+                      <span v-if="food.submittedBy"> · by {{ food.submittedBy }}</span>
                     </div>
                   </div>
                   <div class="flex items-center gap-1 shrink-0">
@@ -682,14 +629,8 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                     >
                       <Icon name="heroicons:flag" size="1rem" />
                     </button>
-                    <Icon
-                      v-else
-                      name="heroicons:flag"
-                      size="1rem"
-                      class="text-hp-red"
-                    />
-                    <span
-                      class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
+                    <Icon v-else name="heroicons:flag" size="1rem" class="text-hp-red" />
+                    <span class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
                       >Community</span
                     >
                     <Icon
@@ -705,11 +646,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                 v-else
                 class="text-center py-12 text-white/30 text-sm flex items-center justify-center"
               >
-                <Icon
-                  name="heroicons:globe-alt"
-                  size="2rem"
-                  class="mb-2 text-gaming-500/30"
-                />
+                <Icon name="heroicons:globe-alt" size="2rem" class="mb-2 text-gaming-500/30" />
                 Search the community food database above.
               </div>
             </div>
@@ -738,10 +675,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
               >
                 Serving Size
               </div>
-              <div
-                v-if="customServings.length > 1"
-                class="grid grid-cols-2 gap-2 mb-4"
-              >
+              <div v-if="customServings.length > 1" class="grid grid-cols-2 gap-2 mb-4">
                 <button
                   v-for="(serving, idx) in customServings"
                   :key="idx"
@@ -758,9 +692,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
                   </div>
                   <div class="text-[11px] text-white/40">
                     {{ Math.round(serving.calories) }} kcal
-                    {{
-                      serving.servingGrams ? `· ${serving.servingGrams}g` : ""
-                    }}
+                    {{ serving.servingGrams ? `· ${serving.servingGrams}g` : "" }}
                   </div>
                 </button>
               </div>

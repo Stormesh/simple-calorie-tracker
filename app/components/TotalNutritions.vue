@@ -52,9 +52,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
     label: "Protein",
     value: totalNutrients.protein,
     unit: "g",
-    max: Math.round(
-      ((bmrState.value.bmr || 0) * MAX_PROTEIN) / PROTEIN_PER_KCAL,
-    ),
+    max: Math.round(((bmrState.value.bmr || 0) * MAX_PROTEIN) / PROTEIN_PER_KCAL),
   },
   {
     label: "Carbohydrates",
@@ -83,8 +81,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
       class="text-center mb-12 p-6 glass-light rounded-2xl shadow-lg shadow-gaming-900/30 items-center justify-center flex-col md:flex-row flex-wrap gap-4 hidden md:flex border border-gaming-700/20"
     >
       <div class="w-full text-center mb-2">
-        <span
-          class="section-header text-sm font-black text-gaming-400 tracking-[0.2em]"
+        <span class="section-header text-sm font-black text-gaming-400 tracking-[0.2em]"
           >DAILY NUTRITION</span
         >
       </div>
@@ -106,8 +103,7 @@ const nutritionFacts = computed<INutritionList[]>(() => [
         <div
           class="text-center m-4 mb-12 p-6 glass-light rounded-2xl shadow-lg shadow-gaming-900/30 flex items-center justify-center flex-col border border-gaming-700/20"
         >
-          <span
-            class="section-header text-xs font-black text-gaming-400 tracking-[0.2em] mb-3"
+          <span class="section-header text-xs font-black text-gaming-400 tracking-[0.2em] mb-3"
             >DAILY NUTRITION</span
           >
           <NutritionCard :nutrition="item" />

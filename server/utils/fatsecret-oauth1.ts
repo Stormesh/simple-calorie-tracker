@@ -3,8 +3,7 @@ import { createHmac } from "crypto";
 const API_URL = "https://platform.fatsecret.com/rest/server.api";
 
 const generateNonce = (length: number): string => {
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -25,10 +24,7 @@ const generateSignature = (
 ): string => {
   const sortedParams = Object.entries(params)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
-    )
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join("&");
 
   const signatureBaseString = [
@@ -37,13 +33,9 @@ const generateSignature = (
     encodeURIComponent(sortedParams),
   ].join("&");
 
-  const signingKey = `${encodeURIComponent(
-    consumerSecret,
-  )}&${encodeURIComponent(tokenSecret)}`;
+  const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(tokenSecret)}`;
 
-  const signature = createHmac("sha1", signingKey)
-    .update(signatureBaseString)
-    .digest("base64");
+  const signature = createHmac("sha1", signingKey).update(signatureBaseString).digest("base64");
 
   return signature;
 };
@@ -62,12 +54,7 @@ export const fatsecretApiRequest = async <T = unknown>(
     ...params,
   };
 
-  const signature = generateSignature(
-    "POST",
-    API_URL,
-    oauthParams,
-    consumerSecret,
-  );
+  const signature = generateSignature("POST", API_URL, oauthParams, consumerSecret);
 
   const authHeaderParams: Record<string, string> = {
     ...oauthParams,
@@ -77,10 +64,7 @@ export const fatsecretApiRequest = async <T = unknown>(
   const authHeader =
     "OAuth " +
     Object.entries(authHeaderParams)
-      .map(
-        ([key, value]) =>
-          `${encodeURIComponent(key)}="${encodeURIComponent(value)}"`,
-      )
+      .map(([key, value]) => `${encodeURIComponent(key)}="${encodeURIComponent(value)}"`)
       .join(", ");
 
   try {

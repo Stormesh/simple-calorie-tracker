@@ -28,9 +28,7 @@ const foodStateDefault = () => ({
   focused: false,
 });
 
-const foodStates = ref<IFoodState[]>(
-  Array.from({ length: foods.value.length }, foodStateDefault),
-);
+const foodStates = ref<IFoodState[]>(Array.from({ length: foods.value.length }, foodStateDefault));
 
 const maxFoodsReached = computed(() => {
   return foods.value.length >= MAX_FOODS;
@@ -173,8 +171,7 @@ const showFoodDetails = async (index: number) => {
           : [
               {
                 serving_id: foodItem.servingId,
-                measurement_description:
-                  foodItem.servingDescription || "serving",
+                measurement_description: foodItem.servingDescription || "serving",
                 metric_serving_amount: foodItem.grams,
                 metric_serving_unit: "g",
                 number_of_units: 1,
@@ -235,10 +232,7 @@ const editFood = async (index: number) => {
   foodState.loading = false;
 };
 
-const searchAndSelectServing = async (
-  index: number,
-  scroll: boolean = false,
-) => {
+const searchAndSelectServing = async (index: number, scroll: boolean = false) => {
   const foodItem = foods.value[index],
     foodState = foodStates.value[index];
   if (!foodItem || !foodState) return;
@@ -293,9 +287,7 @@ provide(FOOD_LIST_KEY, {
     >
       <span class="shimmer-text">{{ title }}</span>
     </div>
-    <div
-      class="glass-light rounded-b-xl rounded-t-none shadow-lg shadow-gaming-900/30"
-    >
+    <div class="glass-light rounded-b-xl rounded-t-none shadow-lg shadow-gaming-900/30">
       <div class="divide-y divide-gaming-800/30">
         <div
           v-for="(food, index) in foods"
@@ -313,12 +305,7 @@ provide(FOOD_LIST_KEY, {
         </div>
       </div>
       <div class="flex justify-center overflow-hidden pt-1 pb-3 gap-2">
-        <FoodListButton
-          label="Add food"
-          name="addFood"
-          icon="ic:outline-plus"
-          @click="addItem"
-        />
+        <FoodListButton label="Add food" name="addFood" icon="ic:outline-plus" @click="addItem" />
         <FoodListButton
           label="Reset"
           name="resetFood"
@@ -329,10 +316,7 @@ provide(FOOD_LIST_KEY, {
     </div>
     <div class="mt-2">
       <div class="flex items-center justify-center gap-2 text-base">
-        <span
-          class="text-gaming-400 font-mono text-xs uppercase tracking-widest"
-          >Total</span
-        >
+        <span class="text-gaming-400 font-mono text-xs uppercase tracking-widest">Total</span>
         <span class="text-white font-black text-lg"
           >{{ Math.round(totalNutrients.totalCalories)
           }}<span class="text-gaming-400 text-sm font-normal"> kcal</span></span

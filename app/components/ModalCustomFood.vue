@@ -83,9 +83,7 @@ const submit = () => {
       servingDescription: s.servingDescription.trim() || "serving",
     })),
     shareToCommunity: shareToCommunity.value,
-    nickname: shareToCommunity.value
-      ? nickname.value.trim() || undefined
-      : undefined,
+    nickname: shareToCommunity.value ? nickname.value.trim() || undefined : undefined,
     editId: props.editFood?.id,
   };
 
@@ -102,8 +100,7 @@ const close = () => {
   <UModal
     :open="open"
     :ui="{
-      content:
-        'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
+      content: 'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-lg',
     }"
     @close="close"
   >
@@ -112,18 +109,12 @@ const close = () => {
         <div
           class="section-header text-base font-black text-gaming-300 text-center py-3 px-6 bg-gaming-900/80 border-b border-gaming-700/30 tracking-widest shrink-0"
         >
-          <span class="shimmer-text">{{
-            editFood ? "Edit Food" : "New Custom Food"
-          }}</span>
+          <span class="shimmer-text">{{ editFood ? "Edit Food" : "New Custom Food" }}</span>
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 space-y-4">
-          <div
-            class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2"
-          >
-            <h3
-              class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider"
-            >
+          <div class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2">
+            <h3 class="text-sm font-semibold text-gaming-400 mb-2 uppercase tracking-wider">
               Food Info
             </h3>
             <UInput
@@ -145,9 +136,7 @@ const close = () => {
             class="bg-gaming-950/40 rounded-xl p-3 border border-gaming-800/20 space-y-2"
           >
             <div class="flex items-center justify-between mb-1">
-              <h3
-                class="text-sm font-semibold text-gaming-400 uppercase tracking-wider"
-              >
+              <h3 class="text-sm font-semibold text-gaming-400 uppercase tracking-wider">
                 Serving {{ sIdx + 1 }}
               </h3>
               <button
@@ -278,13 +267,10 @@ const close = () => {
                 type="checkbox"
                 class="w-4 h-4 rounded border-gaming-700/40 bg-gaming-950/80 text-gaming-500 focus:ring-gaming-500/50"
               />
-              <span class="text-sm font-semibold text-white"
-                >Submit to community</span
-              >
+              <span class="text-sm font-semibold text-white">Submit to community</span>
             </label>
             <p class="text-xs text-white/40 ml-7">
-              Share this food with everyone. Others will be able to search and
-              use it.
+              Share this food with everyone. Others will be able to search and use it.
             </p>
             <UInput
               v-if="shareToCommunity"
@@ -300,9 +286,7 @@ const close = () => {
           </div>
         </div>
 
-        <div
-          class="shrink-0 border-t border-gaming-700/30 p-4 bg-gaming-950/40"
-        >
+        <div class="shrink-0 border-t border-gaming-700/30 p-4 bg-gaming-950/40">
           <div class="flex gap-3">
             <UButton
               label="Cancel"

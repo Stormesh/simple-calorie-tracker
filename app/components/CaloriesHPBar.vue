@@ -4,9 +4,7 @@ const { aggregatedNutrients } = useAggregatedNutrients();
 
 const defaultMaxBmr = 2000;
 
-const maxBmr = computed(() =>
-  bmrState.value.bmr ? bmrState.value.bmr : defaultMaxBmr,
-);
+const maxBmr = computed(() => (bmrState.value.bmr ? bmrState.value.bmr : defaultMaxBmr));
 
 const caloriesLeft = computed(() => {
   return Math.round(maxBmr.value - aggregatedNutrients.value.totalCalories);
@@ -71,18 +69,9 @@ const heartStyle = computed(() => {
           />
         </div>
         <div class="flex justify-between mt-1 px-1">
-          <span
-            class="text-xs font-semibold text-white/60 font-mono tracking-wider"
-            >HP</span
-          >
-          <span
-            class="text-xs font-bold text-white/80 font-mono tracking-wider"
-          >
-            <span
-              :class="
-                getCaloriePercentage() <= 0 ? 'text-hp-red' : 'text-gaming-300'
-              "
-            >
+          <span class="text-xs font-semibold text-white/60 font-mono tracking-wider">HP</span>
+          <span class="text-xs font-bold text-white/80 font-mono tracking-wider">
+            <span :class="getCaloriePercentage() <= 0 ? 'text-hp-red' : 'text-gaming-300'">
               {{ caloriesLeft }}
             </span>
             <span class="text-white/40"> / {{ maxBmr }}</span>

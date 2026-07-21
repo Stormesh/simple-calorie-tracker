@@ -8,8 +8,7 @@ const toast = useToast();
 const overlay = useOverlay();
 const customFoodModal = overlay.create(ModalCustomFood);
 
-const { foods, addFood, updateFood, deleteFood, exportToJson, importFromJson } =
-  useCustomFoods();
+const { foods, addFood, updateFood, deleteFood, exportToJson, importFromJson } = useCustomFoods();
 
 const searchQuery = ref("");
 
@@ -129,8 +128,7 @@ const close = () => {
 <template>
   <UModal
     :ui="{
-      content:
-        'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-2xl',
+      content: 'modal-gaming rounded-2xl shadow-2xl shadow-gaming-900/60 border-0 max-w-2xl',
     }"
     @close="close"
   >
@@ -198,11 +196,7 @@ const close = () => {
             v-if="filteredFoods.length === 0"
             class="text-center py-12 text-white/40 text-sm flex items-center justify-center"
           >
-            <Icon
-              name="mdi:food-apple"
-              size="2rem"
-              class="mb-2 text-gaming-500/50"
-            />
+            <Icon name="mdi:food-apple" size="2rem" class="mb-2 text-gaming-500/50" />
             No custom foods yet. Click "Add Food" to create one.
           </div>
 
@@ -214,11 +208,7 @@ const close = () => {
             <div
               class="w-10 h-10 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
             >
-              <Icon
-                name="mdi:food-apple"
-                size="1.2rem"
-                class="text-gaming-400"
-              />
+              <Icon name="mdi:food-apple" size="1.2rem" class="text-gaming-400" />
             </div>
             <div class="flex-1 min-w-0">
               <div class="text-sm font-semibold text-white truncate">

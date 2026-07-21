@@ -1,6 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const token =
-    getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
+  const token = getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
   const config = useRuntimeConfig(event);
   const moderatorSecret = config.moderatorSecret as string;
 
@@ -21,10 +20,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  await db
-    .prepare(`DELETE FROM community_foods WHERE id = ?`)
-    .bind(body.foodId)
-    .run();
+  await db.prepare(`DELETE FROM community_foods WHERE id = ?`).bind(body.foodId).run();
 
   return { success: true };
 });

@@ -36,10 +36,7 @@ interface CountResult {
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const q = ((query.q as string) || "").trim();
-  const limit = Math.min(
-    Math.max(parseInt(query.limit as string) || 20, 1),
-    50,
-  );
+  const limit = Math.min(Math.max(parseInt(query.limit as string) || 20, 1), 50);
   const offset = Math.max(parseInt(query.offset as string) || 0, 0);
 
   const db = getDb(event);

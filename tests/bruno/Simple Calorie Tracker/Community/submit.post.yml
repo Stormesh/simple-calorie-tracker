@@ -10,19 +10,20 @@ http:
   headers:
     Content-Type: application/json
   body: json
-  json: {
-    "foodName": "{{communityFoodName}}",
-    "servingDescription": "100g",
-    "servingGrams": 100,
-    "calories": 250,
-    "totalFat": 10,
-    "cholesterol": 20,
-    "sodium": 300,
-    "totalCarbohydrate": 30,
-    "sugars": 5,
-    "protein": 15,
-    "nickname": "{{communityNickname}}"
-  }
+  json:
+    {
+      "foodName": "{{communityFoodName}}",
+      "servingDescription": "100g",
+      "servingGrams": 100,
+      "calories": 250,
+      "totalFat": 10,
+      "cholesterol": 20,
+      "sodium": 300,
+      "totalCarbohydrate": 30,
+      "sugars": 5,
+      "protein": 15,
+      "nickname": "{{communityNickname}}",
+    }
 
 settings:
   encodeUrl: true
