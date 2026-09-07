@@ -12,36 +12,36 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@internationalized/date": "^3.12.2",
-    "@nuxt/eslint": "^1.16.0",
-    "@nuxt/icon": "^2.3.1",
-    "@nuxt/image": "^2.0.0",
-    "@nuxt/ui": "^4.9.0",
-    "@tailwindcss/vite": "^4.3.2",
-    "@vueuse/core": "^14.3.0",
+    "@internationalized/date": "^3.12.4",
+    "@nuxt/eslint": "^1.17.0",
+    "@nuxt/icon": "^2.5.1",
+    "@nuxt/image": "^2.1.0",
+    "@nuxt/ui": "^4.11.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vueuse/core": "^14.4.0",
     "@vueuse/nuxt": "14.3.0",
     "chart.js": "^4.5.1",
     "eslint": "^9.39.5",
-    "nuxt": "^4.4.8",
-    "tailwindcss": "^4.3.2",
+    "nuxt": "^4.5.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
-    "vue": "^3.5.39",
+    "vue": "^3.5.42",
     "vue-chartjs": "^5.3.4",
     "vue-router": "^4.6.4",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.129.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260711.1",
+    "@cloudflare/workers-types": "^5.20260906.1",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/ic": "^1.2.4",
     "@iconify-json/line-md": "^1.2.16",
-    "@iconify-json/lucide": "^1.2.116",
+    "@iconify-json/lucide": "^1.2.129",
     "@iconify-json/mdi": "^1.2.3",
     "@types/node": "^24.13.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "leo-profanity": "^1.9.0",
-    "prettier": "^3.9.5",
-    "vue-tsc": "^3.3.7"
+    "prettier": "^3.9.6",
+    "vue-tsc": "^3.3.11"
   }
 }

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { CalendarDate } from "@internationalized/date";
-import { formatLocalDate } from "~/composables/day-logs";
 
 const dayLogs = useDayLogs();
 const isPopoverOpen = ref(false);
 
 const canGoNext = computed(() => {
-  return dayLogs.currentDate.value < formatLocalDate(new Date());
+  return dayLogs.currentDate.value < dayLogs.todayString.value;
 });
 
 const calendarDate = computed({
@@ -22,11 +21,10 @@ const calendarDate = computed({
   },
 });
 
-const todayMax = new CalendarDate(
-  new Date().getFullYear(),
-  new Date().getMonth() + 1,
-  new Date().getDate(),
-);
+const todayMax = computed(() => {
+  const d = new Date(dayLogs.todayString.value + "T12:00:00");
+  return new CalendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+});
 
 function openPopover() {
   isPopoverOpen.value = true;
@@ -55,7 +53,7 @@ function openPopover() {
       <UButton
         color="neutral"
         variant="ghost"
-        class="flex flex-col items-center px-4 py-1.5 rounded-xl min-w-[160px]"
+        class="flex flex-col items-center px-4 py-1.5 rounded-xl min-w-40"
         @click="openPopover"
       >
         <span class="text-sm font-bold text-white font-mono tracking-wide">

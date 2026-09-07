@@ -6,7 +6,7 @@ defineProps<{
   grams: number;
 }>();
 
-const foodName = defineModel<string>("foodName");
+const foodName = defineModel<string>("foodName", { default: "" });
 
 const {
   changeFoodDetails,

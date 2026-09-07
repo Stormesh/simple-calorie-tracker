@@ -101,14 +101,14 @@ const caloriesChartData = ref<IChartData>({ labels: [], datasets: [] });
 const weightChartData = ref<IChartData>({ labels: [], datasets: [] });
 const macroChartData = ref<IChartData>({ labels: [], datasets: [] });
 
-const hasData = ref(false);
+const hasData = ref<boolean | null>(null);
 const hasWeightData = ref(false);
 
 function loadChartData() {
   const allLogs = getAllDayLogs();
   const target = bmrState.value.bmr || 2000;
 
-  const today = new Date();
+  const today = new Date(dayLogs.todayString.value + "T12:00:00");
   const labels: string[] = [];
   const dayTotals: IDailyTotals[] = [];
 
@@ -314,17 +314,23 @@ const caloriesOptions = {
 
 onMounted(() => {
   onWeightChange(loadChartData);
+  loadChartData();
 });
 
 watch(
-  [aggregatedNutrients, () => bmrState.value.bmr, () => dayLogs.currentDate.value],
+  [
+    aggregatedNutrients,
+    () => bmrState.value.bmr,
+    () => dayLogs.currentDate.value,
+    () => dayLogs.todayString.value,
+  ],
   loadChartData,
-  { deep: true, immediate: true },
+  { deep: true },
 );
 </script>
 
 <template>
-  <div class="flex justify-center items-center mt-8 mb-4">
+  <div class="flex justify-center items-center mt-8 pb-4">
     <div
       class="w-full max-w-4xl p-6 glass-light rounded-2xl shadow-lg shadow-gaming-900/30 border border-gaming-700/20"
     >
@@ -334,7 +340,15 @@ watch(
         >
       </div>
 
-      <div v-if="!hasData" class="py-12 text-center">
+      <div v-if="hasData === null" class="space-y-6" role="status" aria-label="Loading analytics">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <USkeleton class="h-56 rounded-xl" />
+          <USkeleton class="h-56 rounded-xl" />
+        </div>
+        <USkeleton class="h-56 rounded-xl" />
+      </div>
+
+      <div v-else-if="!hasData" class="py-12 text-center">
         <Icon name="mdi:chart-line" size="3rem" class="text-white/20 mx-auto mb-3" />
         <p class="text-white/40 text-sm font-mono">Start logging food to see your trends</p>
       </div>

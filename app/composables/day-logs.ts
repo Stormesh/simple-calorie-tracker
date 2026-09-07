@@ -19,13 +19,13 @@ export function getTodayString(): string {
   return formatLocalDate(new Date());
 }
 
-function formatDateLabel(dateStr: string): string {
-  const today = getTodayString();
+function formatDateLabel(dateStr: string, todayStr?: string): string {
+  const today = todayStr ?? getTodayString();
   if (dateStr === today) return "Today";
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = formatLocalDate(yesterday);
+  const todayDate = new Date(today + "T12:00:00");
+  todayDate.setDate(todayDate.getDate() - 1);
+  const yStr = formatLocalDate(todayDate);
   if (dateStr === yStr) return "Yesterday";
 
   const d = new Date(dateStr + "T12:00:00");
@@ -214,36 +214,20 @@ export function loadWeight(date: string): number | null {
   return dayLog?.weightLog ?? null;
 }
 
-let midnightWatcherStarted = false;
-
-function initMidnightWatcher() {
-  if (midnightWatcherStarted) return;
-  midnightWatcherStarted = true;
-
-  function scheduleNext() {
-    const now = new Date();
-    const msUntilMidnight =
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
-
-    setTimeout(() => {
-      switchDate(getTodayString());
-      scheduleNext();
-    }, msUntilMidnight);
-  }
-
-  scheduleNext();
-}
-
 export const useDayLogs = () => {
-  initMidnightWatcher();
-
   const currentDate = useCookie<string>("current-date", {
     default: () => getTodayString(),
   });
 
-  const isToday = computed(() => currentDate.value === getTodayString());
+  // Reactive clock via VueUse: cheap interval (30s) + immediate
+  // catch-up on tab visibility/focus, so a missed midnight (sleep,
+  // throttled background tab) still rolls over without a 24h setTimeout.
+  const now = useNow({ interval: 30_000 });
+  const todayString = computed(() => formatLocalDate(now.value));
 
-  const dateLabel = computed(() => formatDateLabel(currentDate.value));
+  const isToday = computed(() => currentDate.value === todayString.value);
+
+  const dateLabel = computed(() => formatDateLabel(currentDate.value, todayString.value));
 
   const availableDates = computed(() => getAvailableDates());
 
@@ -257,11 +241,35 @@ export const useDayLogs = () => {
     saveWeight(currentDate.value, val);
   });
 
+  if (import.meta.client) {
+    // Normal rollover: only auto-advance if the user was on the old
+    // "today". Viewing history is left alone.
+    watch(todayString, (newToday, oldToday) => {
+      if (newToday !== oldToday && currentDate.value === oldToday) {
+        switchDate(newToday);
+      }
+    });
+
+    // Catch-up for throttled intervals (background tab / sleep):
+    // if the reactive clock is stale but the system date moved on,
+    // advance immediately when the tab becomes visible/focused.
+    const catchUpAfterSleep = () => {
+      const freshToday = getTodayString();
+      if (currentDate.value !== freshToday && currentDate.value === todayString.value) {
+        switchDate(freshToday);
+      }
+    };
+    useEventListener(document, "visibilitychange", () => {
+      if (document.visibilityState === "visible") catchUpAfterSleep();
+    });
+    useEventListener(window, "focus", catchUpAfterSleep);
+  }
+
   function goNext() {
     const d = new Date(currentDate.value + "T12:00:00");
     d.setDate(d.getDate() + 1);
     const next = formatLocalDate(d);
-    if (next <= getTodayString()) {
+    if (next <= todayString.value) {
       switchDate(next);
     }
   }
@@ -273,7 +281,7 @@ export const useDayLogs = () => {
   }
 
   function goToday() {
-    switchDate(getTodayString());
+    switchDate(todayString.value);
   }
 
   function goToDate(date: string) {
@@ -286,6 +294,7 @@ export const useDayLogs = () => {
 
   return {
     currentDate,
+    todayString,
     isToday,
     dateLabel,
     availableDates,
