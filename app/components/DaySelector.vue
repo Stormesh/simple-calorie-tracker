@@ -38,7 +38,7 @@ function openPopover() {
       size="sm"
       color="neutral"
       variant="ghost"
-      class="rounded-xl"
+      class="rounded-xl hover:bg-gaming-700/40 hover:text-gaming-300 active:bg-gaming-500/40"
       aria-label="Previous day"
       @click="dayLogs.goPrev()"
     />
@@ -53,7 +53,7 @@ function openPopover() {
       <UButton
         color="neutral"
         variant="ghost"
-        class="flex flex-col items-center px-4 py-1.5 rounded-xl min-w-40"
+        class="flex flex-col items-center px-4 py-1.5 rounded-xl min-w-40 hover:bg-gaming-700/40 hover:text-gaming-300 active:bg-gaming-500/40"
         @click="openPopover"
       >
         <span class="text-sm font-bold text-white font-mono tracking-wide">
@@ -83,7 +83,7 @@ function openPopover() {
       size="sm"
       color="neutral"
       variant="ghost"
-      class="rounded-xl"
+      class="rounded-xl hover:bg-gaming-700/40 hover:text-gaming-300 active:bg-gaming-500/40"
       :class="{ 'opacity-30 pointer-events-none': !canGoNext }"
       aria-label="Next day"
       :disabled="!canGoNext"
