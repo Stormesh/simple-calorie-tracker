@@ -103,7 +103,10 @@ async function fetchFromApi<T>(
   options?: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: BodyInit },
 ): Promise<T | null> {
   try {
-    const response = await $fetch<T>(url, options);
+    // Nuxt's typed-route $fetch wraps a caller-supplied generic in
+    // TypedInternalResponse instead of returning it directly — cast once
+    // here so the rest of this helper can work with plain T.
+    const response = (await $fetch<T>(url, options)) as T;
 
     if (response && typeof response === "object" && "error" in response) {
       console.error("API Error:", (response as Record<string, unknown>).error);

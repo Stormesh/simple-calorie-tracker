@@ -10,14 +10,15 @@ pnpm run generate  # static export (output: dist)
 pnpm run preview   # preview production build
 ```
 
-Before committing or deploying, run format + lint and fix any errors:
+Before committing or deploying, run format + lint + typecheck and fix any errors:
 
 ```bash
 pnpm run format    # auto-format with Prettier
 pnpm run lint      # check Prettier + ESLint
+pnpm run typecheck # vue-tsc via `nuxt typecheck`
 ```
 
-No typecheck or test commands are configured.
+No test command is configured.
 
 ## Stack
 
@@ -60,13 +61,14 @@ server/
 
 ### Key composables
 
-| Composable                                    | Purpose                                                                |
-| --------------------------------------------- | ---------------------------------------------------------------------- |
-| `useDayLogs()`                                | Day navigation, date switching, weight save/load, midnight auto-switch |
-| `useBmr()`                                    | BMR form state (stored in `bmr` cookie)                                |
-| `useAggregatedNutrients()`                    | Computed totals from meal cookies                                      |
-| `useWeightChange()`                           | Computed deficit/surplus display                                       |
-| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates                                        |
+| Composable                                    | Purpose                                                                                |
+| --------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `useDayLogs()`                                | Day navigation, date switching, date label, shared midnight rollover clock             |
+| `useCurrentDateCookie()`                      | Session-wide shared `current-date` cookie ref (never call `useCookie` for it directly) |
+| `useBmr()`                                    | BMR form state (stored in `bmr` cookie)                                                |
+| `useAggregatedNutrients()`                    | Computed totals from meal cookies                                                      |
+| `useWeightChange()`                           | Computed deficit/surplus display                                                       |
+| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates                                                        |
 
 ### State storage
 
@@ -74,7 +76,7 @@ server/
 - **Meal foods** — per-meal cookies `foods-{Breakfast|Lunch|Dinner|Snacks}` (arrays of `IFoodTemplate`)
 - **Current date** — `current-date` cookie
 - **BMR form** — `bmr` cookie (object: `IBmrForm`)
-- **Migration** — old per-date keys (`maxhp-day-log:YYYY-MM-DD`) migrated to single `all` key; flagged via `maxhp-migrated` and `maxhp-format-v2`
+- **Migration** — legacy per-date keys (`maxhp-day-log:YYYY-MM-DD`) are folded into the single `all` key and deleted (idempotent, once per session); the one-time cookie-data migration is flagged via `maxhp-migrated`
 
 ## Conventions
 
