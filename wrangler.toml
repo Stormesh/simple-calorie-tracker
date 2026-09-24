@@ -1,4 +1,4 @@
-name = "stormesh-simple-calorie-counter"
+name = "stormesh-simple-calorie-tracker"
 compatibility_date = "2025-07-15"
 compatibility_flags = ["nodejs_compat", "no_nodejs_compat_v2"]
 

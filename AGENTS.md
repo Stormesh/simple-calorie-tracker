@@ -61,14 +61,22 @@ server/
 
 ### Key composables
 
-| Composable                                    | Purpose                                                                                |
-| --------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `useDayLogs()`                                | Day navigation, date switching, date label, shared midnight rollover clock             |
-| `useCurrentDateCookie()`                      | Session-wide shared `current-date` cookie ref (never call `useCookie` for it directly) |
-| `useBmr()`                                    | BMR form state (stored in `bmr` cookie)                                                |
-| `useAggregatedNutrients()`                    | Computed totals from meal cookies                                                      |
-| `useWeightChange()`                           | Computed deficit/surplus display                                                       |
-| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates                                                        |
+| Composable                                    | Purpose                                                                                             |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `useDayLogs()`                                | Day navigation, date switching, date label, shared midnight rollover clock                          |
+| `useCurrentDateCookie()`                      | Session-wide shared `current-date` cookie ref (never call `useCookie` for it directly)              |
+| `useBmr()`                                    | BMR form state (stored in `bmr` cookie)                                                             |
+| `useAggregatedNutrients()`                    | Computed totals from meal cookies                                                                   |
+| `useWeightChange()`                           | Computed deficit/surplus display                                                                    |
+| `onWeightChange(fn)` / `notifyWeightChange()` | Event system for weight updates                                                                     |
+| `useTheme()`                                  | Theme id + custom accent (cookie-backed); sets `data-theme` on `<html>` — see `app/utils/themes.ts` |
+
+### Theming
+
+- Presets (`crimson` default, `emerald`, `ocean`, `violet`, `gold`, `rose`, `mono`) each redefine `--color-gaming-*` in an **unlayered** `[data-theme="…"]` block in `app/assets/css/app.css` (unlayered beats Tailwind's `@layer theme`); `custom` derives the scale from `--custom-accent` via `color-mix`
+- `gaming-*` utilities, glass/glow classes, and Nuxt UI `primary: "gaming"` all follow the active theme automatically
+- **Semantic colors stay fixed across themes**: `hp-*`, danger reds (`hp-red`, over-target `red-*`), heart glow — don't theme them
+- Cookies: `theme` (preset id) + `accent` (`#rrggbb`); an inline head script in `nuxt.config.ts` applies them before first paint (static export has no per-request SSR)
 
 ### State storage
 

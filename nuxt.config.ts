@@ -29,6 +29,17 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: "en",
       },
+      // No-flash theme bootstrap: static export has no per-request SSR
+      // context, so data-theme must be applied before first paint.
+      // Mirrors useCookie's encodeURIComponent encoding and the
+      // sanitize* guards in ~/utils/themes.ts.
+      script: [
+        {
+          key: "theme-init",
+          tagPosition: "head",
+          innerHTML: `(function(){try{var VALID=["crimson","emerald","ocean","violet","gold","rose","mono","custom"];var m=document.cookie.match(/(?:^|;\\s*)theme=([^;]*)/);var t=m?decodeURIComponent(m[1]):"crimson";if(VALID.indexOf(t)<0)t="crimson";document.documentElement.setAttribute("data-theme",t);var a=document.cookie.match(/(?:^|;\\s*)accent=([^;]*)/);var c=a?decodeURIComponent(a[1]):"#ef4444";if(!/^#[0-9a-fA-F]{6}$/.test(c))c="#ef4444";document.documentElement.style.setProperty("--custom-accent",c);}catch(e){}})();`,
+        },
+      ],
       meta: [
         {
           name: "description",

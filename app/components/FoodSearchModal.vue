@@ -447,7 +447,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
               <div
                 v-if="customResults.length === 0"
-                class="text-center py-8 text-white/40 text-sm flex items-center justify-center"
+                class="text-center py-8 text-white/40 text-sm flex items-center justify-center flex-col"
               >
                 <Icon name="mdi:food-apple" size="2rem" class="mb-2 text-gaming-500/50" />
                 No custom foods yet. Create one in My Food Library.

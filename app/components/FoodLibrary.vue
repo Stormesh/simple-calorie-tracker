@@ -194,7 +194,7 @@ const close = () => {
         <div class="flex-1 overflow-y-auto p-2">
           <div
             v-if="filteredFoods.length === 0"
-            class="text-center py-12 text-white/40 text-sm flex items-center justify-center"
+            class="text-center py-12 text-white/40 text-sm flex items-center justify-center flex-col"
           >
             <Icon name="mdi:food-apple" size="2rem" class="mb-2 text-gaming-500/50" />
             No custom foods yet. Click "Add Food" to create one.

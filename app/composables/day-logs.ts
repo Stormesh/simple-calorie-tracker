@@ -38,13 +38,8 @@ function formatDateLabel(dateStr: string, todayStr?: string): string {
   });
 }
 
-// Reactivity that must survive individual components (cookie refs, timers,
-// listeners) is created in a detached effect scope instead of whatever
-// component setup happens to run first — otherwise it dies when that
-// component unmounts, silently breaking cookie persistence.
-function inSessionScope<T>(factory: () => T): T {
-  return effectScope(true).run(factory)!;
-}
+// day-logs.ts relies on the shared inSessionScope helper (session-scope.ts)
+// for reactivity that must outlive individual components.
 
 const mealCookieCache = new Map<string, Ref<IFoodTemplate[]>>();
 

@@ -1,69 +1,58 @@
 <script setup lang="ts">
 import { ModalReset, ModalBMR, FoodLibrary } from "#components";
-import type { DropdownMenuItem } from "@nuxt/ui";
+import type { SettingsPanelAction } from "~/composables/settings-panel";
+
 const overlay = useOverlay();
 
-const resetModal = overlay.create(ModalReset);
 const bmrModal = overlay.create(ModalBMR);
 const foodLibraryModal = overlay.create(FoodLibrary);
+const resetModal = overlay.create(ModalReset);
 
-const resetOpen = () => {
-  resetModal.open();
+const { open, closePanel, togglePanel } = useSettingsPanel();
+
+const handleSelect = (action: SettingsPanelAction) => {
+  // Close the panel first so the modal owns focus and sits alone on screen.
+  closePanel();
+  if (action === "diet") bmrModal.open();
+  else if (action === "library") foodLibraryModal.open();
+  else resetModal.open();
 };
 
-const bmrOpen = () => {
-  bmrModal.open();
-};
+watch(open, (isOpen) => {
+  if (import.meta.client) {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }
+});
 
-const foodLibraryOpen = () => {
-  foodLibraryModal.open();
-};
-
-const items = ref<DropdownMenuItem[]>([
-  {
-    label: "My Food Library",
-    icon: "mdi:food-apple",
-    class: "cursor-pointer",
-    onSelect: () => {
-      foodLibraryOpen();
-    },
-  },
-  {
-    label: "Reset",
-    icon: "heroicons:arrow-path",
-    class: "cursor-pointer",
-    onSelect: () => {
-      resetOpen();
-    },
-  },
-  {
-    label: "Diet Profile",
-    icon: "heroicons:scale",
-    class: "cursor-pointer",
-    onSelect: () => {
-      bmrOpen();
-    },
-  },
-]);
+onBeforeUnmount(() => {
+  if (import.meta.client) {
+    document.body.style.overflow = "";
+  }
+});
 </script>
 
 <template>
   <div>
-    <UDropdownMenu
-      arrow
-      :ui="{
-        content:
-          'bg-gaming-950/90 backdrop-blur-xl border border-gaming-700/30 rounded-xl shadow-2xl shadow-gaming-900/50 text-white',
-        item: 'hover:bg-gaming-800/50 text-white data-[highlighted]:bg-gaming-700/50 rounded-lg mx-1',
-      }"
-      :items="items"
-    >
-      <UButton
-        icon="mdi:gear"
-        size="lg"
-        class="cursor-pointer bg-gaming-700/80 hover:bg-gaming-600 text-white p-2.5 rounded-xl shadow-lg shadow-gaming-900/50 hover:shadow-gaming-500/30 transition-all duration-300 hover:scale-105 active:scale-95 animate-pulse-glow"
-        aria-label="Settings"
-      />
-    </UDropdownMenu>
+    <UButton
+      :icon="open ? 'heroicons:x-mark' : 'mdi:gear'"
+      size="lg"
+      class="cursor-pointer bg-gaming-700/80 p-2.5 text-white rounded-xl shadow-lg shadow-gaming-900/50 transition-all duration-300 hover:bg-gaming-600 hover:shadow-gaming-500/30 hover:scale-105 active:scale-95 animate-pulse-glow"
+      :aria-label="open ? 'Close settings' : 'Settings'"
+      @click="togglePanel"
+    />
+
+    <Teleport to="body">
+      <Transition name="settings-backdrop">
+        <div
+          v-if="open"
+          class="fixed inset-x-0 top-16 bottom-0 z-35 bg-black/60 backdrop-blur-sm"
+          aria-hidden="true"
+          @click="closePanel"
+        />
+      </Transition>
+      <Transition name="settings-panel">
+        <SettingsPanel v-if="open" @close="closePanel" @select="handleSelect" />
+      </Transition>
+    </Teleport>
   </div>
 </template>
