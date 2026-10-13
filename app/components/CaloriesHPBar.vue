@@ -10,21 +10,26 @@ const caloriesLeft = computed(() => {
   return Math.round(maxBmr.value - aggregatedNutrients.value.totalCalories);
 });
 
-const getCaloriePercentage = () => {
-  return (caloriesLeft.value / maxBmr.value) * 100;
-};
+const isOverTarget = computed(() => caloriesLeft.value < 0);
 
+const overage = computed(() => Math.abs(caloriesLeft.value));
+
+const percentage = computed(() => {
+  const raw = (caloriesLeft.value / maxBmr.value) * 100;
+  return Math.max(0, Math.min(100, raw));
+});
+
+// Red is reserved for "over target" only — running low on budget stays
+// cautionary (orange) rather than looking like failure.
 const hpColor = computed(() => {
-  const pct = getCaloriePercentage();
-  if (pct > 75) return "green";
-  if (pct > 50) return "yellow";
-  if (pct > 25) return "orange";
-  return "red";
+  if (isOverTarget.value) return "var(--color-hp-red)";
+  if (percentage.value > 75) return "var(--color-hp-green)";
+  if (percentage.value > 50) return "var(--color-hp-yellow)";
+  return "var(--color-hp-orange)";
 });
 
 const heartStyle = computed(() => {
-  const pct = getCaloriePercentage();
-  const clampedPct = Math.max(0, Math.min(100, pct));
+  const clampedPct = percentage.value;
   const factor = 1 - clampedPct / 100;
 
   const duration = 0.35 + (clampedPct / 100) * 1.15;
@@ -58,9 +63,12 @@ const heartStyle = computed(() => {
         />
       </div>
       <div class="flex-1 ml-6">
-        <div class="relative glass-light rounded-full p-0.5 hp-bar glow-border">
+        <div
+          class="relative glass-light rounded-full p-0.5 hp-bar"
+          :class="isOverTarget ? 'hp-bar-over glow-border-red' : 'glow-border'"
+        >
           <UProgress
-            v-model="caloriesLeft"
+            :model-value="caloriesLeft"
             height="20"
             class="rounded-full overflow-hidden"
             size="2xl"
@@ -71,10 +79,13 @@ const heartStyle = computed(() => {
         <div class="flex justify-between mt-1 px-1">
           <span class="text-xs font-semibold text-white/60 font-mono tracking-wider">HP</span>
           <span class="text-xs font-bold text-white/80 font-mono tracking-wider">
-            <span :class="getCaloriePercentage() <= 0 ? 'text-hp-red' : 'text-gaming-300'">
-              {{ caloriesLeft }}
-            </span>
-            <span class="text-white/40"> / {{ maxBmr }}</span>
+            <template v-if="isOverTarget">
+              <span class="text-hp-orange">+{{ overage }} over</span>
+            </template>
+            <template v-else>
+              <span class="text-gaming-300">{{ caloriesLeft }}</span>
+              <span class="text-white/40"> / {{ maxBmr }}</span>
+            </template>
           </span>
         </div>
       </div>

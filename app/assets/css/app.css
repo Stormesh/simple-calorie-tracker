@@ -230,6 +230,52 @@ body {
     inset 0 0 15px rgba(245, 158, 11, 0.05);
 }
 
+.glow-border-red {
+  animation: pulseGlowRed 1.6s ease-in-out infinite;
+}
+
+@keyframes pulseGlowRed {
+  0%,
+  100% {
+    box-shadow:
+      0 0 15px color-mix(in srgb, var(--color-hp-red) 20%, transparent),
+      inset 0 0 15px color-mix(in srgb, var(--color-hp-red) 3%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 22px color-mix(in srgb, var(--color-hp-red) 40%, transparent),
+      inset 0 0 15px color-mix(in srgb, var(--color-hp-red) 5%, transparent);
+  }
+}
+
+/* Over-target: a dark red gradient inner ring with a soft glow feel.
+   The mask keeps only the padding area visible (gradient border trick),
+   and the blur melts it into an inset glow instead of a hard rim. */
+.hp-bar-over::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 3px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-hp-red) 15%, transparent),
+    color-mix(in srgb, var(--color-hp-red) 55%, black) 50%,
+    color-mix(in srgb, var(--color-hp-red) 15%, transparent)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
 .btn-gaming {
   position: relative;
   overflow: hidden;
