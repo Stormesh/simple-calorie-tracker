@@ -3,5 +3,7 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "markdown.extension.completion.enabled": false,
+  "markdown.extension.tableFormatter.enabled": false
 }

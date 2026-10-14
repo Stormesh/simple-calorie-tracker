@@ -1,3 +1,10 @@
+import {
+  ALL_KEY,
+  STORAGE_PREFIX,
+  mergeLegacyDayLogs,
+  type ILegacyEntry,
+} from "~/utils/day-log-migration";
+
 export interface IDayLog {
   date: string;
   foods: Record<string, IFoodTemplate[]>;
@@ -5,13 +12,7 @@ export interface IDayLog {
   weightLog?: number;
 }
 
-const STORAGE_PREFIX = "maxhp-day-log:";
-const ALL_KEY = `${STORAGE_PREFIX}all`;
 const MIGRATED_FLAG = "maxhp-migrated";
-
-// Non-date keys older builds left behind under our prefix — safe to drop
-// once the legacy migration has run.
-const LEGACY_FLAG_KEYS = new Set([`${STORAGE_PREFIX}format-v2`, `${STORAGE_PREFIX}migrated`]);
 
 export function formatLocalDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -95,84 +96,26 @@ function getAllRef() {
   return useLocalStorage<Record<string, IDayLog>>(ALL_KEY, {});
 }
 
-function logHasContent(log: IDayLog): boolean {
-  if (log.weightLog != null) return true;
-  return Object.values(log.foods).some((foods) => foods.some((f) => f.foodName));
-}
-
-function parseLegacyDayLog(key: string, date: string): IDayLog | null {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(key) ?? "null") as Partial<IDayLog> | null;
-    if (
-      !parsed ||
-      typeof parsed.date !== "string" ||
-      typeof parsed.foods !== "object" ||
-      !parsed.foods
-    ) {
-      console.error("Skipping unrecognized legacy day log:", key);
-      return null;
-    }
-    // The `date` field must match the key — charts match days on it.
-    // `foods` is restated explicitly: a Partial spread would keep it optional.
-    return {
-      ...parsed,
-      foods: parsed.foods,
-      date,
-      updatedAt: parsed.updatedAt ?? new Date(0).toISOString(),
-    };
-  } catch (e) {
-    console.error("Failed to migrate day log entry:", e);
-    return null;
-  }
-}
-
-// Fold legacy per-date keys (`maxhp-day-log:YYYY-MM-DD`) into the single
-// `maxhp-day-log:all` record. Runs once per session and is idempotent: it
-// only fills days the current record doesn't meaningfully cover yet, then
-// drops the legacy keys so they don't linger forever (the original
-// migration never deleted them, and skipped them entirely whenever `all`
-// already had data — permanently orphaning old history).
+// Read the raw legacy entries and delegate the merge decision to the pure
+// mergeLegacyDayLogs helper (~/utils/day-log-migration), which is unit-tested
+// in isolation. Runs once per session and is idempotent.
 function migrateOldIndividualKeys() {
   if (!import.meta.client) return;
 
   const ref = allRef;
   if (!ref) return;
 
-  const merged = { ...ref.value };
-  const staleKeys: string[] = [];
-  let changed = false;
-
-  // Collect keys first and delete only after the loop: removing entries
-  // while indexing with localStorage.key(i) shifts them and skips some.
+  // Snapshot keys first: removing entries while indexing with
+  // localStorage.key(i) shifts them and skips some.
+  const legacyEntries: ILegacyEntry[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (!key?.startsWith(STORAGE_PREFIX) || key === ALL_KEY) continue;
-
-    const date = key.slice(STORAGE_PREFIX.length);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      if (LEGACY_FLAG_KEYS.has(key)) staleKeys.push(key);
-      continue;
+    if (key?.startsWith(STORAGE_PREFIX)) {
+      legacyEntries.push({ key, raw: localStorage.getItem(key) });
     }
-
-    const current = merged[date];
-    if (current && logHasContent(current)) {
-      // The current record has real data for this day — it has been
-      // maintained since it was written, so the legacy entry is stale.
-      staleKeys.push(key);
-      continue;
-    }
-
-    const legacy = parseLegacyDayLog(key, date);
-    if (!legacy) continue; // unrecognised/corrupt: leave it untouched
-
-    // Current record is missing or an empty stub (older builds created
-    // those for days with only a weight entry) — legacy wins.
-    if (logHasContent(legacy)) {
-      merged[date] = legacy;
-      changed = true;
-    }
-    staleKeys.push(key);
   }
+
+  const { merged, changed, staleKeys } = mergeLegacyDayLogs(ref.value, legacyEntries);
 
   if (changed) {
     ref.value = merged;

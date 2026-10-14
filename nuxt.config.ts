@@ -4,7 +4,14 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/image", "@nuxt/icon", "@vueuse/nuxt"],
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/ui",
+    "@nuxt/image",
+    "@nuxt/icon",
+    "@vueuse/nuxt",
+    "@nuxt/test-utils/module",
+  ],
   css: ["~/assets/css/app.css"],
   typescript: {
     strict: true,
@@ -85,5 +92,8 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ["chart.js", "vue-chartjs"],
+    },
   },
 });

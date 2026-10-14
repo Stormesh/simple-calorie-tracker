@@ -6,30 +6,33 @@ const generateId = (): string => {
   return `custom-${crypto.randomUUID()}`;
 };
 
-const migrateFood = (food: ICustomFood): ICustomFood => {
-  if (food.servings && food.servings.length > 0) return food;
-  return {
-    ...food,
-    servings: [
-      {
-        servingDescription: food.servingDescription || "100g",
-        servingGrams: food.servingGrams || 100,
-        calories: food.calories || 0,
-        totalFat: food.totalFat || 0,
-        cholesterol: food.cholesterol || 0,
-        sodium: food.sodium || 0,
-        totalCarbohydrate: food.totalCarbohydrate || 0,
-        sugars: food.sugars || 0,
-        protein: food.protein || 0,
-      },
-    ],
-  };
+const migrateFood = (food: ICustomFood): ICustomFood => ({
+  ...food,
+  servings: getCustomFoodServings(food),
+});
+
+// localStorage is untrusted: older builds, partial writes, or another tab can
+// leave it empty or corrupt. This must never throw — a broken read would leave
+// the foods ref permanently unset and the library unusable. Exported for tests.
+export const deserializeCustomFoods = (raw: string | null): ICustomFood[] => {
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((item): ICustomFood[] => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) return [];
+      return [migrateFood(item as ICustomFood)];
+    });
+  } catch (e) {
+    console.error("Failed to parse stored custom foods, starting empty:", e);
+    return [];
+  }
 };
 
 export const useCustomFoods = () => {
   const foods = useLocalStorage<ICustomFood[]>(STORAGE_KEY, [], {
     serializer: {
-      read: (raw) => JSON.parse(raw).map(migrateFood),
+      read: deserializeCustomFoods,
       write: (value) => JSON.stringify(value),
     },
   });

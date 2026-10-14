@@ -24,3 +24,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# nuxi local setup state (install-wizard tracking, machine-local)
+.nuxtrc
