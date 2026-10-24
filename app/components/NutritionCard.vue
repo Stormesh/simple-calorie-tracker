@@ -18,7 +18,7 @@ defineProps<INutritionCardProps>();
     :class="
       nutrition.max && Math.round(nutrition.value) > nutrition.max ? 'stat-card-over' : 'stat-card'
     "
-    class="flex flex-col items-center p-4 min-w-[120px] rounded-xl bg-gaming-950/50 border border-gaming-800/20 hover:border-gaming-600/40 transition-all duration-300 hover:shadow-lg hover:shadow-gaming-900/30"
+    class="flex flex-col items-center p-4 min-w-30 rounded-xl bg-gaming-950/50 border border-gaming-800/20 hover:border-gaming-600/40 transition-all duration-300 hover:shadow-lg hover:shadow-gaming-900/30"
   >
     <div class="flex items-baseline gap-1">
       <span
