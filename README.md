@@ -60,9 +60,9 @@ A gamified calorie tracker that turns your nutrition into an RPG health bar. Bui
 3. Create a `.env` file in the project root with your FatSecret API credentials:
 
    ```env
-   FATSECRET_API_KEY=your_api_key
-   FATSECRET_API_SECRET=your_api_secret
-   FATSECRET_API_CLIENT_SECRET=your_oauth2_client_secret
+   NUXT_API_KEY=your_api_key
+   NUXT_API_SECRET=your_api_secret
+   NUXT_API_CLIENT_SECRET=your_oauth2_client_secret
    ```
 
    > Register at [FatSecret Platform](https://platform.fatsecret.com/) to obtain credentials. OAuth2 is preferred; OAuth1 falls back automatically.
@@ -162,12 +162,16 @@ Requires a Cloudflare D1 database named `maxhp-community` (configured in `wrangl
 
 ### Environment Variables
 
-| Variable                      | Required | Description                      |
-| ----------------------------- | -------- | -------------------------------- |
-| `FATSECRET_API_KEY`           | Yes      | FatSecret consumer key           |
-| `FATSECRET_API_SECRET`        | Yes      | FatSecret consumer secret        |
-| `FATSECRET_API_CLIENT_SECRET` | No       | FatSecret OAuth2 client secret   |
-| `NUXT_MODERATOR_SECRET`       | No       | Community food moderation secret |
+| Variable                 | Required | Description                                                  |
+| ------------------------ | -------- | ------------------------------------------------------------ |
+| `NUXT_API_KEY`           | Yes      | FatSecret consumer key                                       |
+| `NUXT_API_SECRET`        | Yes      | FatSecret consumer secret                                    |
+| `NUXT_API_CLIENT_SECRET` | No       | FatSecret OAuth2 client secret; enables OAuth2 (else OAuth1) |
+| `NUXT_MODERATOR_SECRET`  | No       | Community food moderation secret                             |
+
+These names are not arbitrary: Nitro overrides `runtimeConfig` keys from
+`NUXT_`-prefixed environment variables at runtime. `nuxt.config.ts` must leave
+the keys empty, otherwise the values are inlined into the deployed bundle.
 
 ---
 

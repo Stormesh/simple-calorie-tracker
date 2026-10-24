@@ -17,10 +17,14 @@ export default defineNuxtConfig({
     strict: true,
   },
   runtimeConfig: {
-    apiKey: process.env.FATSECRET_API_KEY,
-    apiSecret: process.env.FATSECRET_API_SECRET,
-    apiClientSecret: process.env.FATSECRET_API_CLIENT_SECRET,
-    moderatorSecret: process.env.NUXT_MODERATOR_SECRET || "",
+    // Left empty on purpose: reading process.env here would inline the values
+    // into the deployed build output. Nitro overlays NUXT_API_KEY,
+    // NUXT_API_SECRET, NUXT_API_CLIENT_SECRET and NUXT_MODERATOR_SECRET from
+    // the runtime environment instead.
+    apiKey: "",
+    apiSecret: "",
+    apiClientSecret: "",
+    moderatorSecret: "",
   },
   nitro: {
     preset: "cloudflare-pages",

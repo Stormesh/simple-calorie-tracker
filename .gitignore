@@ -27,3 +27,6 @@ logs
 
 # nuxi local setup state (install-wizard tracking, machine-local)
 .nuxtrc
+
+# Local agent tooling config (MCP servers point at this machine's sessions)
+opencode.json
