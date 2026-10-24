@@ -151,14 +151,25 @@ server/
 
 ## Deployment
 
-This app is designed for [Cloudflare Pages](https://pages.cloudflare.com/).
+This app is designed for [Cloudflare Pages](https://pages.cloudflare.com/), with D1 for the community database (`maxhp-community`, configured in `wrangler.toml`).
+
+Cloudflare Pages deploys on every push: `master` to production, other branches to a preview. GitHub Actions only verifies (lint, typecheck, tests, build) — it does not deploy, and a failing run does not stop the Pages deploy.
+
+Secrets belong to the Pages project, not the build:
 
 ```bash
-pnpm run build
-npx wrangler deploy
+npx wrangler pages secret put NUXT_API_KEY --project-name maxhp
+npx wrangler pages secret put NUXT_API_SECRET --project-name maxhp
+npx wrangler pages secret put NUXT_MODERATOR_SECRET --project-name maxhp
 ```
 
-Requires a Cloudflare D1 database named `maxhp-community` (configured in `wrangler.toml`).
+Schema changes are applied deliberately, before the code that needs them is pushed:
+
+```bash
+npx wrangler d1 migrations apply maxhp-community --remote
+```
+
+`migrations/0003 → backfill → 0004` is the one sequence that needs a step in between; see `AGENTS.md` for the order.
 
 ### Environment Variables
 

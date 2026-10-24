@@ -106,8 +106,11 @@ Order matters, and the steps are deliberately separate files:
 3. `migrations/0004_name_key_unique.sql` — creates the unique index, and aborts if any row still lacks a key.
 4. `migrations/0005_community_food_flags.sql` — creates the durable flag ledger. Independent of the steps above; it only adds a table.
 5. `migrations/0006_flag_reporter_index.sql` — index on `(ip_hash, created_at)` backing the per-reporter flag quota. Also independent; it only adds an index.
+6. `migrations/0007_name_key_required.sql` — `BEFORE INSERT` / `BEFORE UPDATE OF name_key` triggers that abort on a `NULL` or empty key. Independent; it only adds triggers.
 
 Step 3's guard is load-bearing: SQLite treats `NULL`s as distinct in a unique index, so without it a half-backfilled table would accept duplicates silently. Take a D1 export before applying any of this against production.
+
+Step 6 closes the gap the guard leaves open: the guard protects the _migration_, not the _invariant_. After 0004 a row inserted without a key is still legal, never collides, and is invisible to search (which matches on `name_key`, not `food_name`). The triggers make that an error instead. Both app paths that write a name always compute the key, and the backfill only `UPDATE`s it to a real value, so they never fire in normal operation.
 
 Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--apply]`.
 
@@ -157,15 +160,29 @@ Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--
 
 ## Deployment
 
+**Cloudflare Pages is wired to this repo and deploys on every push**: `master` to production, any other branch to a preview. GitHub Actions does not deploy — `.github/workflows/verify.yml` runs lint, typecheck, tests and build as a check only, so a red run does **not** stop production from moving. Treat a push as a deploy.
+
 ```bash
-pnpm run build          # produces .output for Cloudflare Pages
-npx wrangler deploy    # deploy to Cloudflare (requires wrangler.toml + D1 binding)
+pnpm run build   # local smoke test; output is dist/, per wrangler.toml
 ```
 
 - Nitro preset: `cloudflare-pages` with `nodeCompat: true`
-- Requires `.env` with `NUXT_API_KEY`, `NUXT_API_SECRET`, `NUXT_MODERATOR_SECRET`; add `NUXT_API_CLIENT_SECRET` to switch FatSecret to OAuth2 (without it the app falls back to OAuth1)
+- `wrangler.toml` sets the Pages project (`maxhp`) and `pages_build_output_dir = "dist"`
 - Community features use D1 database `maxhp-community` (ID in `wrangler.toml`)
-- `wrangler pages_build_output_dir = "dist"` — use `nuxt generate` for static export
+- Secrets live on the **Pages project**, not in the build: `NUXT_API_KEY`, `NUXT_API_SECRET`, `NUXT_MODERATOR_SECRET`, and `NUXT_API_CLIENT_SECRET` to switch FatSecret to OAuth2 (without it the app falls back to OAuth1). Set them with `npx wrangler pages secret put <NAME> --project-name maxhp`
+- Local `.env` uses the same `NUXT_*` names
+
+### Applying migrations
+
+Schema is **never** applied by the push, so ordering is the operator's job: apply the migration first, then push the code that depends on it.
+
+```bash
+npx wrangler d1 migrations apply maxhp-community --remote
+```
+
+Or run the `Migrate` workflow (`workflow_dispatch`) if the API token is not available locally. It is deliberately not triggered by a push: a push already deploys, and one migration (`0003 → backfill → 0004`) needs a data step in the middle that a single `apply` cannot express. Applying `0003` and the backfill before the code is pushed is what keeps that step from shipping against an unkeyed table.
+
+Because Pages deploys on push, a code release that _requires_ a new schema must still survive the window between the push and the migration. Prefer landing the schema first and the dependent code in a later release when the change is not backward compatible — the unique index and the `ON CONFLICT` that depends on it are exactly that case.
 
 ## Known gaps
 

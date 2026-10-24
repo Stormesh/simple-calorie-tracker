@@ -1,0 +1,24 @@
+name: Verify
+
+on: [push]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      # Deliberately no credentials: `runtimeConfig` keys are empty and Nitro
+      # reads NUXT_* from the Pages environment at request time, so a build that
+      # needs secrets here would mean a secret is being inlined again.
+      - run: pnpm build

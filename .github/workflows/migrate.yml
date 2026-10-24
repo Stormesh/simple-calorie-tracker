@@ -1,0 +1,30 @@
+name: Migrate
+
+# Schema changes are applied deliberately, never from a push.
+#
+# Cloudflare Pages deploys on push independently of GitHub Actions, so a push
+# would put new code in front of whatever schema exists at that moment. Some
+# migrations also need a data step in the middle — 0003 adds `name_key`, the
+# backfill fills it, and 0004 refuses to build the unique index until it is
+# filled — which no single `migrations apply` can express. Run this before
+# pushing the code that depends on the new schema.
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm wrangler d1 migrations apply maxhp-community --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
