@@ -15,7 +15,12 @@ export default defineConfig({
     // (A full Nuxt-environment project via @nuxt/test-utils was tried but its
     // app-entry stub cannot boot under this pnpm layout; parked, not removed.)
     environment: "happy-dom",
-    include: ["app/**/*.{test,spec}.ts"],
+    include: [
+      "app/**/*.{test,spec}.ts",
+      "server/**/*.{test,spec}.ts",
+      "shared/**/*.{test,spec}.ts",
+      "scripts/**/*.{test,spec}.ts",
+    ],
     // Several tests feed deliberately corrupt input, and the code under test
     // (correctly) console.errors when it rejects bad data. Silence console
     // output from passing tests so that handled-error logging doesn't read as

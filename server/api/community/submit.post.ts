@@ -65,12 +65,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const ip = getRateLimitIp(event);
-  const rateCheck = checkRateLimit(ip);
-  if (!rateCheck.allowed) {
-    throw createError({
-      statusCode: 429,
-      statusMessage: `Rate limit exceeded. Try again later.`,
-    });
+  const limit = peekRateLimit(ip, SUBMISSION_POLICIES);
+  if (!limit.allowed) {
+    throwRateLimited(event, limit);
   }
 
   const db = getDb(event);
@@ -83,18 +80,21 @@ export default defineEventHandler(async (event) => {
 
   const id = `community-${crypto.randomUUID()}`;
   const now = new Date().toISOString();
+  const nameKey = normalizeFoodName(body.foodName);
 
   const servingsJson = body.servings ? JSON.stringify(body.servings) : null;
   const firstServing = body.servings?.[0];
 
-  await db
+  const insert = await db
     .prepare(
-      `INSERT INTO community_foods (id, food_name, serving_description, serving_grams, calories, total_fat, cholesterol, sodium, total_carbohydrate, sugars, protein, submitted_by, servings, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO community_foods (id, food_name, name_key, serving_description, serving_grams, calories, total_fat, cholesterol, sodium, total_carbohydrate, sugars, protein, submitted_by, servings, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(name_key) DO NOTHING`,
     )
     .bind(
       id,
       body.foodName.trim(),
+      nameKey,
       firstServing
         ? firstServing.servingDescription || "serving"
         : body.servingDescription || "100g",
@@ -112,10 +112,29 @@ export default defineEventHandler(async (event) => {
     )
     .run();
 
+  // The unique index is what actually blocks duplicates; this branch only
+  // reports it. A rejection spends no quota, since nothing was stored.
+  if (insert.meta.changes === 0) {
+    const existing = await db
+      .prepare(`SELECT id FROM community_foods WHERE name_key = ?`)
+      .bind(nameKey)
+      .first<{ id: string }>();
+
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Food already exists in the community database",
+      data: { foodId: existing?.id ?? null, foodName: body.foodName.trim() },
+    });
+  }
+
+  // Only accepted submissions spend quota, so a database outage or a failed
+  // insert does not cost the submitter a slot.
+  consumeRateLimit(ip, SUBMISSION_POLICIES);
+
   return {
     success: true,
     id,
-    remaining: rateCheck.remaining,
+    remaining: Math.max(0, limit.remaining - 1),
     message: "Food submitted successfully",
   };
 });

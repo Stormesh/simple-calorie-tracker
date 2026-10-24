@@ -51,23 +51,36 @@ export default defineEventHandler(async (event) => {
   let total: number;
 
   if (q) {
-    const searchTerm = `%${q}%`;
+    // Match on the normalized key so search is case- and whitespace-insensitive
+    // ("chicken  breast" finds "Chicken Breast"), and escape LIKE wildcards so a
+    // bare "%" cannot match every row.
+    const nameKey = normalizeFoodName(q);
+    const escaped = escapeLikePattern(nameKey);
+    const contains = `%${escaped}%`;
+    const prefixed = `${escaped}%`;
+
     results = await db
       .prepare(
         `SELECT id, food_name, serving_description, serving_grams, calories, total_fat, cholesterol, sodium, total_carbohydrate, sugars, protein, submitted_by, servings, created_at
        FROM community_foods
-       WHERE hidden = 0 AND food_name LIKE ?
-       ORDER BY food_name ASC
+       WHERE hidden = 0 AND name_key LIKE ? ESCAPE '\\'
+       ORDER BY
+         CASE
+           WHEN name_key = ? THEN 0
+           WHEN name_key LIKE ? ESCAPE '\\' THEN 1
+           ELSE 2
+         END,
+         name_key ASC
        LIMIT ? OFFSET ?`,
       )
-      .bind(searchTerm, limit, offset)
+      .bind(contains, nameKey, prefixed, limit, offset)
       .all<CommunityFoodRow>();
 
     const countResult = await db
       .prepare(
-        `SELECT COUNT(*) as count FROM community_foods WHERE hidden = 0 AND food_name LIKE ?`,
+        `SELECT COUNT(*) as count FROM community_foods WHERE hidden = 0 AND name_key LIKE ? ESCAPE '\\'`,
       )
-      .bind(searchTerm)
+      .bind(contains)
       .first<CountResult>();
     total = countResult?.count ?? 0;
   } else {
