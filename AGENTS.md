@@ -58,9 +58,58 @@ server/
     db.ts              — D1 database access (event.context.cloudflare.env.DB)
     fatsecret-*.ts     — OAuth helpers
     food-cache.ts      — in-memory cache (per-request)
-    rate-limit.ts
-    blocklist.ts
+    rate-limit.ts      — swappable sliding-window limiter + caller IP resolution
+    rate-limit-http.ts — 429 helper: `Retry-After` + `retryAt` payload
+    auth.ts            — `requireModerator(event)` guard for moderator endpoints
+    blocklist.ts       — leo-profanity check for submitted food names
+    ip-hash.ts         — SHA-256 reporter identity for durable flag dedupe
+    community-edit.ts  — pure, whitelisted field validation for the edit endpoint (`planCommunityEdit`)
 ```
+
+### Moderation and abuse controls
+
+- `requireModerator(event)` is the single guard for `approve`, `delete`, and `flagged`; add new moderator endpoints through it rather than re-reading the header. It compares the `moderator-token` header with `NUXT_MODERATOR_SECRET` via SHA-256 digests in `timingSafeEqual` (no length or content leak), and rate limits _failed_ attempts only, so routine moderation is never throttled.
+- The required custom header is also what blocks cross-site form posts — a browser cannot set it without a CORS preflight, and no CORS is configured. Do not add permissive CORS without replacing this scheme.
+- Every secret key is deliberately `""` in `nuxt.config.ts`: reading `process.env` there would inline the value into the deployed build output. Nitro overlays `NUXT_API_KEY`, `NUXT_API_SECRET`, `NUXT_API_CLIENT_SECRET` and `NUXT_MODERATOR_SECRET` from the runtime environment instead.
+- Rate limiting is `peek` → work → `consume`, so only _accepted_ submissions spend quota and a database outage never costs a user a slot. Submission policy is two-tier (10/hour, 30/day). The default limiter is per-isolate memory, i.e. best-effort; `IRateLimiter` exists so a D1 or Durable Object backend can replace it without touching call sites.
+
+### Flagging
+
+- Reporters flag through `flag.post.ts`, which requires a **reason** (≤500 characters) — a bare click carries no signal for the moderator who has to act on it.
+- Dedupe is durable. `community_food_flags` has primary key `(food_id, ip_hash)`, so one report per reporter per food is enforced in D1 instead of in per-isolate memory. A repeat report is **409** and adds no vote.
+- Volume is bounded per reporter, and just as durably: `flag.post.ts` counts that reporter's rows in the ledger (**15/hour**, 30/day) before writing anything and rejects with **429** + `Retry-After`/`retryAt`. Reading the ledger rather than module memory is what makes this bound survive isolates and cold starts. Because one report per food caps _depth_, the quota is what caps _breadth_ — how many entries a single actor can touch.
+- `ip_hash` is `SHA-256(ip)` from `server/utils/ip-hash.ts`. That is pseudonymisation, not anonymisation — an IPv4 address can be brute forced back out of the digest — and it exists only to keep raw reporter IPs out of the database. Do not reuse it as a general privacy control.
+- `community_foods.flags` is the severity counter, incremented once per accepted report; the food is hidden at `FLAG_THRESHOLD` (**5** distinct reporters). Flagging only ever _sets_ `hidden`; clearing it is a moderator decision.
+- The ledger is **never pruned or reset**. `approve` and `edit` reset `flags`/`hidden` but deliberately leave the ledger alone, so the reporters who already voted cannot vote again — this closes the "hide it, get approved, hide it again" loop that the old counter allowed. `delete` removes the rows through `ON DELETE CASCADE`.
+- `flagged.get.ts` returns each reporter's reason with the queue, so triage needs no second request.
+
+### Moderator edit
+
+- `edit.post.ts` writes only the fields the caller sends, then resets `flags`/`hidden` in the same statement, so saving a correction is also the "this is now correct" action.
+- Validation lives in `server/utils/community-edit.ts` (`planCommunityEdit`) — a pure, whitelisted field-to-column map that returns validation failures as data, unit-tested. It deliberately does not import `h3`, so the spec can load it; the route handler turns a failure into the HTTP error. Unknown keys are ignored rather than interpolated into the statement.
+- Renaming recomputes `name_key` and returns **409** when another entry already owns the name. The unique index stays the real guard; the lookup only turns a constraint failure into a message that names the conflict.
+- There is **no moderation UI**. `flagged`, `approve`, `edit` and `delete` are API-only and exercised through the Bruno collection; adding a screen is separate work.
+
+### Duplicate handling
+
+- `community_foods.name_key` holds `normalizeFoodName(food_name)` and backs a **unique index**, so one community entry exists per normalized name. The app is the only writer of that key, which is why `submit.post.ts` can rely on `ON CONFLICT(name_key) DO NOTHING` and treat `meta.changes === 0` as a duplicate (HTTP 409).
+- `normalizeFoodName` lives in `shared/utils/food-name.ts` — auto-imported by both the app and Nitro — so the app and the backfill script cannot drift apart. It is **never** computed in SQL: SQLite's `lower()` is ASCII-only, which would key `CAFÉ` and `café` differently and let duplicates through.
+- A 409 does **not** consume rate-limit quota, because nothing was stored.
+- `search.get.ts` matches on `name_key` (case- and whitespace-insensitive) and escapes `%`/`_` via `escapeLikePattern`. Ordering is relevance-first (`exact → prefix → contains`), never `food_name ASC`, which let a `AAA` prefix control visibility.
+
+### Data migrations
+
+Order matters, and the steps are deliberately separate files:
+
+1. `migrations/0003_add_name_key.sql` — adds the nullable column.
+2. `scripts/backfill-name-key.ts` — dry-run by default; prints duplicate groups and proposed survivors, `--apply` writes them. Survivors are the earliest `created_at` (ties by id), with `flags`/`hidden` merged upward so moderation state is never dropped.
+3. `migrations/0004_name_key_unique.sql` — creates the unique index, and aborts if any row still lacks a key.
+4. `migrations/0005_community_food_flags.sql` — creates the durable flag ledger. Independent of the steps above; it only adds a table.
+5. `migrations/0006_flag_reporter_index.sql` — index on `(ip_hash, created_at)` backing the per-reporter flag quota. Also independent; it only adds an index.
+
+Step 3's guard is load-bearing: SQLite treats `NULL`s as distinct in a unique index, so without it a half-backfilled table would accept duplicates silently. Take a D1 export before applying any of this against production.
+
+Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--apply]`.
 
 ### Key composables
 
@@ -98,7 +147,8 @@ server/
 
 ### Testing
 
-- **Vitest** (`vitest.config.ts`, single `happy-dom` project, `app/**/*.{test,spec}.ts`). `pnpm run test` runs once, `pnpm run test:watch` watches. Import `{ describe, it, expect }` from `vitest` explicitly (no globals). `silent: "passed-only"` keeps handled-error logging in passing tests from reading as warnings.
+- **Vitest** (`vitest.config.ts`, single `happy-dom` project, `app/**`, `server/**`, `shared/**` and `scripts/**` `*.{test,spec}.ts`). `pnpm run test` runs once, `pnpm run test:watch` watches. Import `{ describe, it, expect }` from `vitest` explicitly (no globals). `silent: "passed-only"` keeps handled-error logging in passing tests from reading as warnings.
+- `server/**`, `shared/**` and `scripts/**` specs must stay free of Nitro auto-imports, and import shared helpers by **relative path** (`../../shared/utils/food-name`), because vitest does not resolve Nuxt's `shared/utils` alias. That is why the limiter is a pure `createRateLimiter(now)` factory with an injectable clock, why the HTTP-shaped `throwRateLimited` lives in a separate module (`rate-limit-http.ts`) that imports `h3` explicitly, and why the backfill's decision logic is a pure `planNameKeyBackfill` export.
 - **Pure-logic specs** need no setup: theme/accent sanitizers (`app/utils/themes.spec.ts`), the legacy day-log merge (`app/utils/day-log-migration.spec.ts`), and the custom-foods storage deserializer (`app/composables/custom-foods.spec.ts`, which binds the `getCustomFoodServings` auto-import onto `globalThis` in `beforeAll`/`afterAll`).
 - **Composable specs** (`app/composables/day-logs.spec.ts`, `app/composables/weight-change.spec.ts`) test Nuxt-coupled logic without booting Nuxt: bind the real Vue/VueUse implementations and stub `useCookie`/`useLocalStorage` via `vi.stubGlobal` with in-memory `Map<string, Ref>` jars (deterministic and synchronous — real cookie refs only sync asynchronously across separate `useCookie` calls). Seed the jars in `beforeEach`, never import `@nuxt/test-utils/runtime` here. `day-logs.ts` top-level only declares functions, so stubbing after static imports is safe.
 - Caveat: without the Nuxt runtime `import.meta.client` is falsy, so these specs exercise the server branches (no session-singleton caching, no midnight clock, no one-time-migration trigger). All user-facing branching is identical across branches; the client-only wiring is covered by the pure migration specs and review, not tests.
@@ -113,6 +163,20 @@ npx wrangler deploy    # deploy to Cloudflare (requires wrangler.toml + D1 bindi
 ```
 
 - Nitro preset: `cloudflare-pages` with `nodeCompat: true`
-- Requires `.env` with `FATSECRET_API_KEY`, `FATSECRET_API_SECRET`, `FATSECRET_API_CLIENT_SECRET` (OAuth2)
+- Requires `.env` with `NUXT_API_KEY`, `NUXT_API_SECRET`, `NUXT_MODERATOR_SECRET`; add `NUXT_API_CLIENT_SECRET` to switch FatSecret to OAuth2 (without it the app falls back to OAuth1)
 - Community features use D1 database `maxhp-community` (ID in `wrangler.toml`)
 - `wrangler pages_build_output_dir = "dist"` — use `nuxt generate` for static export
+
+## Known gaps
+
+Deliberate, documented debt — not oversights:
+
+1. **Moderator credential is static.** A long-lived shared secret with no expiry, rotation, or identity, and no audit trail on `approve`/`edit`/`delete`. Upgrading means an HMAC-signed token with an expiry claim. Note `timingSafeEqual` + SHA-256 already removes the timing side channel and the length leak.
+2. **No Turnstile.** Without a custom domain there is no WAF rule either, so `submit` relies on the application-level limiter alone.
+3. **Rate limiting is per-isolate, for submissions and moderator attempts.** Those quotas count in module memory, so distributed abuse and cold starts defeat them. `IRateLimiter` exists so a D1 or Durable Object backend can replace the in-memory one without touching call sites. Flag dedupe _and_ the flag volume quota are already durable (see "Flagging"), because both are derived from the ledger rather than from a counter in memory.
+
+Resolved:
+
+- ~~FatSecret secrets inlined into the build~~ — `nuxt.config.ts` now leaves every secret key empty and Nitro overlays `NUXT_*` at runtime.
+- ~~No unique constraint on `food_name`~~ and ~~search ranked by `food_name ASC`~~ — see "Duplicate handling" below.
+- ~~Flagging was weak: per-isolate dedupe, a threshold of 3, an ignored reason, nothing bounding one reporter's volume, and no way to correct an entry~~ — see "Flagging" and "Moderator edit" above.

@@ -1,11 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const token = getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
-  const config = useRuntimeConfig(event);
-  const moderatorSecret = config.moderatorSecret as string;
-
-  if (!moderatorSecret || token !== moderatorSecret) {
-    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
-  }
+  requireModerator(event);
 
   const body = await readBody<{ foodId: string }>(event);
   if (!body?.foodId) {
@@ -20,6 +14,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Clears the severity counter. The flag ledger is deliberately left in place:
+  // the reporters who already voted stay on record, so approving an entry does
+  // not hand them a fresh vote to hide it again.
   await db
     .prepare(`UPDATE community_foods SET flags = 0, hidden = 0 WHERE id = ?`)
     .bind(body.foodId)

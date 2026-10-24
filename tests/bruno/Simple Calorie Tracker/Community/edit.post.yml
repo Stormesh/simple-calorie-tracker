@@ -1,0 +1,20 @@
+info:
+  name: Community Edit
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: http://localhost:3000/api/community/edit
+  auth: inherit
+  headers:
+    Content-Type: application/json
+    moderator-token: "{{moderatorToken}}"
+  body: json
+  json: { "foodId": "{{communityFoodId}}", "foodName": "Test Chicken Breast", "calories": 165 }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -16,14 +16,14 @@ interface FlaggedFoodRow {
   hidden: number;
 }
 
-export default defineEventHandler(async (event) => {
-  const token = getHeader(event, "moderator-token") || getHeader(event, "Moderator-Token");
-  const config = useRuntimeConfig(event);
-  const moderatorSecret = config.moderatorSecret as string;
+interface FlagRow {
+  food_id: string;
+  reason: string;
+  created_at: string;
+}
 
-  if (!moderatorSecret || token !== moderatorSecret) {
-    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
-  }
+export default defineEventHandler(async (event) => {
+  requireModerator(event);
 
   const db = getDb(event);
   if (!db) {
@@ -42,6 +42,24 @@ export default defineEventHandler(async (event) => {
     )
     .all();
 
+  // Reporter-supplied reasons are what the moderator is actually triaging, so
+  // they travel with the queue rather than behind a second request.
+  const flagRows = await db
+    .prepare(
+      `SELECT food_id, reason, created_at
+     FROM community_food_flags
+     WHERE food_id IN (SELECT id FROM community_foods WHERE flags > 0)
+     ORDER BY created_at ASC`,
+    )
+    .all();
+
+  const reasonsByFood = new Map<string, Array<{ reason: string; createdAt: string }>>();
+  for (const row of flagRows.results as unknown as FlagRow[]) {
+    const reasons = reasonsByFood.get(row.food_id) ?? [];
+    reasons.push({ reason: row.reason, createdAt: row.created_at });
+    reasonsByFood.set(row.food_id, reasons);
+  }
+
   const foods = (results.results as unknown as FlaggedFoodRow[]).map((row) => ({
     id: row.id,
     foodName: row.food_name,
@@ -58,6 +76,7 @@ export default defineEventHandler(async (event) => {
     createdAt: row.created_at,
     flags: row.flags,
     hidden: row.hidden === 1,
+    reasons: reasonsByFood.get(row.id) ?? [],
   }));
 
   return { foods };

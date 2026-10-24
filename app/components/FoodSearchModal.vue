@@ -68,25 +68,60 @@ const communityResults = ref<ICustomFood[]>([]);
 const isSearchingCommunity = ref(false);
 const hasSearchedCommunity = ref(false);
 const flaggedFoods = ref(new Set<string>());
+const pendingFlagId = ref<string | null>(null);
+const flagReason = ref("");
+const isSubmittingFlag = ref(false);
 
 let communityDebounce: ReturnType<typeof setTimeout>;
 
-const handleFlag = async (food: ICustomFood) => {
-  const result = await flagFood(food.id);
-  if (result) {
+/** Flagging opens an inline reason box; the API rejects a blank reason. */
+const startFlag = (food: ICustomFood) => {
+  pendingFlagId.value = food.id;
+  flagReason.value = "";
+};
+
+const cancelFlag = () => {
+  pendingFlagId.value = null;
+  flagReason.value = "";
+};
+
+const submitFlag = async (food: ICustomFood) => {
+  const reason = flagReason.value.trim();
+  if (!reason || isSubmittingFlag.value) return;
+
+  isSubmittingFlag.value = true;
+  const result = await flagFood(food.id, reason);
+  isSubmittingFlag.value = false;
+
+  if (result.status === "flagged") {
     flaggedFoods.value.add(food.id);
     toast.add({
       title: "Food flagged",
       description: "A moderator will review this entry",
       icon: "heroicons:flag",
     });
+  } else if (result.status === "already-flagged") {
+    flaggedFoods.value.add(food.id);
+    toast.add({
+      title: "Already flagged",
+      description: "You have already reported this entry",
+      icon: "heroicons:information-circle",
+    });
+  } else if (result.status === "rate-limited") {
+    toast.add({
+      title: "Too many reports",
+      description: `You can report another entry in ${formatRetryDelay(result.retryAt)}.`,
+      icon: "heroicons:clock",
+    });
   } else {
     toast.add({
       title: "Failed to flag",
-      description: "You may have already flagged this food",
+      description: "Please try again in a moment",
       icon: "heroicons:exclamation-triangle",
     });
   }
+
+  cancelFlag();
 };
 
 const doCommunitySearch = async () => {
@@ -598,46 +633,78 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
               </div>
 
               <div v-else-if="communityResults.length > 0" class="space-y-1.5">
-                <div
-                  v-for="food in communityResults"
-                  :key="food.id"
-                  class="flex items-center gap-3 p-3 rounded-xl bg-gaming-950/40 border border-gaming-800/20 hover:border-gaming-600/40 hover:bg-gaming-950/60 transition-all cursor-pointer group"
-                  @click="selectCustomFood(food)"
-                >
+                <div v-for="food in communityResults" :key="food.id">
                   <div
-                    class="w-8 h-8 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
+                    class="flex items-center gap-3 p-3 rounded-xl bg-gaming-950/40 border border-gaming-800/20 hover:border-gaming-600/40 hover:bg-gaming-950/60 transition-all cursor-pointer group"
+                    @click="selectCustomFood(food)"
                   >
-                    <Icon name="mdi:food-apple" size="1.1rem" class="text-gaming-400" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm font-semibold text-white truncate">
-                      {{ food.foodName }}
-                    </div>
-                    <div class="text-xs text-white/40 truncate">
-                      {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
-                      {{ getCustomFoodServings(food)[0]!.servingDescription }}
-                      ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
-                      <span v-if="food.submittedBy"> · by {{ food.submittedBy }}</span>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-1 shrink-0">
-                    <button
-                      v-if="!flaggedFoods.has(food.id)"
-                      class="p-1.5 rounded-lg hover:bg-hp-red/20 transition-colors text-white/30 hover:text-hp-red cursor-pointer"
-                      title="Flag as inappropriate"
-                      @click.stop="handleFlag(food)"
+                    <div
+                      class="w-8 h-8 rounded-lg bg-gaming-800/40 flex items-center justify-center shrink-0"
                     >
-                      <Icon name="heroicons:flag" size="1rem" />
-                    </button>
-                    <Icon v-else name="heroicons:flag" size="1rem" class="text-hp-red" />
-                    <span class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
-                      >Community</span
-                    >
-                    <Icon
-                      name="heroicons:chevron-right"
-                      size="1rem"
-                      class="text-white/20 group-hover:text-gaming-400 transition-colors"
+                      <Icon name="mdi:food-apple" size="1.1rem" class="text-gaming-400" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-semibold text-white truncate">
+                        {{ food.foodName }}
+                      </div>
+                      <div class="text-xs text-white/40 truncate">
+                        {{ getCustomFoodServings(food)[0]!.calories }} kcal ·
+                        {{ getCustomFoodServings(food)[0]!.servingDescription }}
+                        ({{ getCustomFoodServings(food)[0]!.servingGrams }}g)
+                        <span v-if="food.submittedBy"> · by {{ food.submittedBy }}</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <button
+                        v-if="!flaggedFoods.has(food.id)"
+                        class="p-1.5 rounded-lg hover:bg-hp-red/20 transition-colors text-white/30 hover:text-hp-red cursor-pointer"
+                        title="Flag as inappropriate"
+                        @click.stop="startFlag(food)"
+                      >
+                        <Icon name="heroicons:flag" size="1rem" />
+                      </button>
+                      <Icon v-else name="heroicons:flag" size="1rem" class="text-hp-red" />
+                      <span
+                        class="text-[10px] uppercase tracking-wider text-gaming-500 font-semibold"
+                        >Community</span
+                      >
+                      <Icon
+                        name="heroicons:chevron-right"
+                        size="1rem"
+                        class="text-white/20 group-hover:text-gaming-400 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- A reason is required, so flagging opens a box rather than
+                       reporting on a single click. -->
+                  <div
+                    v-if="pendingFlagId === food.id"
+                    class="mt-1.5 p-3 rounded-xl bg-gaming-950/60 border border-hp-red/30 space-y-2"
+                  >
+                    <textarea
+                      v-model="flagReason"
+                      rows="2"
+                      maxlength="500"
+                      placeholder="What is wrong with this entry? (required)"
+                      class="w-full bg-gaming-950/80 border border-gaming-700/40 rounded-lg p-2 text-white placeholder:text-white/30 text-xs focus:outline-none focus:ring-2 focus:ring-hp-red/40 resize-none"
+                      @click.stop
                     />
+                    <div class="flex justify-end gap-2">
+                      <button
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white/60 hover:text-white hover:bg-gaming-800/60 transition-colors cursor-pointer"
+                        @click.stop="cancelFlag"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-hp-red/80 hover:bg-hp-red disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                        :disabled="!flagReason.trim() || isSubmittingFlag"
+                        @click.stop="submitFlag(food)"
+                      >
+                        Submit report
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

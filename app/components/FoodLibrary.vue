@@ -50,11 +50,27 @@ const handleSave = async (
       ...foodData,
       nickname,
     });
-    if (result) {
+
+    if (result.status === "shared") {
       toast.add({
         title: "Shared with community",
-        description: result.message,
+        description:
+          result.remaining > 0 ? `${result.message} · ${result.remaining} left` : result.message,
         icon: "heroicons:globe-alt",
+      });
+    } else if (result.status === "duplicate") {
+      toast.add({
+        title: "Already in the community database",
+        description: result.foodName
+          ? `"${result.foodName}" was shared before — your copy is saved to your library.`
+          : "That food was shared before — your copy is saved to your library.",
+        icon: "heroicons:information-circle",
+      });
+    } else if (result.status === "rate-limited") {
+      toast.add({
+        title: "Share limit reached",
+        description: `You can share again in ${formatRetryDelay(result.retryAt)}.`,
+        icon: "heroicons:clock",
       });
     } else {
       toast.add({
