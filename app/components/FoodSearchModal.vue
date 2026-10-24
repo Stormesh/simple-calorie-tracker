@@ -35,6 +35,15 @@ const isFetchingDetails = ref(false);
 const selectedServingIndex = ref(0);
 const quantity = ref(1);
 
+/**
+ * What the stepper actually means.
+ *
+ * Clearing the number field emits 0, and a zeroed quantity would preview — and
+ * then save — an entry with 0 g and 0 kcal. An empty or unparseable field falls
+ * back to one serving, so the preview, the saved entry and its label all agree.
+ */
+const effectiveQuantity = computed(() => quantity.value || 1);
+
 const servings = computed(() => selectedFoodDetails.value?.servings?.serving || []);
 
 const selectedServing = computed(() => servings.value[selectedServingIndex.value] || null);
@@ -42,7 +51,7 @@ const selectedServing = computed(() => servings.value[selectedServingIndex.value
 const scaledNutrition = computed(() => {
   const serving = selectedServing.value;
   if (!serving) return null;
-  const quantityValue = quantity.value || 0;
+  const quantityValue = effectiveQuantity.value;
   return {
     grams: Math.round((serving.metric_serving_amount || 0) * quantityValue * 10) / 10,
     calories: Math.round((serving.calories || 0) * quantityValue),
@@ -165,7 +174,7 @@ const selectCustomFood = (food: ICustomFood) => {
 const customScaledNutrition = computed(() => {
   const serving = selectedCustomServing.value;
   if (!serving) return null;
-  const q = quantity.value || 0;
+  const q = effectiveQuantity.value;
   return {
     grams: Math.round(serving.servingGrams * q * 10) / 10,
     calories: Math.round(serving.calories * q),
@@ -436,7 +445,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
                 <FoodNutritionPreview
                   v-if="scaledNutrition"
-                  :title="`Nutrition for ${quantity} × ${selectedServing?.measurement_description}`"
+                  :title="`Nutrition for ${effectiveQuantity} × ${selectedServing?.measurement_description}`"
                   :calories="scaledNutrition.calories"
                   :fat="scaledNutrition.fat"
                   :protein="scaledNutrition.protein"
@@ -573,7 +582,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
               <FoodNutritionPreview
                 v-if="customScaledNutrition"
-                :title="`Nutrition for ${quantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
+                :title="`Nutrition for ${effectiveQuantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
                 :calories="customScaledNutrition.calories"
                 :fat="customScaledNutrition.fat"
                 :protein="customScaledNutrition.protein"
@@ -768,7 +777,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
 
               <FoodNutritionPreview
                 v-if="customScaledNutrition"
-                :title="`Nutrition for ${quantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
+                :title="`Nutrition for ${effectiveQuantity} × ${selectedCustomServing?.servingDescription || 'serving'}`"
                 :calories="customScaledNutrition.calories"
                 :fat="customScaledNutrition.fat"
                 :protein="customScaledNutrition.protein"

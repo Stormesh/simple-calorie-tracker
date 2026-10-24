@@ -8,11 +8,11 @@ const emit = defineEmits<{
 }>();
 
 function decrement() {
-  emit("update:modelValue", Math.max(0.25, +(props.modelValue - 0.25).toFixed(2)));
+  emit("update:modelValue", Math.max(0.5, +(props.modelValue - 0.5).toFixed(2)));
 }
 
 function increment() {
-  emit("update:modelValue", Math.min(99, +(props.modelValue + 0.25).toFixed(2)));
+  emit("update:modelValue", Math.min(99, +(props.modelValue + 0.5).toFixed(2)));
 }
 </script>
 
@@ -29,8 +29,8 @@ function increment() {
       <input
         :value="modelValue"
         type="number"
-        min="0.25"
-        step="0.25"
+        min="0.5"
+        step="0.5"
         class="w-20 text-center bg-gaming-950/80 border border-gaming-700/40 rounded-xl py-2 text-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gaming-500/50 input-gaming"
         @input="emit('update:modelValue', Number(($event.target as HTMLInputElement).value))"
       />
