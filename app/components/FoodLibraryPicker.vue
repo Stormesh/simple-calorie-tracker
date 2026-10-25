@@ -192,7 +192,7 @@ const confirmSelection = () => {
 </script>
 
 <template>
-  <div>
+  <div class="p-4">
     <!-- Food list -->
     <div v-if="!selected">
       <div class="relative mb-3">
@@ -221,13 +221,23 @@ const confirmSelection = () => {
         No custom foods yet. Create one in My Food Library.
       </div>
 
+      <div
+        v-else-if="isCommunity && !query.trim()"
+        class="text-center py-12 text-white/30 text-sm flex items-center justify-center"
+      >
+        <Icon name="heroicons:globe-alt" size="2rem" class="mb-2 text-gaming-500/30" />
+        Search the community food database above.
+      </div>
+
       <div v-else-if="results.length === 0" class="text-center py-8 text-white/40 text-sm">
-        <template v-if="isCommunity">
-          <Icon name="heroicons:globe-alt" size="2rem" class="mx-auto mb-2 text-gaming-500/50" />
-          <template v-if="query.trim()"> No community foods found for "{{ query }}" </template>
-          <template v-else> Search the community food database above. </template>
-        </template>
-        <template v-else> No custom foods found for "{{ query }}" </template>
+        <Icon
+          v-if="isCommunity"
+          name="heroicons:globe-alt"
+          size="2rem"
+          class="mx-auto mb-2 text-gaming-500/50"
+        />
+        <template v-if="isCommunity">No community foods found for "{{ query }}"</template>
+        <template v-else>No custom foods found for "{{ query }}"</template>
       </div>
 
       <div v-else class="space-y-1.5">
