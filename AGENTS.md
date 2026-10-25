@@ -41,7 +41,7 @@ app/
   app.config.ts        — Nuxt UI color config
   layouts/default.vue  — bg-gaming-gradient + MyHeader + slot
   pages/index.vue      — single-page app
-  components/          — auto-imported (21 components)
+  components/          — auto-imported Vue SFCs
   composables/         — auto-imported (day-logs.spec.ts + weight-change.spec.ts live here)
   utils/
     food-types.ts      — IFoodTemplate interface
