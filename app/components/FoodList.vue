@@ -121,13 +121,23 @@ const resetFoods = () => {
 
 const overlay = useOverlay();
 
-const openFoodSearch = (index: number) => {
-  const searchModal = overlay.create(FoodSearchModal);
-  searchModal.open({
+/**
+ * Overlay instances stay mounted after closing unless `destroyOnClose` is set,
+ * so opening without it leaves a hidden modal behind for the rest of the
+ * session.
+ */
+const openFoodSearchModal = (props: {
+  index: number;
+  initialFoodDetails?: IFoodDetails;
+  editMode?: boolean;
+}) => {
+  overlay.create(FoodSearchModal, { destroyOnClose: true }).open({
     cookieName: `foods-${title}`,
-    index,
+    ...props,
   });
 };
+
+const openFoodSearch = (index: number) => openFoodSearchModal({ index });
 
 const scrollToDetails = () => {
   foodDetailsRef?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -211,21 +221,11 @@ const editFood = async (index: number) => {
   foodState.loading = true;
 
   if (foodItem.isCustom) {
-    const searchModal = overlay.create(FoodSearchModal);
-    searchModal.open({
-      cookieName: `foods-${title}`,
-      index,
-    });
+    openFoodSearchModal({ index });
   } else {
     const details = await getFood(foodId);
     if (details) {
-      const searchModal = overlay.create(FoodSearchModal);
-      searchModal.open({
-        cookieName: `foods-${title}`,
-        index,
-        initialFoodDetails: details,
-        editMode: true,
-      });
+      openFoodSearchModal({ index, initialFoodDetails: details, editMode: true });
     }
   }
 
@@ -253,12 +253,7 @@ const searchAndSelectServing = async (index: number, scroll: boolean = false) =>
   foodState.loading = false;
 
   if (details) {
-    const searchModal = overlay.create(FoodSearchModal);
-    searchModal.open({
-      cookieName: `foods-${title}`,
-      index,
-      initialFoodDetails: details,
-    });
+    openFoodSearchModal({ index, initialFoodDetails: details });
     if (scroll) scrollToDetails();
   }
 };

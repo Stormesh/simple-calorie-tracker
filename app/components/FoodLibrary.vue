@@ -6,7 +6,6 @@ const emit = defineEmits<{ close: [] }>();
 const toast = useToast();
 
 const overlay = useOverlay();
-const customFoodModal = overlay.create(ModalCustomFood);
 
 const { foods, addFood, updateFood, deleteFood, exportToJson, importFromJson } = useCustomFoods();
 
@@ -19,7 +18,9 @@ const filteredFoods = computed(() => {
 });
 
 const openForm = (food?: ICustomFood) => {
-  customFoodModal.open({
+  // A fresh mount per open: form state (name, servings, community toggle) is
+  // initialised in setup, so a reused instance would carry it into the next food.
+  overlay.create(ModalCustomFood, { destroyOnClose: true }).open({
     editFood: food,
     showCommunityToggle: true,
     onSave: handleSave,
