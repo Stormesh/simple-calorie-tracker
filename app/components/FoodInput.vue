@@ -1,6 +1,8 @@
 <script setup lang="ts">
 defineProps<{
   index: number;
+  /** Set once a row points at a real food; empty while it is still a draft. */
+  foodId?: string;
   foodState?: { loading: boolean; focused: boolean };
   calories: number;
   grams: number;
@@ -29,9 +31,10 @@ const {
       <Icon name="line-md:loading-loop" size="1.4rem" class="text-gaming-400" />
     </div>
 
-    <!-- Empty row: editable input -->
+    <!-- Draft row: still being typed. Once a food is attached it keeps its id
+         even at 0 kcal (water, black coffee), so calories cannot mean "empty". -->
     <div
-      v-else-if="calories === 0"
+      v-else-if="!foodId && calories === 0"
       class="h-11 flex relative bg-gaming-950/60 rounded-xl overflow-hidden shadow-inner shadow-gaming-950/50 input-gaming"
       :class="
         foodState?.focused ? 'ring-2 ring-gaming-500/70 glow-border' : 'ring-1 ring-gaming-800/30'

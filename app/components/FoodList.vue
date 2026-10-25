@@ -293,6 +293,7 @@ provide(FOOD_LIST_KEY, {
           <FoodInput
             v-model:food-name="food.foodName"
             :index="index"
+            :food-id="food.foodId"
             :calories="food.calories"
             :grams="food.grams ?? 0"
             :food-state="foodStates[index]"
