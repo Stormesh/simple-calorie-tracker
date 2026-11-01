@@ -134,13 +134,18 @@ server/
 
 ### State Storage
 
-| Store          | Type              | Key                                        |
-| -------------- | ----------------- | ------------------------------------------ |
-| Day logs       | `useLocalStorage` | `maxhp-day-log:all`                        |
-| Meal foods     | `useCookie`       | `foods-{Breakfast\|Lunch\|Dinner\|Snacks}` |
-| Current date   | `useCookie`       | `current-date`                             |
-| BMR form       | `useCookie`       | `bmr`                                      |
-| Migration flag | `useLocalStorage` | `maxhp-format-v2`                          |
+| Store          | Type              | Key                                             |
+| -------------- | ----------------- | ----------------------------------------------- |
+| Day logs       | `useLocalStorage` | `maxhp-day-log:all`                             |
+| Meal foods     | `useLocalStorage` | `maxhp-meal:{Breakfast\|Lunch\|Dinner\|Snacks}` |
+| Custom foods   | `useLocalStorage` | `custom-foods`                                  |
+| Current date   | `useCookie`       | `current-date`                                  |
+| BMR form       | `useCookie`       | `bmr`                                           |
+| Theme / accent | `useCookie`       | `theme`, `accent`                               |
+| Player name    | `useCookie`       | `player-name`                                   |
+| Migration flag | `useLocalStorage` | `maxhp-migrated`, `maxhp-meals-migrated`        |
+
+Everything lives on the device: there are no accounts and no server-side user data. Settings → **Data → Export backup** writes one JSON file with the whole state, and **Import backup** restores it — which is also how data moves from the browser to the Android app.
 
 ### Configuration
 
@@ -148,6 +153,68 @@ server/
 - **Unit system** — Metric (kg/cm) or Imperial (lbs/in) in Diet Profile
 - **Custom foods** — Add via the "Custom Food" button in any meal section
 - **Search provider** — FatSecret; falls back from OAuth2 to OAuth1
+
+## Android app (APK)
+
+The same app ships as an Android app through [Capacitor](https://capacitorjs.com/) — no second codebase, no Play Store. The APK is a WebView around a static (`ssr: false`) export of this repo, and the API stays on Cloudflare Pages, so the web deployment is unchanged.
+
+### Building
+
+Prerequisites: JDK 21 (the Gradle in the Capacitor template rejects newer), the Android SDK (`sdk.dir` in `android/local.properties` or `ANDROID_HOME`), and a device or emulator.
+
+```bash
+pnpm run cap:sync    # NUXT_MOBILE=1 nuxt generate, then copy into android/
+pnpm run cap:android # optional: open Android Studio for SDK/AVD management
+cd android && ./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+`NUXT_MOBILE=1` is a build flag, not a config fork: it sets `ssr: false` and the static Nitro preset, and nothing else. `nuxt.config.ts` refuses to build that way in a `CF_PAGES` environment, so a mobile build can never replace the deployed web app.
+
+The APK talks to `https://maxhp.pages.dev` by default. Point it elsewhere (a preview deployment, a local `pnpm dev`) with:
+
+```bash
+NUXT_PUBLIC_API_BASE=https://<branch>.maxhp.pages.dev pnpm run cap:sync
+```
+
+The base is baked in at build time, so it has to be set for every `cap:sync`, not once. The app calls the same `/api/*` routes the web does, cross-origin — that is why `server/utils/cors.ts` allows the WebView origins for the public API only, while the moderator routes stay unreachable from a browser.
+
+### Signing
+
+Release builds need a keystore. `android/keystore.properties` and the `.jks` it points at are both gitignored, so they never enter the repo or the Pages build.
+
+```bash
+cd android
+keytool -genkeypair -v -keystore app/maxhp-release.jks \
+  -alias maxhp -keyalg RSA -keysize 2048 -validity 10000
+
+cat > keystore.properties <<EOF
+storeFile=maxhp-release.jks
+storePassword=<password>
+keyAlias=maxhp
+keyPassword=<password>
+EOF
+```
+
+> **Back this up somewhere outside the repo.** The keystore is the app's identity: lose it and a new build is a different app to Android — it cannot be installed over the old one, and updating means uninstalling first, which deletes all local data.
+
+Then bump `versionCode` (an integer that must always increase) and `versionName` in `android/app/build.gradle`, commit, and publish:
+
+```bash
+pnpm run apk:release v1.0.0
+```
+
+That regenerates the SPA, builds the signed APK and attaches `MaxHP-<version>.apk` to a GitHub release via `gh`. Nothing is pushed; the release is the only network write.
+
+### What the shell changes
+
+- **Absolute API base** — inside the WebView the app is served from `https://localhost`, so a relative `/api/…` would resolve in the shell and 404. Every request goes through `apiUrl()`.
+- **External links leave the app** — a plain link would navigate the WebView itself, and there is no address bar to get back with. The FatSecret logo hands its URL to the system browser instead.
+- **Safe areas** — Android 15+ enforces edge-to-edge, so the header and the overlays pad with `env(safe-area-inset-*)`; on the web those resolve to `0px`.
+- **Hardware back** — closes the open dialog, otherwise goes back in the history, otherwise exits.
+- **Keyboard** — the WebView resizes natively, so a focused input is never hidden under the keyboard.
+- **Meals in localStorage** — a cookie caps at ~4 KB and truncates a real meal silently; day logs, meals and custom foods are localStorage, small settings stay cookies.
+- **No iOS build.** iPhone users get the PWA: open the site in Safari and _Add to Home Screen_.
 
 ## Deployment
 

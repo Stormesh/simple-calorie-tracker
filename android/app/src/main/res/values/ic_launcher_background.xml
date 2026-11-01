@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Matches `background` in scripts/android-assets.sh and the SplashScreen
+         colour in capacitor.config.ts: the adaptive icon, the splash and the
+         first painted frame must not disagree, or the launch flashes. -->
+    <color name="ic_launcher_background">#080808</color>
 </resources>

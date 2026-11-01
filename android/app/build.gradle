@@ -1,5 +1,25 @@
 apply plugin: 'com.android.application'
 
+/*
+ * Release signing.
+ *
+ * The keystore and its passwords are machine-local: `android/keystore.properties`
+ * and the `.jks` it points at are both gitignored. Nothing is committed, so a
+ * fresh clone (or CI) simply has no release key and `assembleDebug` keeps working
+ * — only `assembleRelease` needs the file.
+ *
+ * Losing this keystore means every future build is a different app to Android:
+ * updates cannot be installed over the old one, and users have to uninstall
+ * (losing their local data) before installing the new APK. Back it up somewhere
+ * that is not this repo, together with the passwords.
+ */
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "app.maxhp.tracker"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -8,7 +28,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +36,29 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                // `storeFile` is resolved relative to this module (android/app),
+                // which is where `cap sync` and `keytool` leave the file.
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Unsigned output is unusable on a device, so warn instead of
+            // silently producing `app-release-unsigned.apk`.
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            } else {
+                logger.warn("android/keystore.properties not found — the release APK will be unsigned.")
+            }
         }
     }
 }

@@ -15,7 +15,9 @@
     "typecheck": "nuxt typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "apk:release": "bash scripts/release-apk.sh",
+    "apk:assets": "bash scripts/android-assets.sh"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

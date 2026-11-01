@@ -15,6 +15,7 @@ The Android app is a second artifact from the same source — see [Mobile (Capac
 ```bash
 pnpm run cap:sync    # NUXT_MOBILE=1 nuxt generate, then copy into android/
 pnpm run cap:android # open the project in Android Studio (SDK/AVD manager)
+pnpm run apk:release v1.0.0  # signed release APK → GitHub release (needs a keystore)
 ```
 
 Before committing or deploying, run format + lint + typecheck + tests and fix any errors:
@@ -53,12 +54,16 @@ app/
   composables/         — auto-imported (day-logs.spec.ts + weight-change.spec.ts live here)
   plugins/
     api-base.client.ts — sets the absolute API base from runtimeConfig (native only)
+    native-shell.client.ts — status bar, splash, keyboard probe, hardware back (native only)
   utils/
     food-types.ts      — IFoodTemplate interface
     meals.ts           — foodsList = ["Breakfast", "Lunch", "Dinner", "Snacks"]
     themes.ts          — theme registry + sanitizers (+ themes.spec.ts)
     day-log-migration.ts — pure legacy-key merge logic (+ day-log-migration.spec.ts)
-  assets/css/app.css   — Tailwind theme, glass/glow/hp-bar utilities
+    meal-migration.ts  — pure cookie→localStorage decision (+ meal-migration.spec.ts)
+    backup.ts          — pure backup document build/parse/merge (+ backup.spec.ts)
+    native.ts          — `isNativeShell()`, `openExternal()`
+  assets/css/app.css   — Tailwind theme, glass/glow/hp-bar utilities, safe-area vars
 shared/
   utils/
     food-name.ts       — `normalizeFoodName`, used by app and Nitro
@@ -156,10 +161,13 @@ Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--
 ### State storage
 
 - **Day logs** — `useLocalStorage<Record<string, IDayLog>>` under key `maxhp-day-log:all`
-- **Meal foods** — per-meal cookies `foods-{Breakfast|Lunch|Dinner|Snacks}` (arrays of `IFoodTemplate`)
+- **Meal foods** — per-meal localStorage `maxhp-meal:{Breakfast|Lunch|Dinner|Snacks}` (arrays of `IFoodTemplate`), read through `useMealFoods(meal)`. Never call `useCookie("foods-…")` again: a 4 KB cookie silently truncates a real meal, and the ref cache in `useMealFoods` is what makes one component's write visible to the others immediately
+- **Custom foods** — `custom-foods` localStorage, read through `useCustomFoods()`
 - **Current date** — `current-date` cookie
 - **BMR form** — `bmr` cookie (object: `IBmrForm`)
-- **Migration** — legacy per-date keys (`maxhp-day-log:YYYY-MM-DD`) are folded into the single `all` key and deleted (idempotent, once per session); the merge decision is pure logic in `~/utils/day-log-migration.ts` (unit-tested). The one-time cookie-data migration is flagged via `maxhp-migrated`
+- **Theme / accent / player name** — `theme`, `accent`, `player-name` cookies (small scalars, fine as cookies)
+- **Backup** — `app/utils/backup.ts` (pure) + `useDataBackup()`; one JSON file with day logs, meals, custom foods, profile and theme. Delivery is tiered (share sheet → WebView clipboard → anchor download) because `<a download>` does nothing inside Capacitor. Import merges day logs by `updatedAt` instead of replacing, so an old file cannot delete days logged since
+- **Migration** — legacy per-date keys (`maxhp-day-log:YYYY-MM-DD`) are folded into the single `all` key and deleted (idempotent, once per session); the merge decision is pure logic in `~/utils/day-log-migration.ts` (unit-tested). The one-time cookie-data migration is flagged via `maxhp-migrated`, the cookie→localStorage meal move via `maxhp-meals-migrated` (`planMealMigration`, unit-tested). Page load runs `migrateMealFoods()` **before** `migrateUnsavedMeals()`, otherwise an upgrading browser saves four blank rows over its own foods
 
 ## Conventions
 
@@ -172,8 +180,8 @@ Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--
 
 - **Vitest** (`vitest.config.ts`, single `happy-dom` project, `app/**`, `server/**`, `shared/**` and `scripts/**` `*.{test,spec}.ts`). `pnpm run test` runs once, `pnpm run test:watch` watches. Import `{ describe, it, expect }` from `vitest` explicitly (no globals). `silent: "passed-only"` keeps handled-error logging in passing tests from reading as warnings.
 - `server/**`, `shared/**` and `scripts/**` specs must stay free of Nitro auto-imports, and import shared helpers by **relative path** (`../../shared/utils/food-name`), because vitest does not resolve Nuxt's `shared/utils` alias. That is why the limiter is a pure `createRateLimiter(now)` factory with an injectable clock, why the HTTP-shaped `throwRateLimited` lives in a separate module (`rate-limit-http.ts`) that imports `h3` explicitly, and why the backfill's decision logic is a pure `planNameKeyBackfill` export.
-- **Pure-logic specs** need no setup: theme/accent sanitizers (`app/utils/themes.spec.ts`), the legacy day-log merge (`app/utils/day-log-migration.spec.ts`), the custom-foods storage deserializer (`app/composables/custom-foods.spec.ts`, which binds the `getCustomFoodServings` auto-import onto `globalThis` in `beforeAll`/`afterAll`), the API base joiner (`shared/utils/api.spec.ts`) and the CORS decision (`server/utils/cors.spec.ts`).
-- **Composable specs** (`app/composables/day-logs.spec.ts`, `app/composables/weight-change.spec.ts`) test Nuxt-coupled logic without booting Nuxt: bind the real Vue/VueUse implementations and stub `useCookie`/`useLocalStorage` via `vi.stubGlobal` with in-memory `Map<string, Ref>` jars (deterministic and synchronous — real cookie refs only sync asynchronously across separate `useCookie` calls). Seed the jars in `beforeEach`, never import `@nuxt/test-utils/runtime` here. `day-logs.ts` top-level only declares functions, so stubbing after static imports is safe.
+- **Pure-logic specs** need no setup: theme/accent sanitizers (`app/utils/themes.spec.ts`), the legacy day-log merge (`app/utils/day-log-migration.spec.ts`), the meal cookie→storage decision (`app/utils/meal-migration.spec.ts`), the backup document (`app/utils/backup.spec.ts`), the custom-foods storage deserializer (`app/composables/custom-foods.spec.ts`, which binds the `getCustomFoodServings` auto-import onto `globalThis` in `beforeAll`/`afterAll`), the API base joiner (`shared/utils/api.spec.ts`) and the CORS decision (`server/utils/cors.spec.ts`).
+- **Composable specs** (`app/composables/day-logs.spec.ts`, `app/composables/weight-change.spec.ts`, `app/composables/meal-foods.spec.ts`) test Nuxt-coupled logic without booting Nuxt: bind the real Vue/VueUse implementations and stub `useCookie`/`useLocalStorage` via `vi.stubGlobal` with in-memory `Map<string, Ref>` jars (deterministic and synchronous — real cookie refs only sync asynchronously across separate `useCookie` calls). The `useLocalStorage` stub must honour a **getter** default (`typeof initial === "function" ? initial() : initial`), because meals pass `() => foodArrayDefault()` so every reader gets a fresh array. Seed the jars in `beforeEach`, never import `@nuxt/test-utils/runtime` here. `day-logs.ts` top-level only declares functions, so stubbing after static imports is safe.
 - Caveat: without the Nuxt runtime `import.meta.client` is falsy, so these specs exercise the server branches (no session-singleton caching, no midnight clock, no one-time-migration trigger). All user-facing branching is identical across branches; the client-only wiring is covered by the pure migration specs and review, not tests.
 - Parked, do not retry without checking upstream: a full Nuxt-environment project via `@nuxt/test-utils` (`defineVitestProject`) cannot boot in this repo — its virtual app-entry module id loses the absolute project prefix under this pnpm layout, so Nuxt's own relative imports (`./diagnostics/core.js`, …) fail to resolve (`@nuxt/test-utils@4.3.3` + `nuxt@4.6.1`). `@nuxt/test-utils`, `@vue/test-utils`, and the `@nuxt/test-utils/module` entry in `nuxt.config.ts` are kept installed for a future retry; `.nuxtrc` (nuxi wizard state) is gitignored.
 - Nuxt auto-imported values are bare globals at call time; any spec needing one must bind it explicitly (`vi.stubGlobal` or `globalThis`).
@@ -226,6 +234,28 @@ cd android
 - `android/local.properties` (`sdk.dir=...`, gitignored) or `ANDROID_HOME` tells Gradle where the SDK is. A fresh clone has neither.
 - `android/app/src/main/assets/public` is generated by `cap sync` and gitignored — the build copies whatever the last `generate:mobile` produced, so re-sync after any client change.
 
+### Runtime shell
+
+`app/plugins/native-shell.client.ts` and `app/utils/native.ts` hold every piece of native behaviour; all of it is inert on the web (`.client.ts` plus an `isNativeShell()` guard, which reads Capacitor's injected global structurally so `@capacitor/core` never enters the SSR bundle).
+
+- **Hardware back** is decided by the DOM, not a registry of modals: `role="dialog"` present → dispatch `Escape` (every `UModal` and the settings panel already close on it) → else `history.back()` when `canGoBack` → else `App.exitApp()`. Nuxt UI keeps an overlay _instance_ alive after closing, so a component registry would leave stale entries and swallow the back button.
+- **External links** go through `openExternal()`: `Browser.open` in the shell, `window.open` on the web. A plain link would navigate the WebView, and there is no address bar to get back with.
+- **Safe areas** (`app/assets/css/app.css`): `html` uses `viewport-fit=cover`, the header carries `safe-area-top` and `min-h-16`, and `--app-header-h` (`4rem + env(safe-area-inset-top)`) positions the settings panel and its backdrop. Android 15+ enforces edge-to-edge, so `StatusBar.setBackgroundColor` is a no-op and CSS is the only mechanism — `StatusBar.setStyle` is still called for icon colour.
+- **Keyboard** is `resize: "native"` in `capacitor.config.ts`, so the WebView (header included) resizes rather than the keyboard covering the focused input.
+- **Splash** hides on `app:mounted`; `launchAutoHide` is the safety net. Colour matches `.bg-gaming-gradient`'s darkest stop so there is no white flash.
+
+### Signing and release
+
+The keystore is machine-local and **never committed**: `android/keystore.properties` and `*.jks` are gitignored, and `android/app/build.gradle` only enables `signingConfigs.release` when that file exists, so a fresh clone still builds `assembleDebug`.
+
+- Losing the keystore makes every future build a _different app_ to Android: it cannot be installed over the old one, and updating means uninstalling first, which wipes the user's localStorage.
+- `versionCode` must increase on every release; `versionName` is the human label. Both live in `android/app/build.gradle`.
+- `pnpm run apk:release v1.0.0` (`scripts/release-apk.sh`) regenerates the SPA, builds the signed APK, and attaches `MaxHP-<version>.apk` to a GitHub release with `gh`. Distribution is sideload-only — no Play Store, no CI workflow, no signing secret in GitHub.
+
+### Icon and splash
+
+`scripts/android-assets.sh` (`pnpm run apk:assets`) regenerates every launcher icon and splash bitmap from `public/favicon.png` — adaptive foreground (heart inside the 66dp-safe zone of a 108dp canvas), legacy square + round, and 11 splash sizes on `#080808`. Re-run it after changing the artwork; nothing else in `android/app/src/main/res` should be edited by hand. `#080808` appears in three places that must agree: the script, `values/ic_launcher_background.xml` and `capacitor.config.ts`.
+
 ## Known gaps
 
 Deliberate, documented debt — not oversights:
@@ -233,6 +263,10 @@ Deliberate, documented debt — not oversights:
 1. **Moderator credential is static.** A long-lived shared secret with no expiry, rotation, or identity, and no audit trail on `approve`/`edit`/`delete`. Upgrading means an HMAC-signed token with an expiry claim. Note `timingSafeEqual` + SHA-256 already removes the timing side channel and the length leak.
 2. **No Turnstile.** Without a custom domain there is no WAF rule either, so `submit` relies on the application-level limiter alone.
 3. **Rate limiting is per-isolate, for submissions and moderator attempts.** Those quotas count in module memory, so distributed abuse and cold starts defeat them. `IRateLimiter` exists so a D1 or Durable Object backend can replace the in-memory one without touching call sites. Flag dedupe _and_ the flag volume quota are already durable (see "Flagging"), because both are derived from the ledger rather than from a counter in memory.
+4. **The APK is sideload-only.** No Play Store means no automatic updates: users re-download a release by hand, and Android shows the "install unknown apps" prompt the first time. `versionCode` must increase per release or the install silently fails, and data survives only because an _update_ (not a reinstall) keeps app storage.
+5. **Mobile clients share one quota bucket per IP.** Carrier CGNAT puts many users behind one address, so the 10/hour submit limit and the 15/hour flag limit apply to strangers collectively. Combined with gap 3 (per-isolate counters), the limits are a speed bump, not a boundary.
+6. **No iOS build.** iPhone users are pointed at the PWA (Safari → _Add to Home Screen_), which has no share-sheet backup, no hardware-back handling and no offline cache beyond what the service worker gives them.
+7. **FatSecret data is persisted on the device.** Their terms restrict storing and redistributing nutrition values beyond the id-and-attribution model; day logs, custom foods, the community database and now the backup file all keep numbers fetched from their API. The "powered by" mark is shown, but the storage question is unresolved and should be checked before wider distribution.
 
 Resolved:
 
