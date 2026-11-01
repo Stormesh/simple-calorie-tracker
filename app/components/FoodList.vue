@@ -15,11 +15,7 @@ const MAX_FOODS = 10;
 
 const { title, foodDetailsRef } = defineProps<IFoodProps>();
 
-const foods = useCookie<IFoodTemplate[]>(`foods-${title}`, {
-  default: () => {
-    return foodArrayDefault();
-  },
-});
+const foods = useMealFoods(title);
 
 const { getFoodById } = useCustomFoods();
 
@@ -132,7 +128,7 @@ const openFoodSearchModal = (props: {
   editMode?: boolean;
 }) => {
   overlay.create(FoodSearchModal, { destroyOnClose: true }).open({
-    cookieName: `foods-${title}`,
+    meal: title,
     ...props,
   });
 };

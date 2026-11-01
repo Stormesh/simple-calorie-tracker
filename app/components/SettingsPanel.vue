@@ -67,6 +67,24 @@ const sections = computed<ISettingsSection[]>(() => [
     ],
   },
   {
+    id: "data",
+    title: "Data",
+    items: [
+      {
+        id: "backup",
+        label: "Export backup",
+        icon: "heroicons:arrow-down-tray",
+        description: "Days, meals & custom foods in one file",
+      },
+      {
+        id: "restore",
+        label: "Import backup",
+        icon: "heroicons:arrow-up-tray",
+        description: "Restore from a backup file (meals are replaced)",
+      },
+    ],
+  },
+  {
     id: "danger",
     title: "Danger Zone",
     danger: true,

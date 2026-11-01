@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface IModalProps {
-  cookieName: string;
+  /** Meal name ("Breakfast", …) whose foods this modal writes into. */
+  meal: string;
   index: number;
   initialFoodDetails?: IFoodDetails;
   editMode?: boolean;
@@ -11,9 +12,7 @@ type TabId = "api" | "my-foods" | "community";
 const props = defineProps<IModalProps>();
 const emit = defineEmits<{ close: [value: boolean] }>();
 
-const foods = useCookie<IFoodTemplate[]>(props.cookieName, {
-  default: () => foodArrayDefault(),
-});
+const foods = useMealFoods(props.meal);
 
 const activeTab = ref<TabId>("api");
 

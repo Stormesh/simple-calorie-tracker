@@ -6,15 +6,19 @@ const foodDetailsElement = computed(() => foodDetailsRef.value?.rootElement || n
 const { aggregatedNutrients } = useAggregatedNutrients();
 
 onMounted(() => {
-  migrateCookieData();
+  // Order matters: the cookie→localStorage move must land before the
+  // "save what the last session left behind" step reads the meals, otherwise
+  // a browser upgrading from the cookie build would save four blank rows.
+  migrateMealFoods();
+  migrateUnsavedMeals();
   const currentDate = useCurrentDateCookie();
   const today = getTodayString();
 
   if (currentDate.value !== today) {
-    // Fill the meal cookies from the stored log for the stored date first:
-    // after a browser restart the session cookies are gone, and switching
-    // below would otherwise save empty foods over that day's stored log.
-    restoreDayToCookies(currentDate.value, false);
+    // Fill the meal storage from the stored log for the stored date first:
+    // after a browser restart the meals may be empty, and switching below
+    // would otherwise save empty foods over that day's stored log.
+    restoreDayToMeals(currentDate.value, false);
   }
 
   if (currentDate.value < today) {

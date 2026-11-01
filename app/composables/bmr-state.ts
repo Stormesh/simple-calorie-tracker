@@ -1,4 +1,4 @@
-interface IBmrForm {
+export interface IBmrForm {
   bmr: number | null;
   weight: number | null;
   height: number | null;

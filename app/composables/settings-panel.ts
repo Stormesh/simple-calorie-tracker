@@ -1,4 +1,4 @@
-export type SettingsPanelAction = "diet" | "library" | "reset";
+export type SettingsPanelAction = "diet" | "library" | "backup" | "restore" | "reset";
 
 export const useSettingsPanel = () => {
   const open = useState<boolean>("settings-panel-open", () => false);

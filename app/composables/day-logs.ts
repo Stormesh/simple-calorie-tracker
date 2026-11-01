@@ -1,3 +1,4 @@
+import { useMealFoods, hasUnsavedMealFoods } from "~/composables/meal-foods";
 import {
   ALL_KEY,
   STORAGE_PREFIX,
@@ -41,22 +42,6 @@ function formatDateLabel(dateStr: string, todayStr?: string): string {
 
 // day-logs.ts relies on the shared inSessionScope helper (session-scope.ts)
 // for reactivity that must outlive individual components.
-
-const mealCookieCache = new Map<string, Ref<IFoodTemplate[]>>();
-
-function useMealCookie(meal: string): Ref<IFoodTemplate[]> {
-  if (!import.meta.client) {
-    // Never cache on the server: module state is shared across requests.
-    return useCookie<IFoodTemplate[]>(`foods-${meal}`);
-  }
-  if (!mealCookieCache.has(meal)) {
-    mealCookieCache.set(
-      meal,
-      inSessionScope(() => useCookie<IFoodTemplate[]>(`foods-${meal}`)),
-    );
-  }
-  return mealCookieCache.get(meal)!;
-}
 
 let currentDateRef: Ref<string> | null = null;
 
@@ -128,7 +113,7 @@ export function saveDayToStorage(date: string) {
   const dayData: Record<string, IFoodTemplate[]> = {};
 
   foodsList.forEach((meal) => {
-    const val = useMealCookie(meal).value;
+    const val = useMealFoods(meal).value;
     dayData[meal] = val && val.some((f) => f.foodName) ? JSON.parse(JSON.stringify(val)) : [];
   });
 
@@ -145,28 +130,38 @@ export function saveDayToStorage(date: string) {
   all.value = { ...all.value, [date]: log };
 }
 
+/** Replace the whole log set in one write — used when restoring a backup. */
+export function replaceAllDayLogs(logs: Record<string, IDayLog>) {
+  getAllRef().value = logs;
+}
+
+/** The raw log map, for a backup. Callers must not mutate it. */
+export function loadAllDayLogs(): Record<string, IDayLog> {
+  return getAllRef().value;
+}
+
 export function loadDayFromStorage(date: string): IDayLog | null {
   return getAllRef().value[date] ?? null;
 }
 
-// Load a day's stored foods into the meal cookies. Stored foods always win.
+// Load a day's stored foods into the meal storage. Stored foods always win.
 // `clearWhenEmpty` decides what happens when the stored day has no foods for
 // a meal (log missing or empty):
-//  - true (switching dates): the cookies still hold the previous day's foods.
+//  - true (switching dates): the meals still hold the previous day's foods.
 //    They were already saved to that day, so clear them — otherwise they
 //    would leak into (and be re-saved under) the day being opened.
-//  - false (initial page load): the cookies may be the only copy of last
+//  - false (initial page load): the meals may be the only copy of last
 //    session's unsaved input, so never discard them here.
-export function restoreDayToCookies(date: string, clearWhenEmpty = true) {
+export function restoreDayToMeals(date: string, clearWhenEmpty = true) {
   const dayLog = loadDayFromStorage(date);
 
   foodsList.forEach((meal) => {
-    const cookie = useMealCookie(meal);
+    const foods = useMealFoods(meal);
     const stored = dayLog?.foods?.[meal];
     if (stored?.some((f) => f.foodName)) {
-      cookie.value = JSON.parse(JSON.stringify(stored));
+      foods.value = JSON.parse(JSON.stringify(stored));
     } else if (clearWhenEmpty) {
-      cookie.value = foodArrayDefault();
+      foods.value = foodArrayDefault();
     }
   });
 }
@@ -185,7 +180,7 @@ export function getAvailableDates(): string[] {
   return Object.keys(getAllRef().value).sort();
 }
 
-export function migrateCookieData() {
+export function migrateUnsavedMeals() {
   const migrated = useLocalStorage<boolean>(MIGRATED_FLAG, false);
   if (migrated.value) return;
 
@@ -195,11 +190,7 @@ export function migrateCookieData() {
   if (!existing) {
     // Same criterion saveDayToStorage uses when deciding what to persist:
     // any food with a name counts, even one with 0 calories.
-    const hasData = foodsList.some((meal) => {
-      return useMealCookie(meal).value?.some((f) => f.foodName);
-    });
-
-    if (hasData) {
+    if (hasUnsavedMealFoods()) {
       saveDayToStorage(today);
     }
   }
@@ -220,7 +211,7 @@ export function switchDate(date: string) {
   }
 
   currentDateCookie.value = date;
-  restoreDayToCookies(date, true); // clear the previous day's foods
+  restoreDayToMeals(date, true); // clear the previous day's foods
 }
 
 export function resetCurrentDay() {
@@ -239,7 +230,7 @@ export function resetCurrentDay() {
   }
 
   foodsList.forEach((meal) => {
-    useMealCookie(meal).value = foodArrayDefault();
+    useMealFoods(meal).value = foodArrayDefault();
   });
 }
 

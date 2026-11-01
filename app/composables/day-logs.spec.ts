@@ -8,10 +8,11 @@ import {
   getTodayString,
   loadDayFromStorage,
   loadWeight,
-  migrateCookieData,
+  migrateUnsavedMeals,
   removeDayFromStorage,
+  replaceAllDayLogs,
   resetCurrentDay,
-  restoreDayToCookies,
+  restoreDayToMeals,
   saveDayToStorage,
   saveWeight,
   switchDate,
@@ -51,7 +52,9 @@ vi.stubGlobal("useCookie", (name: string, opts?: { default?: () => unknown }) =>
 });
 vi.stubGlobal("useLocalStorage", (key: string, initial: unknown) => {
   if (!storageJar.has(key)) {
-    storageJar.set(key, ref(initial));
+    // Meal foods pass a getter, so a fresh default array is handed to every
+    // reader instead of one shared array (useStorage accepts both shapes).
+    storageJar.set(key, ref(typeof initial === "function" ? initial() : initial));
   }
   return storageJar.get(key);
 });
@@ -93,7 +96,7 @@ function dayLog(date: string, opts: Partial<IDayLog> = {}): IDayLog {
 }
 
 function mealFoods(meal: string): IFoodTemplate[] {
-  return (cookieJar.get(`foods-${meal}`)?.value ?? []) as IFoodTemplate[];
+  return (storageJar.get(`maxhp-meal:${meal}`)?.value ?? []) as IFoodTemplate[];
 }
 
 function seedCurrentDate(date: string) {
@@ -101,7 +104,9 @@ function seedCurrentDate(date: string) {
 }
 
 function seedMeal(meal: string, foods: IFoodTemplate[]) {
-  cookieJar.set(`foods-${meal}`, ref(foods));
+  // Meals live in localStorage now; only the current-date cookie is still read
+  // from the cookie jar in these tests.
+  storageJar.set(`maxhp-meal:${meal}`, ref(foods));
 }
 
 function seedStorage(record: Record<string, IDayLog>) {
@@ -132,8 +137,8 @@ describe("saveDayToStorage / loadDayFromStorage", () => {
     expect(loaded?.foods.Breakfast).toEqual([food("Oats", 150)]);
     expect(loaded?.foods.Lunch).toEqual([]);
 
-    // Mutating the cookie afterwards must not affect the stored copy.
-    (cookieJar.get("foods-Breakfast") as Ref<IFoodTemplate[]>).value = [];
+    // Mutating the meal afterwards must not affect the stored copy.
+    (storageJar.get("maxhp-meal:Breakfast") as Ref<IFoodTemplate[]>).value = [];
     expect(loadDayFromStorage("2026-01-05")?.foods.Breakfast).toEqual([food("Oats", 150)]);
   });
 
@@ -161,7 +166,7 @@ describe("switchDate", () => {
 
     // Old day was saved before leaving it.
     expect(loadDayFromStorage("2026-01-05")?.foods.Breakfast).toEqual([food("Oats")]);
-    // Target day's stored foods replaced the cookies.
+    // Target day's stored foods replaced the meal storage.
     expect(mealFoods("Breakfast")).toEqual([food("Eggs")]);
     expect((cookieJar.get("current-date") as Ref<string>).value).toBe("2026-01-06");
   });
@@ -188,12 +193,12 @@ describe("switchDate", () => {
   });
 });
 
-describe("restoreDayToCookies", () => {
-  it("lets stored foods win over cookie input", () => {
+describe("restoreDayToMeals", () => {
+  it("lets stored foods win over current meal input", () => {
     seedStorage({ "2026-01-05": dayLog("2026-01-05", { foods: { Breakfast: [food("Stored")] } }) });
     seedMeal("Breakfast", [food("Typed")]);
 
-    restoreDayToCookies("2026-01-05");
+    restoreDayToMeals("2026-01-05");
 
     expect(mealFoods("Breakfast")).toEqual([food("Stored")]);
   });
@@ -201,14 +206,14 @@ describe("restoreDayToCookies", () => {
   it("preserves unsaved input on initial load when nothing is stored", () => {
     seedMeal("Breakfast", [food("LastSessionDraft")]);
 
-    restoreDayToCookies("2026-01-05", false);
+    restoreDayToMeals("2026-01-05", false);
 
     expect(mealFoods("Breakfast")).toEqual([food("LastSessionDraft")]);
   });
 });
 
 describe("resetCurrentDay", () => {
-  it("removes a day without a weight entry and clears cookies", () => {
+  it("removes a day without a weight entry and clears the meals", () => {
     seedCurrentDate("2026-01-05");
     seedStorage({ "2026-01-05": dayLog("2026-01-05", { foods: { Breakfast: [food("Oats")] } }) });
     seedMeal("Breakfast", [food("Oats")]);
@@ -311,20 +316,29 @@ describe("log listing helpers", () => {
 
     expect(getAvailableDates()).toEqual(["2026-01-04"]);
   });
+
+  it("replaces the whole log set in one write", () => {
+    seedStorage({ "2026-01-05": dayLog("2026-01-05") });
+
+    replaceAllDayLogs({ "2026-02-01": dayLog("2026-02-01", { weightLog: 71 }) });
+
+    expect(getAvailableDates()).toEqual(["2026-02-01"]);
+    expect(loadWeight("2026-02-01")).toBe(71);
+  });
 });
 
-describe("migrateCookieData", () => {
-  it("saves unsaved cookie foods to today exactly once", () => {
+describe("migrateUnsavedMeals", () => {
+  it("saves unsaved meal foods to today exactly once", () => {
     seedMeal("Breakfast", [food("Oats")]);
 
-    migrateCookieData();
+    migrateUnsavedMeals();
 
     const today = getTodayString();
     expect(loadDayFromStorage(today)?.foods.Breakfast).toEqual([food("Oats")]);
 
-    // Second run is a no-op (flag set) — even if cookies change.
+    // Second run is a no-op (flag set) — even if the meals change.
     seedMeal("Breakfast", [food("Changed")]);
-    migrateCookieData();
+    migrateUnsavedMeals();
     expect(loadDayFromStorage(today)?.foods.Breakfast).toEqual([food("Oats")]);
   });
 
@@ -333,13 +347,13 @@ describe("migrateCookieData", () => {
     seedStorage({ [today]: dayLog(today, { foods: { Breakfast: [food("Stored")] } }) });
     seedMeal("Breakfast", [food("Typed")]);
 
-    migrateCookieData();
+    migrateUnsavedMeals();
 
     expect(loadDayFromStorage(today)?.foods.Breakfast).toEqual([food("Stored")]);
   });
 
-  it("does nothing when the cookies hold no data", () => {
-    migrateCookieData();
+  it("does nothing when the meals hold no data", () => {
+    migrateUnsavedMeals();
     expect(loadDayFromStorage(getTodayString())).toBeNull();
   });
 });

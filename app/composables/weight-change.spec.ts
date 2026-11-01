@@ -10,6 +10,7 @@ import type { IFoodTemplate } from "~/utils/food-types";
 // Nuxt/Vue APIs as auto-imported globals. `useCookie` is backed by an
 // in-memory jar of shared refs so setup and code-under-test stay in sync.
 const cookieJar = new Map<string, ReturnType<typeof ref>>();
+const storageJar = new Map<string, ReturnType<typeof ref>>();
 
 vi.stubGlobal("ref", ref);
 vi.stubGlobal("computed", computed);
@@ -18,6 +19,12 @@ vi.stubGlobal("useCookie", (name: string, opts?: { default?: () => unknown }) =>
     cookieJar.set(name, ref(opts?.default?.() ?? null));
   }
   return cookieJar.get(name);
+});
+vi.stubGlobal("useLocalStorage", (key: string, initial: unknown) => {
+  if (!storageJar.has(key)) {
+    storageJar.set(key, ref(typeof initial === "function" ? initial() : initial));
+  }
+  return storageJar.get(key);
 });
 vi.stubGlobal("useAggregatedNutrients", useAggregatedNutrients);
 vi.stubGlobal("useBmr", useBmr);
@@ -52,18 +59,20 @@ function setBmr(bmr: number | null) {
   };
 }
 
+// Meals are localStorage-backed; only BMR is still a cookie.
 function setMealFoods(meal: string, foods: IFoodTemplate[]) {
-  const cookie = cookieJar.get(`foods-${meal}`) as
-    ReturnType<typeof ref<IFoodTemplate[]>> | undefined;
-  if (cookie) {
-    cookie.value = foods;
+  const key = `maxhp-meal:${meal}`;
+  const stored = storageJar.get(key) as ReturnType<typeof ref<IFoodTemplate[]>> | undefined;
+  if (stored) {
+    stored.value = foods;
   } else {
-    cookieJar.set(`foods-${meal}`, ref(foods));
+    storageJar.set(key, ref(foods));
   }
 }
 
 beforeEach(() => {
   cookieJar.clear();
+  storageJar.clear();
   // Start every test from a clean slate: no BMR, no foods.
   setBmr(null);
   foodsList.forEach((meal) => setMealFoods(meal, []));
@@ -182,7 +191,7 @@ describe("useWeightChange", () => {
     expect(weightChange.value.deficit).toBe(600);
   });
 
-  it("reacts to cookie changes", () => {
+  it("reacts to BMR changes", () => {
     setBmr(2000);
     setMealFoods("Breakfast", [food("Oats", 1500)]);
 

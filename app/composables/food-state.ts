@@ -18,11 +18,3 @@ const FOOD_LENGTH = 4;
 
 export const foodArrayDefault = () =>
   Array.from({ length: FOOD_LENGTH }, foodTemplateDefault) as IFoodTemplate[];
-
-export const resetCookies = (cookieNames: string[]) => {
-  cookieNames.forEach((cookieName) => {
-    const cookie = useCookie<IFoodTemplate[]>(cookieName);
-    cookie.value = foodArrayDefault();
-  });
-  window.location.reload();
-};
