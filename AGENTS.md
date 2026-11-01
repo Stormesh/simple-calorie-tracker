@@ -10,6 +10,13 @@ pnpm run generate  # static export (output: dist)
 pnpm run preview   # preview production build
 ```
 
+The Android app is a second artifact from the same source — see [Mobile (Capacitor)](#mobile-capacitor):
+
+```bash
+pnpm run cap:sync    # NUXT_MOBILE=1 nuxt generate, then copy into android/
+pnpm run cap:android # open the project in Android Studio (SDK/AVD manager)
+```
+
 Before committing or deploying, run format + lint + typecheck + tests and fix any errors:
 
 ```bash
@@ -28,6 +35,7 @@ pnpm run test      # vitest run (unit tests)
 - **Tailwind CSS v4** — `@tailwindcss/vite` plugin, custom theme colors (`gaming-*`, `cyber-*`, `hp-*`) in `app/assets/css/app.css`
 - **TypeScript** — `strict: true` in `nuxt.config.ts`
 - **Chart.js** (`^4.5.1`) via `vue-chartjs`
+- **Capacitor** (`^8.6.0`) — packages the SPA into the Android app; `@capacitor/cli` is a dev dependency
 - **Cloudflare D1** — community features, bound as `DB` (see `wrangler.toml`)
 - **FatSecret API** — food search/nutrition, supports OAuth1 and OAuth2
 
@@ -43,13 +51,22 @@ app/
   pages/index.vue      — single-page app
   components/          — auto-imported Vue SFCs
   composables/         — auto-imported (day-logs.spec.ts + weight-change.spec.ts live here)
+  plugins/
+    api-base.client.ts — sets the absolute API base from runtimeConfig (native only)
   utils/
     food-types.ts      — IFoodTemplate interface
     meals.ts           — foodsList = ["Breakfast", "Lunch", "Dinner", "Snacks"]
     themes.ts          — theme registry + sanitizers (+ themes.spec.ts)
     day-log-migration.ts — pure legacy-key merge logic (+ day-log-migration.spec.ts)
   assets/css/app.css   — Tailwind theme, glass/glow/hp-bar utilities
+shared/
+  utils/
+    food-name.ts       — `normalizeFoodName`, used by app and Nitro
+    food.ts            — FatSecret fetch helpers (`searchFood`, `getFood`)
+    api.ts             — `apiUrl()` / `setApiBase()` (+ api.spec.ts)
 server/
+  middleware/
+    cors.ts            — h3 adapter for the native app's CORS decision
   api/
     nutrition/search/[name].ts  — FatSecret food search
     nutrition/[id].ts           — FatSecret food detail
@@ -64,12 +81,15 @@ server/
     blocklist.ts       — leo-profanity check for submitted food names
     ip-hash.ts         — SHA-256 reporter identity for durable flag dedupe
     community-edit.ts  — pure, whitelisted field validation for the edit endpoint (`planCommunityEdit`)
+    cors.ts            — pure `planCorsResponse` + allowlist (+ cors.spec.ts)
+capacitor.config.ts    — appId, webDir (.output/public), androidScheme
+android/               — generated Capacitor Android project (committed)
 ```
 
 ### Moderation and abuse controls
 
 - `requireModerator(event)` is the single guard for `approve`, `delete`, and `flagged`; add new moderator endpoints through it rather than re-reading the header. It compares the `moderator-token` header with `NUXT_MODERATOR_SECRET` via SHA-256 digests in `timingSafeEqual` (no length or content leak), and rate limits _failed_ attempts only, so routine moderation is never throttled.
-- The required custom header is also what blocks cross-site form posts — a browser cannot set it without a CORS preflight, and no CORS is configured. Do not add permissive CORS without replacing this scheme.
+- The required custom header is also what blocks cross-site form posts — a browser cannot set it without a CORS preflight. Do not add permissive CORS without replacing this scheme: the only CORS in the app is `server/middleware/cors.ts`, and it never covers a moderator route (see "Mobile (Capacitor)").
 - Every secret key is deliberately `""` in `nuxt.config.ts`: reading `process.env` there would inline the value into the deployed build output. Nitro overlays `NUXT_API_KEY`, `NUXT_API_SECRET`, `NUXT_API_CLIENT_SECRET` and `NUXT_MODERATOR_SECRET` from the runtime environment instead.
 - Rate limiting is `peek` → work → `consume`, so only _accepted_ submissions spend quota and a database outage never costs a user a slot. Submission policy is two-tier (10/hour, 30/day). The default limiter is per-isolate memory, i.e. best-effort; `IRateLimiter` exists so a D1 or Durable Object backend can replace it without touching call sites.
 
@@ -152,7 +172,7 @@ Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--
 
 - **Vitest** (`vitest.config.ts`, single `happy-dom` project, `app/**`, `server/**`, `shared/**` and `scripts/**` `*.{test,spec}.ts`). `pnpm run test` runs once, `pnpm run test:watch` watches. Import `{ describe, it, expect }` from `vitest` explicitly (no globals). `silent: "passed-only"` keeps handled-error logging in passing tests from reading as warnings.
 - `server/**`, `shared/**` and `scripts/**` specs must stay free of Nitro auto-imports, and import shared helpers by **relative path** (`../../shared/utils/food-name`), because vitest does not resolve Nuxt's `shared/utils` alias. That is why the limiter is a pure `createRateLimiter(now)` factory with an injectable clock, why the HTTP-shaped `throwRateLimited` lives in a separate module (`rate-limit-http.ts`) that imports `h3` explicitly, and why the backfill's decision logic is a pure `planNameKeyBackfill` export.
-- **Pure-logic specs** need no setup: theme/accent sanitizers (`app/utils/themes.spec.ts`), the legacy day-log merge (`app/utils/day-log-migration.spec.ts`), and the custom-foods storage deserializer (`app/composables/custom-foods.spec.ts`, which binds the `getCustomFoodServings` auto-import onto `globalThis` in `beforeAll`/`afterAll`).
+- **Pure-logic specs** need no setup: theme/accent sanitizers (`app/utils/themes.spec.ts`), the legacy day-log merge (`app/utils/day-log-migration.spec.ts`), the custom-foods storage deserializer (`app/composables/custom-foods.spec.ts`, which binds the `getCustomFoodServings` auto-import onto `globalThis` in `beforeAll`/`afterAll`), the API base joiner (`shared/utils/api.spec.ts`) and the CORS decision (`server/utils/cors.spec.ts`).
 - **Composable specs** (`app/composables/day-logs.spec.ts`, `app/composables/weight-change.spec.ts`) test Nuxt-coupled logic without booting Nuxt: bind the real Vue/VueUse implementations and stub `useCookie`/`useLocalStorage` via `vi.stubGlobal` with in-memory `Map<string, Ref>` jars (deterministic and synchronous — real cookie refs only sync asynchronously across separate `useCookie` calls). Seed the jars in `beforeEach`, never import `@nuxt/test-utils/runtime` here. `day-logs.ts` top-level only declares functions, so stubbing after static imports is safe.
 - Caveat: without the Nuxt runtime `import.meta.client` is falsy, so these specs exercise the server branches (no session-singleton caching, no midnight clock, no one-time-migration trigger). All user-facing branching is identical across branches; the client-only wiring is covered by the pure migration specs and review, not tests.
 - Parked, do not retry without checking upstream: a full Nuxt-environment project via `@nuxt/test-utils` (`defineVitestProject`) cannot boot in this repo — its virtual app-entry module id loses the absolute project prefix under this pnpm layout, so Nuxt's own relative imports (`./diagnostics/core.js`, …) fail to resolve (`@nuxt/test-utils@4.3.3` + `nuxt@4.6.1`). `@nuxt/test-utils`, `@vue/test-utils`, and the `@nuxt/test-utils/module` entry in `nuxt.config.ts` are kept installed for a future retry; `.nuxtrc` (nuxi wizard state) is gitignored.
@@ -183,6 +203,28 @@ npx wrangler d1 migrations apply maxhp-community --remote
 Or run the `Migrate` workflow (`workflow_dispatch`) if the API token is not available locally. It is deliberately not triggered by a push: a push already deploys, and one migration (`0003 → backfill → 0004`) needs a data step in the middle that a single `apply` cannot express. Applying `0003` and the backfill before the code is pushed is what keeps that step from shipping against an unkeyed table.
 
 Because Pages deploys on push, a code release that _requires_ a new schema must still survive the window between the push and the migration. Prefer landing the schema first and the dependent code in a later release when the change is not backward compatible — the unique index and the `ON CONFLICT` that depends on it are exactly that case.
+
+## Mobile (Capacitor)
+
+One repo, two artifacts: `pnpm build` produces the Pages deployment (`dist/`, SSR + API) and `pnpm run cap:sync` produces a client-only SPA (`.output/public`) that Capacitor copies into `android/`.
+
+- Mobile is a **build flag, not a config fork**: `NUXT_MOBILE=1` sets `ssr: false` and Nitro preset `static`. The web build is untouched.
+- `nuxt.config.ts` throws when `NUXT_MOBILE` is set in a `CF_PAGES` environment. Pages publishes whatever `pnpm build` leaves in `dist/`; an SPA there has no `_worker.js`, which would take `/api/*` down for the web app and every installed APK. `.github/workflows/verify.yml` asserts `dist/_worker.js/index.js` exists for the same reason.
+- The SPA contains no `server/`, so no runtime secret can reach the binary.
+- **Absolute API base.** In the WebView the app is served from `https://localhost` (Android, because `androidScheme: "https"`) or `capacitor://localhost` (iOS). A relative `/api/...` would resolve inside the WebView and 404, so `app/plugins/api-base.client.ts` calls `setApiBase(runtimeConfig.public.apiBase)` and every request goes through `apiUrl()` (`shared/utils/api.ts`). On the web the base is `""`, so URLs stay relative. Set the deployment URL for a device build with `NUXT_PUBLIC_API_BASE=https://maxhp.pages.dev`.
+- **CORS is scoped, not opened.** `server/utils/cors.ts` (`planCorsResponse`, unit-tested) allows the WebView origins and the web origin, and only for `/api/nutrition/*` and `/api/community/{search,submit,flag}`. The moderator routes are excluded, which preserves the property that a cross-site form post cannot invoke them. `Vary: Origin` is always set on the public API, and a disallowed origin still gets a 204 preflight — just without the allow headers.
+- Override the allowlist with `NUXT_CORS_ORIGINS` (comma-separated); empty means the defaults in `server/utils/cors.ts`.
+
+Building locally needs a JDK Gradle accepts (21) and a known SDK:
+
+```bash
+cd android
+./gradlew assembleDebug   # APK at app/build/outputs/apk/debug/app-debug.apk
+```
+
+- `~/.gradle/gradle.properties` pins `org.gradle.java.home` to JDK 21; the Capacitor 8 template's Gradle 8.14.3 rejects Java 25+ (`Unsupported class file major version 69/71`).
+- `android/local.properties` (`sdk.dir=...`, gitignored) or `ANDROID_HOME` tells Gradle where the SDK is. A fresh clone has neither.
+- `android/app/src/main/assets/public` is generated by `cap sync` and gitignored — the build copies whatever the last `generate:mobile` produced, so re-sync after any client change.
 
 ## Known gaps
 

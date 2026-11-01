@@ -25,6 +25,22 @@ logs
 .env.*
 !.env.example
 
+# Capacitor: web assets copied into the native projects by `cap sync`
+android/app/src/main/assets/public
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+ios/App/App/public
+ios/App/App/capacitor.config.json
+
+# Android build output and local signing material
+android/.gradle
+android/build
+android/app/build
+android/local.properties
+*.keystore
+*.jks
+keystore.properties
+
 # nuxi local setup state (install-wizard tracking, machine-local)
 .nuxtrc
 

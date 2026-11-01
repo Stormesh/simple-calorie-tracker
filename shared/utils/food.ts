@@ -1,3 +1,5 @@
+import { apiUrl } from "./api";
+
 export interface ICustomFoodServing {
   servingDescription: string;
   servingGrams: number;
@@ -123,7 +125,9 @@ async function fetchFromApi<T>(
 export const searchFood = async (foodName: string): Promise<IFoodSearchResult | null> => {
   if (!foodName.trim()) return null;
 
-  return fetchFromApi<IFoodSearchResult>(`/api/nutrition/search/${encodeURIComponent(foodName)}`);
+  return fetchFromApi<IFoodSearchResult>(
+    apiUrl(`/api/nutrition/search/${encodeURIComponent(foodName)}`),
+  );
 };
 
 export const getFood = async (
@@ -133,7 +137,7 @@ export const getFood = async (
 ): Promise<IFoodDetails | null> => {
   if (!foodId.trim()) return null;
 
-  return fetchFromApi<IFoodDetails>(`/api/nutrition/${encodeURIComponent(foodId)}`, {
+  return fetchFromApi<IFoodDetails>(apiUrl(`/api/nutrition/${encodeURIComponent(foodId)}`), {
     method: "POST",
     body: JSON.stringify({ amount, unit }),
   });

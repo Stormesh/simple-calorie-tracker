@@ -6,6 +6,9 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "generate:mobile": "NUXT_MOBILE=1 nuxt generate",
+    "cap:sync": "pnpm generate:mobile && cap sync",
+    "cap:android": "cap open android",
     "preview": "nuxt preview",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
@@ -15,6 +18,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
     "@internationalized/date": "^3.12.4",
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/icon": "^2.5.1",
@@ -35,6 +40,7 @@
     "wrangler": "^4.150.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
     "@cloudflare/workers-types": "^5.20261013.1",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/ic": "^1.2.4",

@@ -1,7 +1,21 @@
 import tailwindcss from "@tailwindcss/vite";
 
+// Mobile builds are a separate artifact: a client-only SPA that Capacitor
+// packages into the APK. The web deployment keeps SSR, so this is a build flag
+// rather than a fork of the config. Reading `process.env` here is safe because
+// the value is not a secret.
+const isMobile = process.env.NUXT_MOBILE === "1";
+
+// Cloudflare Pages publishes `dist/`, including `_worker.js` — the API. A mobile
+// build there would publish an SPA with no backend at the same origin, taking
+// `/api/*` down for the web app and every installed APK. Fail loudly instead.
+if (isMobile && process.env.CF_PAGES) {
+  throw new Error("NUXT_MOBILE must not be set in the Cloudflare Pages build environment");
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: !isMobile,
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: [
@@ -25,14 +39,41 @@ export default defineNuxtConfig({
     apiSecret: "",
     apiClientSecret: "",
     moderatorSecret: "",
-  },
-  nitro: {
-    preset: "cloudflare-pages",
-    cloudflare: {
-      deployConfig: true,
-      nodeCompat: true,
+    // Comma-separated allowlist for the native app's WebView origins, read by
+    // server/middleware/cors.ts. Empty means the defaults in
+    // server/utils/cors.ts. Deliberately private: only the middleware needs it.
+    corsOrigins: "",
+    public: {
+      // Absolute API origin for the native build; empty on the web so every
+      // request stays same-origin and relative.
+      //
+      // The native bundle is static, so this is resolved at build time: Pages
+      // always serves the project in wrangler.toml at `<name>.pages.dev`, which
+      // is why that can be the default instead of an empty string that would
+      // silently 404 inside the WebView. Override with
+      // `NUXT_PUBLIC_API_BASE=https://staging.example pnpm run generate:mobile`.
+      apiBase: isMobile ? "https://maxhp.pages.dev" : "",
     },
   },
+  // Bundle icons at build time. The default ("auto") can resolve icons through
+  // the Iconify API at runtime, which would leave the native app without icons
+  // on a cold, offline launch.
+  icon: {
+    serverBundle: "local",
+  },
+  nitro: isMobile
+    ? {
+        // Static SPA: there is no server inside the binary, which is also why no
+        // runtime secret can leak into it.
+        preset: "static",
+      }
+    : {
+        preset: "cloudflare-pages",
+        cloudflare: {
+          deployConfig: true,
+          nodeCompat: true,
+        },
+      },
   app: {
     head: {
       title: "MaxHP - Level Up Your Health",
@@ -52,6 +93,12 @@ export default defineNuxtConfig({
         },
       ],
       meta: [
+        {
+          // viewport-fit=cover lets the layout pad against the notch and home
+          // indicator with env(safe-area-inset-*) instead of sitting under them.
+          name: "viewport",
+          content: "width=device-width, initial-scale=1, viewport-fit=cover",
+        },
         {
           name: "description",
           content:

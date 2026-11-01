@@ -1,3 +1,5 @@
+import { apiUrl } from "#shared/utils/api";
+
 interface ICommunitySearchResult {
   foods: ICustomFood[];
   total: number;
@@ -77,7 +79,7 @@ export const useCommunityFoods = () => {
 
     try {
       const data = await $fetch<ICommunitySearchResult>(
-        `/api/community/search?q=${encodeURIComponent(query)}&limit=50`,
+        apiUrl(`/api/community/search?q=${encodeURIComponent(query)}&limit=50`),
       );
       return data?.foods || [];
     } catch (e) {
@@ -88,7 +90,7 @@ export const useCommunityFoods = () => {
 
   const submitFood = async (food: ICommunitySubmitBody): Promise<CommunitySubmitResult> => {
     try {
-      const result = await $fetch<ICommunitySubmitResponse>(`/api/community/submit`, {
+      const result = await $fetch<ICommunitySubmitResponse>(apiUrl(`/api/community/submit`), {
         method: "POST",
         body: food,
       });
@@ -112,7 +114,7 @@ export const useCommunityFoods = () => {
         success: boolean;
         flags: number;
         hidden: boolean;
-      }>(`/api/community/flag`, {
+      }>(apiUrl(`/api/community/flag`), {
         method: "POST",
         body: { foodId, reason },
       });

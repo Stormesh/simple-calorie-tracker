@@ -22,3 +22,7 @@ jobs:
       # reads NUXT_* from the Pages environment at request time, so a build that
       # needs secrets here would mean a secret is being inlined again.
       - run: pnpm build
+      # `dist/` must still contain the Nitro server: it is both the web app and
+      # the API. A mobile build here would publish an SPA with no `_worker.js`
+      # and take `/api/*` down for the web app and every installed APK.
+      - run: test -f dist/_worker.js/index.js

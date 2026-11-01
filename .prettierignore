@@ -3,3 +3,7 @@ node_modules
 .output
 dist
 pnpm-lock.yaml
+# Generated native projects: Gradle/Java/XML are not ours to format, and
+# `android/app/src/main/assets/public` is a copy of `.output/public`.
+android
+ios
