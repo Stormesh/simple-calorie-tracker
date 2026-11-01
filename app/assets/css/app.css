@@ -186,6 +186,50 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+/* Touch ergonomics for the APK (inert on the desktop web):
+   - no blue flash on every tap,
+   - no pull-to-refresh: a downward swipe must scroll, not reload the SPA and
+     throw away the food being typed,
+   - no text-size adjustment when the device rotates. */
+html {
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Native shell (Capacitor)
+   ---------------------------------------------------------------------------
+   The APK opts into drawing under the system bars (`viewport-fit=cover` in the
+   viewport meta) because Android 15+ enforces edge-to-edge whether the app asks
+   for it or not. `env(safe-area-inset-*)` is the only way to know where the
+   notch, the cutout and the gesture bar are; on a desktop browser every value
+   resolves to 0px, so the web layout is unchanged.
+
+   `--app-header-h` is the header's real height including the status-bar inset.
+   Overlays that start below the header use it, so they do not slide under it on
+   a device with a notch. */
+
+:root {
+  --app-header-h: calc(4rem + env(safe-area-inset-top, 0px));
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 .glass {
   background: rgba(10, 10, 10, 0.7);
   backdrop-filter: blur(16px);

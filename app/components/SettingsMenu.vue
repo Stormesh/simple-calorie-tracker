@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
       <Transition name="settings-backdrop">
         <div
           v-if="open"
-          class="fixed inset-x-0 top-16 bottom-0 z-35 bg-black/60 backdrop-blur-sm"
+          class="fixed inset-x-0 top-[var(--app-header-h)] bottom-0 z-35 bg-black/60 backdrop-blur-sm"
           aria-hidden="true"
           @click="closePanel"
         />

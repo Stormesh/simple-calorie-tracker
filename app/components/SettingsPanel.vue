@@ -140,7 +140,7 @@ onBeforeUnmount(() => {
 
 <template>
   <aside
-    class="panel-gaming fixed top-16 right-0 bottom-0 z-40 flex w-full flex-col sm:w-96"
+    class="panel-gaming fixed top-[var(--app-header-h)] right-0 bottom-0 z-40 flex w-full flex-col sm:w-96"
     role="dialog"
     aria-label="Settings panel"
   >

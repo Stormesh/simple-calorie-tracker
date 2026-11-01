@@ -5,6 +5,7 @@ import { useCustomFoods } from "./custom-foods";
 import { usePlayerProfile } from "./settings-panel";
 import { useTheme } from "./use-theme";
 import { foodsList } from "~/utils/meals";
+import { isNativeShell } from "~/utils/native";
 import { cloneFoods } from "~/utils/meal-migration";
 import {
   buildBackup,
@@ -35,16 +36,6 @@ export const BACKUP_MIME = "application/json";
 const timestampedName = (): string => `maxhp-backup-${new Date().toISOString().slice(0, 10)}.json`;
 
 export type BackupDelivery = "shared" | "downloaded" | "copied";
-
-/**
- * Capacitor injects a global into the WebView. Checked structurally so this
- * module never has to import `@capacitor/core` (which would then be pulled into
- * the SSR bundle just to ask a browser question).
- */
-const isNativeShell = (): boolean => {
-  const shell = (globalThis as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  return shell?.isNativePlatform?.() === true;
-};
 
 /**
  * Hand the file to the platform. Returns how it left, so the caller can say so
