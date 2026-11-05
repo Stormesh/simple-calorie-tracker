@@ -31,8 +31,27 @@ onMounted(() => {
     switchDate(today);
   }
 
-  window.addEventListener("beforeunload", () => {
-    saveDayToStorage(useCurrentDateCookie().value);
+  // Persist the open day whenever the app can be taken away from us. Android
+  // kills the WebView process without firing `beforeunload`, so that listener
+  // alone lost the day's snapshot (charts and exports lagged behind the meals,
+  // which live in localStorage). `pagehide` covers the native shell and Safari,
+  // `visibilitychange` covers backgrounding on Android and mobile browsers.
+  let lastFlush: string | null = null;
+  const flushDay = () => {
+    const date = useCurrentDateCookie().value;
+    const snapshot = JSON.stringify([date, foodsList.map((meal) => useMealFoods(meal).value)]);
+    // Cheap guard: `beforeunload` and `pagehide` fire together on the web, and
+    // `visibilitychange` fires on every tab switch — each would otherwise
+    // rewrite the whole log map in localStorage for nothing.
+    if (snapshot === lastFlush) return;
+    lastFlush = snapshot;
+    saveDayToStorage(date);
+  };
+
+  window.addEventListener("beforeunload", flushDay);
+  window.addEventListener("pagehide", flushDay);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushDay();
   });
 });
 </script>

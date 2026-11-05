@@ -58,6 +58,8 @@ export function migrateMealFoods(): void {
   if (migrated.value) return;
 
   foodsList.forEach((meal) => {
+    // Deliberately not PERSISTENT_COOKIE: a legacy cookie is read once and
+    // deleted on this same pass, so its lifetime never matters.
     const cookie = useCookie<IFoodTemplate[] | null>(legacyMealCookieKey(meal), {
       default: () => null,
     });

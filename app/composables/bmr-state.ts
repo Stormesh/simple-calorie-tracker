@@ -1,3 +1,5 @@
+import { PERSISTENT_COOKIE } from "~/utils/cookies";
+
 export interface IBmrForm {
   bmr: number | null;
   weight: number | null;
@@ -11,6 +13,9 @@ export interface IBmrForm {
 
 export const useBmr = () =>
   useCookie<IBmrForm>("bmr", {
+    // Without an expiry this is a session cookie and the whole diet profile
+    // vanishes when the app process ends — see ~/utils/cookies.
+    ...PERSISTENT_COOKIE,
     default: () => {
       return {
         bmr: null,

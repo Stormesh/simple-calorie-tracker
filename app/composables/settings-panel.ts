@@ -1,3 +1,5 @@
+import { PERSISTENT_COOKIE } from "~/utils/cookies";
+
 export type SettingsPanelAction = "diet" | "library" | "backup" | "restore" | "reset";
 
 export const useSettingsPanel = () => {
@@ -20,6 +22,7 @@ export const useSettingsPanel = () => {
 
 export const usePlayerProfile = () => {
   const name = useCookie<string>("player-name", {
+    ...PERSISTENT_COOKIE,
     default: () => "",
   });
 

@@ -3,15 +3,21 @@
 // syncs asynchronously), so a theme switch would be observed late by other
 // consumers. Server-side stays per-request: the module-level cache must
 // never cross requests, so the SSR branch hands out fresh refs.
+import { PERSISTENT_COOKIE } from "~/utils/cookies";
+
 let themeCookie: Ref<string> | null = null;
 let accentCookie: Ref<string> | null = null;
 let syncStarted = false;
 
 function getThemeCookie(): Ref<string> {
-  if (!import.meta.client) return useCookie<string>("theme", { default: () => DEFAULT_THEME });
+  if (!import.meta.client)
+    return useCookie<string>("theme", { ...PERSISTENT_COOKIE, default: () => DEFAULT_THEME });
   if (!themeCookie) {
     themeCookie = inSessionScope(() => {
-      const cookie = useCookie<string>("theme", { default: () => DEFAULT_THEME });
+      const cookie = useCookie<string>("theme", {
+        ...PERSISTENT_COOKIE,
+        default: () => DEFAULT_THEME,
+      });
       // Normalize once on first use — rewrites garbage/legacy values.
       cookie.value = sanitizeTheme(cookie.value);
       return cookie;
@@ -21,10 +27,14 @@ function getThemeCookie(): Ref<string> {
 }
 
 function getAccentCookie(): Ref<string> {
-  if (!import.meta.client) return useCookie<string>("accent", { default: () => DEFAULT_ACCENT });
+  if (!import.meta.client)
+    return useCookie<string>("accent", { ...PERSISTENT_COOKIE, default: () => DEFAULT_ACCENT });
   if (!accentCookie) {
     accentCookie = inSessionScope(() => {
-      const cookie = useCookie<string>("accent", { default: () => DEFAULT_ACCENT });
+      const cookie = useCookie<string>("accent", {
+        ...PERSISTENT_COOKIE,
+        default: () => DEFAULT_ACCENT,
+      });
       cookie.value = sanitizeAccent(cookie.value);
       return cookie;
     });

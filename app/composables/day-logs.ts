@@ -1,4 +1,5 @@
 import { useMealFoods, hasUnsavedMealFoods } from "~/composables/meal-foods";
+import { PERSISTENT_COOKIE } from "~/utils/cookies";
 import {
   ALL_KEY,
   STORAGE_PREFIX,
@@ -52,11 +53,17 @@ let currentDateRef: Ref<string> | null = null;
 // per-request: the module-level cache must never cross requests.
 export function useCurrentDateCookie(): Ref<string> {
   if (!import.meta.client) {
-    return useCookie<string>("current-date", { default: () => getTodayString() });
+    return useCookie<string>("current-date", {
+      ...PERSISTENT_COOKIE,
+      default: () => getTodayString(),
+    });
   }
   if (!currentDateRef) {
     currentDateRef = inSessionScope(() =>
-      useCookie<string>("current-date", { default: () => getTodayString() }),
+      useCookie<string>("current-date", {
+        ...PERSISTENT_COOKIE,
+        default: () => getTodayString(),
+      }),
     );
   }
   return currentDateRef;
