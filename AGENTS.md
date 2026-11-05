@@ -166,6 +166,8 @@ Run the backfill with `pnpm exec tsx scripts/backfill-name-key.ts [--remote] [--
 - **Current date** — `current-date` cookie
 - **BMR form** — `bmr` cookie (object: `IBmrForm`)
 - **Theme / accent / player name** — `theme`, `accent`, `player-name` cookies (small scalars, fine as cookies)
+- **Cookie lifetime** — every `useCookie` call that stores a preference must spread `PERSISTENT_COOKIE` (`~/utils/cookies.ts`, one year + `sameSite: "lax"`). Nuxt's default is a **session** cookie, i.e. memory-only: in the Android WebView the whole diet profile vanished with the app process, and in Chrome it vanished at exit unless session restore was on. `theme`/`accent` have to stay cookies because the inline head script in `nuxt.config.ts` reads them before first paint; the rest are cookies only because they are tiny. The legacy `foods-*` cookie in `migrateMealFoods` is the one exception — it is deleted on the pass that reads it
+- **Save-on-exit** — `app/pages/index.vue` flushes the open day on `beforeunload`, `pagehide` _and_ `visibilitychange → hidden`, deduped by a value snapshot. `beforeunload` alone is not enough: Android kills the WebView process without firing it, which left the day-log snapshot (charts, backup exports) behind the meals that live in localStorage
 - **Backup** — `app/utils/backup.ts` (pure) + `useDataBackup()`; one JSON file with day logs, meals, custom foods, profile and theme. Delivery is tiered (share sheet → WebView clipboard → anchor download) because `<a download>` does nothing inside Capacitor. Import merges day logs by `updatedAt` instead of replacing, so an old file cannot delete days logged since
 - **Migration** — legacy per-date keys (`maxhp-day-log:YYYY-MM-DD`) are folded into the single `all` key and deleted (idempotent, once per session); the merge decision is pure logic in `~/utils/day-log-migration.ts` (unit-tested). The one-time cookie-data migration is flagged via `maxhp-migrated`, the cookie→localStorage meal move via `maxhp-meals-migrated` (`planMealMigration`, unit-tested). Page load runs `migrateMealFoods()` **before** `migrateUnsavedMeals()`, otherwise an upgrading browser saves four blank rows over its own foods
 
@@ -252,7 +254,7 @@ The keystore is machine-local and **never committed**: `android/keystore.propert
 
 - Losing the keystore makes every future build a _different app_ to Android: it cannot be installed over the old one, and updating means uninstalling first, which wipes the user's localStorage.
 - `versionCode` must increase on every release; `versionName` is the human label. Both live in `android/app/build.gradle`.
-- `pnpm run apk:release v1.0.0` (`scripts/release-apk.sh`) regenerates the SPA, builds the signed APK, and attaches `MaxHP-<version>.apk` to a GitHub release with `gh`. Distribution is sideload-only — no Play Store, no CI workflow, no signing secret in GitHub.
+- `pnpm run apk:release v1.0.0` (`scripts/release-apk.sh`) regenerates the SPA, builds the signed APK, and attaches `MaxHP-<version>.apk` to a GitHub release with `gh`. Release notes come from `--notes "<text>"`, `--notes-file <path>` or `RELEASE_NOTES`; the sideload instructions are appended, and re-running a tag replaces the asset and refreshes the notes. Distribution is sideload-only — no Play Store, no CI workflow, no signing secret in GitHub.
 
 ### Icon and splash
 
