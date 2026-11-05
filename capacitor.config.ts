@@ -42,8 +42,7 @@ const config: CapacitorConfig = {
       launchShowDuration: 3000,
     },
     StatusBar: {
-      // Light icons for a dark app; set again at runtime by the shell plugin.
-      style: "LIGHT",
+      style: "DARK",
       backgroundColor: "#080808",
     },
   },

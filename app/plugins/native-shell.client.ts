@@ -52,10 +52,16 @@ const closeTopOverlay = (): boolean => {
 export default defineNuxtPlugin((nuxtApp) => {
   if (!isNativeShell()) return;
 
-  // Light icons on the app's dark background. Android 15+ draws the status bar
-  // itself (edge-to-edge is enforced), so this is the appearance call only —
-  // `setBackgroundColor` is a no-op there and is deliberately not called.
-  void StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+  // Light icons on the app's dark background. Note the inversion: Capacitor
+  // names `Style` after the *background*, so `Style.Dark` means "light text for
+  // dark backgrounds" and `Style.Light` would paint the clock and battery dark
+  // — invisible on our #080808. Android implements it as
+  // `setAppearanceLightStatusBars(style !== "DARK")`.
+  //
+  // Android 15+ draws the status bar itself (edge-to-edge is enforced), so this
+  // is the appearance call only — `setBackgroundColor` is a no-op there and is
+  // deliberately not called.
+  void StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
 
   // Hide the splash once the app has actually painted. The config's
   // `launchAutoHide` is the safety net if this never runs.

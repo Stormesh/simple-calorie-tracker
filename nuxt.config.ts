@@ -61,6 +61,23 @@ export default defineNuxtConfig({
   icon: {
     serverBundle: "local",
   },
+  // The app is dark by design: `bg-gaming-gradient`, glass surfaces, the HP bar.
+  // Nuxt UI's color mode defaults to `preference: "system"`, which in a light-mode
+  // browser or Android system theme drops the `dark` class and flips every Nuxt UI
+  // component (modals, inputs, toasts) to its light palette on top of that
+  // gradient — washed-out surfaces and unreadable borders. Pin it to dark.
+  colorMode: {
+    preference: "dark",
+    fallback: "dark",
+  },
+  // No image transforms. `@nuxt/image` defaults to the IPX provider, which builds
+  // `/_ipx/...` URLs answered by Nitro at request time — the APK is a static SPA
+  // with no server, so every `<NuxtImg>` (header logo, HP heart) 404s there while
+  // plain `<img>` elements keep working. `none` emits the original path, which is
+  // what both the web and the WebView can serve from `public/`.
+  image: {
+    provider: "none",
+  },
   nitro: isMobile
     ? {
         // Static SPA: there is no server inside the binary, which is also why no

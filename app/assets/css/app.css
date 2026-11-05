@@ -217,6 +217,14 @@ body {
   --app-header-h: calc(4rem + env(safe-area-inset-top, 0px));
 }
 
+/* Native UI that the browser paints itself — scrollbars, autofill, date and
+   file pickers, the text-selection caret in inputs — follows `color-scheme`,
+   not our Tailwind colours. Without this the app is dark but those widgets
+   render on a white chrome, which reads as "light mode leaking through". */
+html {
+  color-scheme: dark;
+}
+
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
