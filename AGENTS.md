@@ -254,7 +254,7 @@ The keystore is machine-local and **never committed**: `android/keystore.propert
 
 - Losing the keystore makes every future build a _different app_ to Android: it cannot be installed over the old one, and updating means uninstalling first, which wipes the user's localStorage.
 - `versionCode` must increase on every release; `versionName` is the human label. Both live in `android/app/build.gradle`.
-- `pnpm run apk:release v1.0.0` (`scripts/release-apk.sh`) regenerates the SPA, builds the signed APK, and attaches `MaxHP-<version>.apk` to a GitHub release with `gh`. Release notes come from `--notes "<text>"`, `--notes-file <path>` or `RELEASE_NOTES`; the sideload instructions are appended, and re-running a tag replaces the asset and refreshes the notes. Distribution is sideload-only — no Play Store, no CI workflow, no signing secret in GitHub.
+- `pnpm run apk:release v1.0.0` (`scripts/release-apk.sh`) regenerates the SPA, builds the signed APK, and attaches `MaxHP-<version>.apk` to a GitHub release with `gh`. Release notes come from `--notes "<text>"`, `--notes-file <path>` or `RELEASE_NOTES`, and are kept in `release-notes/<tag>.md`; the sideload instructions are appended, and re-running a tag replaces the asset and refreshes the notes. Distribution is sideload-only — no Play Store, no CI workflow, no signing secret in GitHub.
 
 ### Icon and splash
 

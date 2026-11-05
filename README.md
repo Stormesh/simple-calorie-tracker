@@ -201,12 +201,10 @@ EOF
 Then bump `versionCode` (an integer that must always increase) and `versionName` in `android/app/build.gradle`, commit, and publish:
 
 ```bash
-pnpm run apk:release v1.0.0                          # default notes
-pnpm run apk:release v1.0.0 --notes "Fixes icons"    # inline notes
-pnpm run apk:release v1.0.0 --notes-file notes.md    # markdown from a file
+pnpm run apk:release v1.0.1 --notes-file release-notes/v1.0.1.md
 ```
 
-That regenerates the SPA, builds the signed APK and attaches `MaxHP-<version>.apk` to a GitHub release via `gh`. The install instructions are appended to whatever notes you pass; re-running the same tag replaces the APK and refreshes the notes. Nothing is pushed; the release is the only network write, and the tag is created server-side at the remote default branch — push first so it points at the commit you built.
+Release notes live in `release-notes/<tag>.md`; `--notes "<text>"` and the `RELEASE_NOTES` environment variable work too. That regenerates the SPA, builds the signed APK and attaches `MaxHP-<version>.apk` to a GitHub release via `gh`. The install instructions are appended to whatever notes you pass; re-running the same tag replaces the APK and refreshes the notes. Nothing is pushed; the release is the only network write, and the tag is created server-side at the remote default branch — push first so it points at the commit you built.
 
 ### What the shell changes
 
