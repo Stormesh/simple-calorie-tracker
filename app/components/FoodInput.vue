@@ -82,7 +82,9 @@ const {
         <Icon name="mdi:food-apple" size="1.2rem" class="text-gaming-500 shrink-0" />
         <span class="text-sm font-medium text-white truncate">{{ foodName }}</span>
       </div>
-      <div class="flex items-center px-3 border-l border-gaming-800/30 gap-2">
+      <div
+        class="flex flex-col md:flex-row items-center px-3 border-l border-gaming-800/30 gap-0.5 md:gap-2 py-1.5 md:py-0"
+      >
         <span class="text-xs font-bold text-gaming-400 font-mono"
           >{{ Math.round(calories) }}<span class="text-gaming-600">kcal</span></span
         >
